@@ -56,12 +56,7 @@ function civi_booking_get_rooms(){
 
 function civi_booking_find_contacts($type = 'Clinician'){
 	require_once 'api/api.php';
-	$results = civicrm_api("Contact", "get", array ('version' => '3',
-											'sequential' =>'1',
-											'contact_type' =>'Individual',
-											'contact_sub_type' => $type , 
-											'rowCount' =>'0'
-											));
+	$results = civicrm_api("Contact", "get", array ('version' => '3','sequential' =>'1', 'contact_type' =>'Individual', 'contact_sub_type' => $type , 'rowCount' =>'0'));
 							
 	$contacts = array();
 	foreach($results['values'] as $contact){
