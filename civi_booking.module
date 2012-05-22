@@ -30,11 +30,7 @@ function civi_booking_create_slot($slot) {
     watchdog_exception('type', $e);
   }
 }
-
-  // $txn goes out of scope here.  Unless the transaction was rolled back, it
-  // gets automatically comm
-
-
+ 
 function civi_booking_get_rooms(){
 	$query = "SELECT id, room_no, floor
 			FROM civi_booking_room
@@ -72,9 +68,6 @@ function civi_booking_find_contacts($type = 'Clinician'){
 		$contacts[$id]['display_name'] = CRM_Utils_Array::value('display_name',$contact);		
 	} 
 	return $contacts;
-	
-
-
 }
 
 /**
@@ -165,9 +158,6 @@ function create_slot_form($form, &$form_state) {
   	$timeOptions[$time] = date('g:i', $time); 
     //$times[$key] = date('g:i', $time); 
   }
-
-  //print '<pre>'. print_r($times).'</pre>'; 
- 
 
   $form['start_time'] = array(
     '#title' => t('Start time'),
@@ -283,6 +273,11 @@ function create_time_range($start, $end, $by='30 mins') {
     $times[] = $start_time; 
     return $times; 
 } 
+
+
+function dump($array){
+	print '<pre>'. print_r($array).'</pre>'; 
+}
 
 
 
