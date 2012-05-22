@@ -1,0 +1,134 @@
+
+<?php
+/**
+* Author Erawat Chamanont
+*
+*/
+
+function civi_booking_install(){}
+
+/*
+function civi_booking_uninstall() {
+  db_query('DROP TABLE {civi_booking_room}');
+  db_query('DROP TABLE {civi_booking_session_type}');
+  db_query('DROP TABLE {civi_booking_temp_unavailable}');
+  db_query('DROP TABLE {civi_booking_slot}');
+
+  db_query("DELETE FROM {variable} WHERE name LIKE '%civi_booking%'");
+  db_query("DELETE FROM {blocks} WHERE module = '%s'", 'civi_booking');
+  system_rebuild_module_data();
+}
+*/
+
+/*
+function civi_booking_schema() {
+
+  $schema['civi_booking_room'] = array(
+  'description' => 'Stores room for appointment',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "The room id.",
+      ),
+      'room' => array(
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'description' => "The room no.",
+      ),
+      'floor' => array(
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'description' => "The floor that the room is located.",
+      ),
+    ),
+    'primary key' => array('id'),
+    'unique keys' => array(
+      'room_no' => array('room_no'),
+    ),     
+  );
+
+  $schema['civi_booking_session_type'] = array(
+  'description' => 'Stores session type of slot in the booking system',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "The session type id",
+      ),
+      'session_name' => array(
+        'type' => 'varchar',
+        'not null' => TRUE,
+        'description' => "The session name ",
+      ),      
+    ),
+    'primary key' => array('id'),    
+  );
+
+  $schema['civi_booking_slot'] = array(
+  'description' => 'Stores booking slot',
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "The Slot id (Auto incrementing field)",
+      ),
+      'contact_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "The CiviCRM contact id",
+      ),
+      'room_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "The room id.",
+      ),
+      'session_type_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "The session type id.",
+      ),
+      'day_of_week' => array(
+        'type' => 'init', 
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => "The day of week for a lot ( 0 - 7 )  e.g 0 for Sunday",
+      ),
+      'start_time' => array(
+        'mysql_type' => 'TIME',
+        'not null' => TRUE,
+        'description' => "The slot start time.",
+      ),
+      'end_time' => array(
+        ' mysql_type' => 'TIME',
+        'not null' => TRUE,
+        'description' => "The slot end time.",
+      ),
+    ),    
+    'primary key' => array('id'),
+    //Not implemented in D7 yet. Have them  for reference
+    'foreign keys' => array(
+        'room_id' => array(
+            'table' => 'civi_booking_room',
+            'columns' => array('room_id' => 'id'),
+        ),
+        'session_type_id' => array(
+            'table' => 'civi_booking_session_type',
+            'columns' => array('session_type_id' => 'id'),
+        ),        
+    ),
+  );
+  
+  return $schema;
+
+}
+*/
+
+
+

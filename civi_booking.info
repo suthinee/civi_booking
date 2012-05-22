@@ -1,0 +1,6 @@
+name = CiviCRM Online Booking
+description = A Custom booking module for CiviCRM 
+core = 7.x
+version = 0.1-dev
+package = CiviCRM
+dependencies[] = civicrm

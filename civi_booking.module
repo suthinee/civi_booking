@@ -1,0 +1,291 @@
+<?php
+/**
+ * Author @erawat.
+ */
+
+function civi_booking_create_slot($slot) {
+   // The transaction opens here.
+  $txn = db_transaction();
+
+  try {
+    $id = db_insert('civi_booking_slot')
+      ->fields(array(
+        'contact_id' => $slot['contact_id'],
+        'room_id' => $slot['room_id'],
+        'start_time' => date('g:i', $slot['start_time']),
+        'end_time' => date('g:i', $slot['end_time']),
+        'day_of_week' => $slot['day_of_week'],
+        'session_type' => $slot['session_type'],
+        'status	' => $slot['status'],
+        'created_by' => $slot['created_by'],
+
+      ))
+      ->execute();
+    return $id;
+  }
+  catch (Exception $e) {
+    // Something went wrong somewhere, so roll back now.
+    $txn->rollback();
+    // Log the exception to watchdog.
+    watchdog_exception('type', $e);
+  }
+}
+
+  // $txn goes out of scope here.  Unless the transaction was rolled back, it
+  // gets automatically comm
+
+
+function civi_booking_get_rooms(){
+	$query = "SELECT id, room_no, floor
+			FROM civi_booking_room
+			WHERE is_active = 1";
+	civicrm_initialize( );
+	require_once('CRM/Core/DAO.php');	
+	$dao = CRM_Core_DAO::executeQuery( $query );
+	$results = array ();
+	while ( $dao->fetch( ) ) {
+	    $results[] = $dao->toArray();          
+	}
+
+	$rooms = array();
+	foreach($results as $room){
+		$id = CRM_Utils_Array::value('id',$room);
+		$rooms[$id]['id'] = CRM_Utils_Array::value('id',$room);		
+		$rooms[$id]['room_no'] = CRM_Utils_Array::value('room_no',$room);		
+		$rooms[$id]['floor'] = CRM_Utils_Array::value('floor',$room);		
+	} 
+	return $rooms;
+
+}
+
+function civi_booking_find_contacts($type = 'Clinician'){
+	require_once 'api/api.php';
+	$results = civicrm_api("Contact","get", array ('version' => '3',
+												   'sequential' =>'1',
+												   'contact_type' =>'Individual',
+												   'contact_sub_type' => $type , 
+												   'rowCount' =>'0'));
+	$contacts = array();
+	foreach($results['values'] as $contact){
+		$id = CRM_Utils_Array::value('contact_id',$contact);	
+		$contacts[$id]['contact_id'] = CRM_Utils_Array::value('id',$contact);		
+		$contacts[$id]['display_name'] = CRM_Utils_Array::value('display_name',$contact);		
+	} 
+	return $contacts;
+	
+
+
+}
+
+/**
+ * Implements hook_menu().
+ */
+function civi_booking_menu() {
+   $items['booking/create-slot'] = array(
+    'title' => 'Create a slot',
+    'page callback'    => 'drupal_get_form',
+    'page arguments'   => array('create_appointment_form'),
+    'access arguments' => array('access content'),
+  );
+  return $items;
+}
+
+
+
+/**
+ * Implements hook_theme().
+ *
+ * Defines the theming capabilities provided by this module.
+ *
+function civi_booking_theme() {
+  return array(   
+    'create_slot_form'  => array(
+      'render element' => 'form',
+      // In this one the rendering will be done by a tpl.php file instead of
+      // being rendered by a function, so we specify a template.
+      'template' => 'create-slot',
+    ),     
+  ); 
+}
+*/
+
+/**
+ * A create apponintment form.
+ *
+ * This form will be rendered by theme('form') (theme_form() by default)
+ * because we do not provide a theme function for it here.
+ */
+function create_slot_form($form, &$form_state) {
+  $dayOfWeek = array(
+    NULL => t('Select day of week'),
+    '1' => t('Monday'),
+    '2' => t('Tuesday'),
+    '3' => t('Wednesday'),
+    '4' => t('Thursday'),
+    '5' => t('Friday'),
+  );
+
+  $roomOptions = array( NULL => t('Select a room'));
+  $rooms =  civi_booking_get_rooms();
+  foreach($rooms as $room){
+  	$roomOptions[$room['id']] = $room['room_no'];
+  } 
+
+
+  $counsellorOptions = array( NULL => t('Select counsellor'));
+  $counsellors =  civi_booking_find_contacts();
+  foreach($counsellors as $counsellor){
+  	$counsellorOptions[$counsellor['contact_id']] = $counsellor['display_name'];
+  } 
+   
+  $form['room_id'] = array(
+    '#title' => t('Room'),
+    '#type' => 'select',
+    '#options' => $roomOptions,
+  );
+  $form['contact_id'] = array(
+    '#title' => t('Counsellor'),
+    '#type' => 'select',
+    '#options' => $counsellorOptions,
+  );  
+  $form['day_of_week'] = array(
+    '#title' => t('Day of week'),
+    '#type' => 'select',
+    '#options' => $dayOfWeek,
+  );  
+
+  // create array of time ranges 
+  $times = create_time_range('9:30', '17:30', '30 mins'); 
+
+  $timeOptions = array(
+  	NULL => t('Select time')
+  );
+  // format the unix timestamps 
+  foreach ($times as $key => $time) { 
+  	$timeOptions[$time] = date('g:i', $time); 
+    //$times[$key] = date('g:i', $time); 
+  }
+
+  //print '<pre>'. print_r($times).'</pre>'; 
+ 
+
+  $form['start_time'] = array(
+    '#title' => t('Start time'),
+    '#type' => 'select',
+    '#options' => $timeOptions,
+
+  ); 
+  $form['end_time'] = array(
+    '#title' => t('End time'),
+    '#type' => 'select',
+    '#options' => $timeOptions,
+  ); 
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Create appointment'),
+  );
+  
+  return $form;
+}
+
+/**
+ * A project landing form submit.
+ *
+*/
+function create_slot_form_submit($form, &$form_state) {
+  $roomId = $form_state['values']['room_id'];  
+  $contactId = $form_state['values']['contact_id']; 
+  $dayOfWeek = $form_state['values']['day_of_week'];  
+  $startTime = $form_state['values']['start_time']; 
+  $endTime = $form_state['values']['end_time'];  
+
+  $slot = array(
+  	 'contact_id' => $contactId,
+     'room_id' => $roomId,
+     'start_time' => $startTime,
+     'end_time' => $endTime,
+     'day_of_week' => $dayOfWeek,
+     'session_type' => 1,
+     'status' => 0,
+     'created_by' => 1,
+  );
+
+  $id = civi_booking_create_slot($slot);
+  if(isset($id)){
+  	drupal_set_message('The slot has been created', 'status');
+
+  }else{
+  	drupal_set_message('The system cannot create slot', 'error');
+  }
+ 
+}
+
+function create_slot_form_validate($form, &$form_state) {
+  // Validation logic.
+}
+
+/**
+ * Implements template_preprocess() to add information to the
+ * template_preprocess_project_landing_form();
+ *
+
+
+function template_preprocess_create_slot_form(&$variables) {	
+  $variables['text_form_content'] = array();
+  $text_form_hidden = array();  
+
+  // Provide variables named after form keys so theme can output each element independently.
+  
+  foreach (element_children($variables['form']) as $key) {
+    $type = $variables['form'][$key]['#type'];
+    if ($type == 'hidden' || $type == 'token') {
+      $text_form_hidden[] = drupal_render($variables['form'][$key]);
+    }
+    else {
+      $variables['text_form_content'][$key] = drupal_render($variables['form'][$key]);
+    }
+  }
+  
+ // Hidden form elements have no value in the theme. No need for separation.
+  $variables['text_form_content']['hidden'] = implode($text_form_hidden);
+   
+  // Collect all form elements to make it easier to print the whole form.
+  $variables['text_form'] = implode($variables['text_form_content']);
+
+}
+ */
+
+
+
+/** 
+ * create_time_range  
+ *  
+ * @param mixed $start start time, e.g., 9:30am or 9:30 
+ * @param mixed $end   end time, e.g., 5:30pm or 17:30 
+ * @param string $by   1 hour, 1 mins, 1 secs, etc. 
+ * @access public 
+ * @return void 
+ */ 
+function create_time_range($start, $end, $by='30 mins') { 
+
+    $start_time = strtotime($start); 
+    $end_time   = strtotime($end); 
+
+    $current    = time(); 
+    $add_time   = strtotime('+'.$by, $current); 
+    $diff       = $add_time-$current; 
+
+    $times = array(); 
+    while ($start_time < $end_time) { 
+        $times[] = $start_time; 
+        $start_time += $diff; 
+    } 
+    $times[] = $start_time; 
+    return $times; 
+} 
+
+
+
+
+
+
