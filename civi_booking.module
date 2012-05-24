@@ -2,6 +2,35 @@
 /**
  * Author @erawat.
  */
+  /* @erawat hacked */
+function find_slot($id = 0, $status = 0, $sessionType = null){
+  if($id == 0){
+    $idSQL = 'civi_booking_slot.id IS NOT NULL ';
+  }else{
+    $idSQL = 'civi_booking_slot.id = ' . $id;
+  }
+  $params = array( 1 => array( $status, 'Integer'));
+  $query = "SELECT
+              civi_booking_slot.id as id, 
+              civi_booking_slot.start_time as start_time,
+              civi_booking_slot.end_time as end_time, 
+              civi_booking_slot.slot_date as slot_date,
+              civi_booking_room.room_no as room_no,
+              civicrm_contact.display_name as display_name
+            FROM civi_booking_slot 
+            LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.id
+            LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
+            WHERE {$idSQL} AND civi_booking_slot.status = %1";
+  require_once('CRM/Core/DAO.php');   
+  $dao = CRM_Core_DAO::executeQuery( $query, $params );
+  $results = array ();
+    while ( $dao->fetch( ) ) {
+      $results[] = $dao->toArray();   
+   }
+  
+  return $results;
+       
+}
 
 function civi_booking_create_slot($slot) {
    // The transaction opens here.
@@ -12,9 +41,9 @@ function civi_booking_create_slot($slot) {
       ->fields(array(
         'contact_id' => $slot['contact_id'],
         'room_id' => $slot['room_id'],
-        'start_time' => date('g:i', $slot['start_time']),
-        'end_time' => date('g:i', $slot['end_time']),
-        'day_of_week' => $slot['day_of_week'],
+        'start_time' => $slot['start_time'],
+        'end_time' => $slot['end_time'],
+        'slot_date' => $slot['slot_date'],
         'session_type' => $slot['session_type'],
         'status	' => $slot['status'],
         'created_by' => $slot['created_by'],
@@ -74,7 +103,7 @@ function civi_booking_menu() {
    $items['booking/create-slot'] = array(
     'title' => 'Create a slot',
     'page callback'    => 'drupal_get_form',
-    'page arguments'   => array('create_appointment_form'),
+    'page arguments'   => array('create_slot_form'),
     'access arguments' => array('access content'),
   );
   return $items;
@@ -106,15 +135,6 @@ function civi_booking_theme() {
  * because we do not provide a theme function for it here.
  */
 function create_slot_form($form, &$form_state) {
-  $dayOfWeek = array(
-    NULL => t('Select day of week'),
-    '1' => t('Monday'),
-    '2' => t('Tuesday'),
-    '3' => t('Wednesday'),
-    '4' => t('Thursday'),
-    '5' => t('Friday'),
-  );
-
   $roomOptions = array( NULL => t('Select a room'));
   $rooms =  civi_booking_get_rooms();
   foreach($rooms as $room){
@@ -137,8 +157,35 @@ function create_slot_form($form, &$form_state) {
     '#title' => t('Counsellor'),
     '#type' => 'select',
     '#options' => $counsellorOptions,
+  ); 
+
+  $supplementaryAssessment = CRM_Core_OptionGroup::getValue( 'activity_type', 'Supplementary Assessment' );
+  $initialAssessment = CRM_Core_OptionGroup::getValue( 'activity_type', 'Initial Assessment' );
+  $regularSession = CRM_Core_OptionGroup::getValue( 'activity_type', 'Regular Session' );
+
+  $sesionType =  array(
+    NULL => t('Select session type'),
+    $initialAssessment => t('Initial assessment'),
+    $supplementaryAssessment => t('Supplementary assessment'),
+    $regularSession => t('Regular session'),
   );  
-  $form['day_of_week'] = array(
+
+
+  $form['session_type'] = array(
+    '#title' => t('Session type'),
+    '#type' => 'select',
+    '#options' => $sesionType,
+  );  
+
+  $date = strtotime('next Sunday');
+
+  $dayOfWeek = array(NULL => t('Select day'));
+  for($i = 1; $i <= 5; $i++){
+     $day = strtotime('+'. $i .' day', $date);
+     $dayOfWeek[$day] =  date('l d-m-Y', $day); 
+  }
+
+  $form['slot_date'] = array(
     '#title' => t('Day of week'),
     '#type' => 'select',
     '#options' => $dayOfWeek,
@@ -152,7 +199,7 @@ function create_slot_form($form, &$form_state) {
   );
   // format the unix timestamps 
   foreach ($times as $key => $time) { 
-  	$timeOptions[$time] = date('g:i', $time); 
+  	$timeOptions[$time] = date('G:i', $time); 
     //$times[$key] = date('g:i', $time); 
   }
 
@@ -167,6 +214,9 @@ function create_slot_form($form, &$form_state) {
     '#type' => 'select',
     '#options' => $timeOptions,
   ); 
+
+ 
+
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Create appointment'),
@@ -182,20 +232,29 @@ function create_slot_form($form, &$form_state) {
 function create_slot_form_submit($form, &$form_state) {
   $roomId = $form_state['values']['room_id'];  
   $contactId = $form_state['values']['contact_id']; 
-  $dayOfWeek = $form_state['values']['day_of_week'];  
+  $slotDate = $form_state['values']['slot_date'];  
   $startTime = $form_state['values']['start_time']; 
   $endTime = $form_state['values']['end_time'];  
+  $sessionType = $form_state['values']['session_type'];  
+ // var_dump(date('G:i',$startTime));
+ // var_dump(date('G:i',$endTime));
+ // exit;
 
   $slot = array(
   	 'contact_id' => $contactId,
      'room_id' => $roomId,
-     'start_time' => $startTime,
-     'end_time' => $endTime,
-     'day_of_week' => $dayOfWeek,
-     'session_type' => 1,
+     'start_time' =>  date('G:i',$startTime),
+     'end_time' =>  date('G:i',$endTime),
+     'slot_date' => date('Y-m-d H:i:s',$slotDate),
+     'session_type' => $sessionType,
      'status' => 0,
      'created_by' => 1,
   );
+
+// (CRM_Utils_Date::processDate(date('Y-m-d H:i:s',$slotDate), $startTime ));
+
+   //exit;
+
 
   $id = civi_booking_create_slot($slot);
   if(isset($id)){
@@ -243,6 +302,96 @@ function template_preprocess_create_slot_form(&$variables) {
  */
 
 
+/**
+ * Add functionality to select slots
+ */
+function civi_booking_civicrm_buildForm($formName, &$form) {
+  if ($formName == 'CRM_Case_Form_Activity') {
+    if($form->getAction() == CRM_Core_Action::ADD){
+       
+      $results = find_slot();
+      $slots = array();
+      foreach($results as $slot){
+        $id = CRM_Utils_Array::value('id',$slot);
+
+        $date = new DateTime(CRM_Utils_Array::value('slot_date',$slot));
+
+
+        $slots[$id] = CRM_Utils_Array::value('display_name',$slot) . ', ' . 
+        CRM_Utils_Array::value('room_no',$slot) . ', ' . 
+        date_format($date, 'l d/m/Y' ) . ',' . 
+        date('G:i', strtotime(CRM_Utils_Array::value('start_time',$slot)))  . ' - ' . 
+        date('G:i', strtotime(CRM_Utils_Array::value('end_time',$slot)))  ;  
+
+        //dump(CRM_Utils_Array::value('start_time',$slot)  ); 
+       // dump(CRM_Utils_Array::value('end_time',$slot)  ); 
+
+
+        
+      } 
+
+       //print_r($form);
+       $form->addElement('select', 
+                      'slot_id', 
+                      ts('Avaliable slot'),
+                      $slots;
+                      );
+    }
+   
+  }
+}
+
+
+function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
+  if($objectName == 'Activity'){
+    if($op == 'create'){
+        $slotId = CRM_Utils_Array::value('slot_id',$params);
+        $activityTypeId = CRM_Utils_Array::value('activity_type_id',$params);
+        
+        update_slot(1, $activityTypeId, $slotId);
+
+
+        //$activityDate = CRM_Utils_Array::value('activity_date_time',$params);
+        //$activityTime = CRM_Utils_Array::value('activity_date_time',$params);
+
+
+        $slot = (find_slot($slotId, 1));
+        dump($slot);
+        exit; 
+
+
+       $params['activity_date_time'] = CRM_Utils_Array::value('slot_date',$slot);
+
+
+
+       // $params['activity_date_time'] = CRM_Utils_Date::processDate( $params['activity_date_time'], $params['activity_date_time_time'] );
+
+
+
+    }
+  
+
+
+  }
+}
+
+function update_slot($status, $activityTypeId, $slotId) {
+      
+    $query = "
+UPDATE civi_booking_slot
+SET status = %1,
+    session_type = %2
+WHERE id = %3
+";
+ 
+    $params = array( 1  => array( $status, 'Integer' ),
+                     2  => array( $activityTypeId, 'Integer' ),
+                     3  => array( $slotId, 'Integer' ));
+    CRM_Core_DAO::executeQuery( $query, $params );
+}
+
+
+
 
 /** 
  * create_time_range  
@@ -272,10 +421,10 @@ function create_time_range($start, $end, $by='30 mins') {
 } 
 
 
-function dump($array){
-	print '<pre>'. print_r($array).'</pre>'; 
+function dump($val) {
+    echo '<pre>'.var_export($val,true).'</pre>';
+    return $val;
 }
-
 
 
 
