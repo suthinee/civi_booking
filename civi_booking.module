@@ -258,10 +258,7 @@ function create_slot_form_submit($form, &$form_state) {
   $startTime = $form_state['values']['start_time']; 
   $endTime = $form_state['values']['end_time'];  
   $sessionType = $form_state['values']['session_type'];  
- // var_dump(date('G:i',$startTime));
- // var_dump(date('G:i',$endTime));
- // exit;
-
+ 
   $slot = array(
      'contact_id' => $contactId,
      'room_id' => $roomId,
@@ -272,11 +269,6 @@ function create_slot_form_submit($form, &$form_state) {
      'status' => 0,
      'created_by' => 1,
   );
-
-// (CRM_Utils_Date::processDate(date('Y-m-d H:i:s',$slotDate), $startTime ));
-
-   //exit;
-
 
   $id = civi_booking_create_slot($slot);
   if(isset($id)){
@@ -350,9 +342,7 @@ function civi_booking_civicrm_buildForm($formName, &$form) {
           date('G:i', strtotime(CRM_Utils_Array::value('end_time',$slot)))  ;  
            
         } 
-
-         //print_r($form);
-         $form->addElement('select', 
+        $form->addElement('select', 
                         'slot_id', 
                         ts('Avaliable slot'),
                         $slots
@@ -416,7 +406,6 @@ WHERE id = %3
                      3  => array( $slotId, 'Integer' ));
     CRM_Core_DAO::executeQuery( $query, $params );
 }
-
 
 
 
