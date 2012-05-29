@@ -1174,36 +1174,7 @@
 
 <script type="text/javascript">
 
-cj(document).ready(function() {
-	var scheduleOptions = {
-		reservationUrlTemplate: "view-reservation.php?rn=[referenceNumber]",
-		summaryPopupUrl: "ajax/respopup.php"
-	}
-	var schedule = new Schedule(scheduleOptions);
-	schedule.initNavigation();
-	schedule.initReservations();
-});
+
 </script>
 
-
-
-<script type="text/javascript">
-cj(function(){
-  cj("#datepicker").datepicker({ 
-		 numberOfMonths: 3,
-		 showButtonPanel: true,
-		 onSelect: dpDateChanged,
-		 dayNames: ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
-		 dayNamesShort: ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
-		 dayNamesMin: ['Su','Mo','Tu','We','Th','Fr','Sa'],
-		 dateFormat: 'mm/dd/yy',
-		 firstDay: 0,
-		 monthNames: ['January','February','March','April','May','June','July','August','September','October','November','December'],
-		 monthNamesShort: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-		 currentText: "Today"
-	  	   });
-
-  
-});
-</script>
 {/literal}
