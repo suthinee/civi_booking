@@ -2,7 +2,7 @@
 <menu>
  <item>
      <path>civicrm/booking/create-slots</path>
-     <!--<title></title> !-->
+     <title>Create slots</title> 
      <page_callback>CRM_Booking_Page_Slot</page_callback>
      <page_type>1</page_type>
      <weight>9000</weight>
