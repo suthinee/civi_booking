@@ -12,6 +12,7 @@ function civi_booking_civicrm_config(&$config) {
   $template =& CRM_Core_Smarty::singleton();
  
   $root = dirname(__FILE__) . DIRECTORY_SEPARATOR;
+
   $template_dir = $root . 'templates';
 
   // Add our template directory to the Smarty templates path
@@ -23,7 +24,7 @@ function civi_booking_civicrm_config(&$config) {
   }
  
   // Also fix php include path
-  $include_path = $root . 'php' . DIRECTORY_SEPARATOR . PATH_SEPARATOR . get_include_path();
+  $include_path = $root . 'src' . DIRECTORY_SEPARATOR . PATH_SEPARATOR . get_include_path();
   set_include_path($include_path);
 }
 
