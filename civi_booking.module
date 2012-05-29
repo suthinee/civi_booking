@@ -2,18 +2,18 @@
 /**
  * Author @erawat.
  */
+
+function civi_booking_init() {
+  drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/calendar.css');
+  drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/schedule.css');
+}
+
 /**
  * Implements hook_civicrm_config()
  * Add's our template directory to the Smarty path so that it finds our
  * templates first.  Also adds our PHP directory to the PHP include path so that
  * it finds our PHP classes and other files first on require or include.
  */
-function civi_booking_init() {
-  drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/calendar.css');
-  drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/schedule.css');
-}
-
-
 function civi_booking_civicrm_config(&$config) {
   $template =& CRM_Core_Smarty::singleton();
  
