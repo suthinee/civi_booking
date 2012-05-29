@@ -159,23 +159,6 @@ function civi_booking_menu() {
 
 
 /**
- * Implements hook_theme().
- *
- * Defines the theming capabilities provided by this module.
- *
-function civi_booking_theme() {
-  return array(   
-    'create_slot_form'  => array(
-      'render element' => 'form',
-      // In this one the rendering will be done by a tpl.php file instead of
-      // being rendered by a function, so we specify a template.
-      'template' => 'create-slot',
-    ),     
-  ); 
-}
-*/
-
-/**
  * A create apponintment form.
  *
  * This form will be rendered by theme('form') (theme_form() by default)
@@ -308,38 +291,6 @@ function create_slot_form_submit($form, &$form_state) {
 function create_slot_form_validate($form, &$form_state) {
   // Validation logic.
 }
-
-/**
- * Implements template_preprocess() to add information to the
- * template_preprocess_project_landing_form();
- *
-
-
-function template_preprocess_create_slot_form(&$variables) {  
-  $variables['text_form_content'] = array();
-  $text_form_hidden = array();  
-
-  // Provide variables named after form keys so theme can output each element independently.
-  
-  foreach (element_children($variables['form']) as $key) {
-    $type = $variables['form'][$key]['#type'];
-    if ($type == 'hidden' || $type == 'token') {
-      $text_form_hidden[] = drupal_render($variables['form'][$key]);
-    }
-    else {
-      $variables['text_form_content'][$key] = drupal_render($variables['form'][$key]);
-    }
-  }
-  
- // Hidden form elements have no value in the theme. No need for separation.
-  $variables['text_form_content']['hidden'] = implode($text_form_hidden);
-   
-  // Collect all form elements to make it easier to print the whole form.
-  $variables['text_form'] = implode($variables['text_form_content']);
-
-}
- */
-
 
 /**
  * Add functionality to select slots
