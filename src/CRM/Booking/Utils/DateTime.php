@@ -17,7 +17,7 @@ class CRM_Booking_Utils_DateTime{
    * @access public 
    * @return void 
    */ 
-    static function createTimeRange($start, $end, $by='30 mins') { 
+  static function createTimeRange($start, $end, $by='30 mins') { 
 
       $start_time = strtotime($start); 
       $end_time   = strtotime($end); 
@@ -34,6 +34,19 @@ class CRM_Booking_Utils_DateTime{
       $times[] = $start_time; 
       return $times; 
   } 
+
+
+  static function getDayOfNextWeek(){
+
+    $date = strtotime('next Sunday');
+
+    $dayOfWeek = array(NULL => t('Select day'));
+    for($i = 0; $i <= 6; $i++){
+       $day = strtotime('+'. $i .' day', $date);
+       $dayOfWeek[$day] =  date('l d-m-Y', $day); 
+    }
+    return $dayOfWeek;
+  }
 
 }
      
