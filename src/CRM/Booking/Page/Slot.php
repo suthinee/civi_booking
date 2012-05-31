@@ -1,17 +1,9 @@
 <?php
 
-/**
- *
- * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
- * $Id$
- *
- */
-
 require_once 'CRM/Core/Page.php';
 
 /**
- * Event Info Page - Summmary about the event
+ * Slot page
  */
 class CRM_Booking_Page_Slot extends CRM_Core_Page{
 
