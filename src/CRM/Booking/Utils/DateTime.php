@@ -36,14 +36,14 @@ class CRM_Booking_Utils_DateTime{
   } 
 
 
-  static function getDayOfNextWeek(){
+  static function getDaysOfNextWeek(){
 
     $date = strtotime('next Sunday');
 
-    $dayOfWeek = array(NULL => t('Select day'));
+    $dayOfWeek = array();
     for($i = 0; $i <= 6; $i++){
        $day = strtotime('+'. $i .' day', $date);
-       $dayOfWeek[$day] =  date('l d-m-Y', $day); 
+       $dayOfWeek[$day] =  date('l d/m/Y', $day); 
     }
     return $dayOfWeek;
   }
