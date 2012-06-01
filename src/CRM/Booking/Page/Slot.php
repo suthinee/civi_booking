@@ -37,11 +37,12 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         $daysOfNextweek = CRM_Booking_Utils_DateTime::getDaysOfNextweek();
         $this->assign('daysOfNextweek',$daysOfNextweek);
 
-        $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('9:30', '17:30', '30 mins');
+        $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '10 mins');
         $timeOptions = array();
         foreach ($timeRange as $key => $time) { 
             $timeOptions[$time] = date('G:i', $time); 
         }
+
         $this->assign('timeOptions',$timeOptions);
 
         $this->assign('startDate',array_shift(array_values($daysOfNextweek)));
@@ -64,16 +65,35 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
        $initialAssessment = CRM_Core_OptionGroup::getValue( 'activity_type', 'Initial Assessment' );
        $regularSession = CRM_Core_OptionGroup::getValue( 'activity_type', 'Regular Session' );
 
-       $sessionType =  array(
-          NULL => t('Select session type'),
+       $activityTypes =  array(
+          NULL => t('Select Activity type'),
           $initialAssessment => t('Initial assessment'),
           $supplementaryAssessment => t('Supplementary assessment'),
           $regularSession => t('Regular session'),
         );  
 
 
-        $this->assign('sessionType', $sessionType);
-          
+        $this->assign('activityTypes', $activityTypes);
+
+        //TODO: Create BAO for getting these values to avoid five queries
+       $psychotherapy = CRM_Core_OptionGroup::getValue( 'service_20120221114757', 'Psychotherapy' );
+       $psychosexual = CRM_Core_OptionGroup::getValue( 'service_20120221114757', 'Psychosexual' );
+       $parentingTogeter = CRM_Core_OptionGroup::getValue( 'service_20120221114757', 'Parenting Together' );
+       $wellbeing = CRM_Core_OptionGroup::getValue( 'service_20120221114757', 'Wellbeing' );
+       $dsu = CRM_Core_OptionGroup::getValue( 'service_20120221114757', 'DSU' );
+
+       $sessionServices =  array(
+          NULL => t('Select Session service'),
+          $psychotherapy => t('Psychotherapy'),
+          $psychosexual => t('Psychosexual'),
+          $parentingTogeter => t('Parenting Together'),
+          $wellbeing => t('Wellbeing'),
+          $dsu => t('DSU'),
+        ); 
+
+        $this->assign('sessionServices', $sessionServices);
+
+      
         return parent::run();
         
     }
