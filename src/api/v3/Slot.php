@@ -37,17 +37,59 @@
 
 
 function civicrm_api3_slot_create( $params ){
-    echo 'test';
-	exit; 
-    //return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+
+	$contactId = $params['contact_id'];	
+	$roomNo = $params['room_no'];	
+	$date = date('Y-m-d H:i:s',$params['date']);	
+	$startTime = date('G:i',$params['start_time']);	
+	$endTime = date('G:i',$params['end_time']);	
+	$sessionService = $params['session_service'];	
+	$activityType = $params['activity_type'];
+
+	require_once 'CRM/Booking/BAO/Room.php';
+	$results = CRM_Booking_BAO_Room::getRoomByNo($roomNo);
+
+	$roomId = null;
+	foreach($results as $room){
+	    $roomId = CRM_Utils_Array::value('id',$room);
+	    //break; //break as expected one
+	} 
+    $txn = db_transaction();
+    try{
+	 $id = db_insert('civi_booking_slot')
+      ->fields(array(
+        'contact_id' => $contactId,
+	    'room_id' => $roomId,
+	    'start_time' => $startTime,
+	    'end_time' => $endTime,
+	    'slot_date' => $date,
+	    'session_type' => $activityType,
+	    'status ' => 1,
+	    'created_by' => 102,
+      ))->execute();
+      $slot = array(
+      	'slot_id' => $id,
+ 		'room_id' => $roomId,
+	    'start_time' => $startTime,
+	    'end_time' => $endTime,
+	    'slot_date' => $date,
+      );
+      $value = array($slot);
+      return civicrm_api3_create_success($value,$params,'slot', 'create');
+    }catch (Exception $e){
+      return civicrm_api3_create_error(  $e  );
+    }  
+  
 }
 
 
 function _civicrm_api3_slot_create_spec(&$params){
-  $params['room_id']['api.required'] =1;
+  $params['room_no']['api.required'] =1;
   $params['contact_id']['api.required'] =1;
   $params['date']['api.required'] =1;
   $params['start_time']['api.required'] =1;
-  $params['session_type']['api.required'] =1;
+  $params['end_time']['api.required'] =1;
+  $params['activity_type']['api.required'] =1;
+  $params['session_service']['api.required'] =1;
 
 }
