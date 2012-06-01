@@ -16,3 +16,32 @@
 	font-size: 1em;
 }
 
+.reslabel{
+  -moz-transform: rotate(270deg);
+  -moz-transform-origin: 50% 50%;
+  -webkit-transform: rotate(270deg);
+  -webkit-transform-origin: 50% 50%;
+}
+
+.reservations td {
+	padding: 4px;
+}
+
+.page-civicrm-booking-create-slots table {
+	border: solid #36648B 1px !important;
+}
+
+td.resourcename,
+td.resdate {
+	border: solid #36648B 1px;
+}
+
+
+td.reslabel{
+	border-bottom: solid #36648B 1px;+
+	border-top: solid #36648B 1px;
+}
+td.slot{
+	border-bottom: solid #36648B 1px;+
+}
+
