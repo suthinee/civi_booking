@@ -21,8 +21,8 @@
 <div style="height:10px">&nbsp;</div>
 
 
-{foreach from=$daysOfNextweek item=day}
-<table class="reservations" border="1" cellpadding="0" width="100%">
+{foreach from=$daysOfNextweek key=dayKey item=day}
+<table id={$dayKey} class="reservations" border="0" cellpadding="0" width="100%">
 			<tbody><tr>
 			<td class="resdate">{$day}</td>
 				{$timeRange}
@@ -36,11 +36,12 @@
 						<tr class="slots">
 							<td class="resourcename">{$v}</td>
 							{foreach from=$timeOptions key=k item=time}
-					        	<td colspan="1" class="reservable slot">
+					        	<td colspan="1" class="reservable slot {$k}">
 					        		<div class='time hide'>{$k}</div>
 							       	<div class='roomNo hide'>{$v}</div>
 							       	<div class='roomId hide'></div>
 							       	<div class='date hide'>{$day}</div>
+							       	<div class='unixDate hide'>{$dayKey}</div>
 					        	</td>
 							{/foreach}								
 			   			</tr>
@@ -55,27 +56,26 @@
 {literal}
 
 <script type="text/javascript">
+	var crmajaxURL = '{/literal}{php} print base_path(); {/php}{literal}civicrm/ajax/rest';
+	console.log(crmajaxURL);
+  	var startTime = null;
+    var unixDate = null;
+    var roomNo = null;
 	cj(function() {
 		cj("td.slot").live('click', function(){
-        	var startTime = cj(this).find('div.starTime').text();
-        	var date = cj(this).find('div.date').text();
-        	var room = cj(this).find('div.roomNo').text();
-        	var roomId = cj(this).find('div.roomId').text();
+        	startTime = cj(this).find('div.time').text();
+        	date = cj(this).find('div.date').text();
+        	unixDate = cj(this).find('div.unixDate').text();
+        	roomNo = cj(this).find('div.roomNo').text();
+        	//roomId = cj(this).find('div.roomId').text();
 
         	cj('#dateHolder').text(date);
-        	cj('#roomNo').text(room);
-			
+        	cj('#roomNo').text(roomNo);
 			cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
-						cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
+			//cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
 
-
-			console.log( cj(this).next().text() );
-
-
-
-
-        	cj( "#slotDialog" ).data('room', room)
-            .dialog('open');   
+        	cj( "#slotDialog" ).data('obj', this)
+        					   .dialog('open');   
 		}).hover(function(){
    			cj(this).css("background","#40d288");
     	},function(){
@@ -86,12 +86,48 @@
 			    autoOpen: false,
 			    resizable: false,
 			    draggable: false,
-			    height:300,
+			    height:450,
    			    width:300,
 			    modal: true,
 			    buttons: {
 			    	'Create a slot': function() {
-            			alert('slot has been created');
+			    		var contactId = cj('select[name="counsellor"]').val();    // get the value from a dropdown select
+			    		var startTime = cj('select[name="startSelect"]').val(); 
+			    		var endTime = cj('select[name="endSelect"]').val(); 
+			    		var sessionService = cj('select[name="sessionService"]').val(); 
+			    		var activityType = cj('select[name="activityType"]').val(); 
+			    		
+			 		    		
+			    	    cj().crmAPI ('slot','create',{'version' :'3', 
+			    	    							  'sequential' :'1',
+			    	    							  'contact_id' : contactId, 
+			    	    							  'date' : unixDate, 
+			    	    							  'start_time' : startTime, 
+			    	    							  'end_time' : endTime, 
+			    	    							  'session_service' :sessionService, 
+			    	    							  'room_no' : roomNo, 
+			    	    							  'activity_type' : activityType},{
+				           ajaxURL: crmajaxURL,
+				           success:function (data){ 
+				            if(data.count != 0){
+				              cj.each(data.values, function(key, value) {
+				           		//console.log(cj(this).data());
+				           		//console.log(cj(this).data());
+				              	//cj(this).data('obj').removeClass("reservable").addClass("reserved");
+
+				              	//value.slot_id
+				              	//value.start_time
+				              	//value.end_time
+				              	//value.slot_date
+
+				           		//cj(this).dialog('close');
+
+				              });
+				            }  
+				          }
+				        });
+				         
+
         			},
 			        Cancel: function() {
 			            cj(this).dialog('close');
@@ -105,7 +141,6 @@
 
 <div id="slotDialog" title="Create a slot" class="ui-dialog-content ui-widget-content">
 	<form>
-			<input type="hidden" value="">
 			<ul>
 				<li>
 					<span class="label_text">Date: </span>
@@ -117,33 +152,40 @@
 					<span id="roomId"class="hide"></span> 
 				</li>
 				<li>
-					<label for="startSelect">Start Time: </label>
-					<select id="startSelect" name="startSelect">
+					<label for="startSelect" >Start Time: </label>
+					<select id="startSelect"  disabled="disabled" name="startSelect">
 						<option value="">Select Start time</option>
 						{foreach from=$timeOptions key=k item=time}
 							<option value="{$k}">{$time}</option>
 						{/foreach}					
 					</select>
 				</li>
-				<!--
 				<li>
-					<label for="end">End Time: </label>
-					<select name="end">
-						<option value="">Select End Time</option>
+					<label for="endSelect">End Time: </label>
+					<select id="endSelect" name="endSelect">
+						<option value="">Select End time</option>
 						{foreach from=$timeOptions key=k item=time}
 							<option value="{$k}">{$time}</option>
-						{/foreach}
+						{/foreach}					
 					</select>
 				</li>
-				-->
 				<li>
-					<label for="sessionType">Session type: </label>
-					<select name="sessionType">
-						{foreach from=$sessionType key=k item=session}
-							<option value="{$k}">{$session}</option>
+					<label for="activityType">Activity type: </label>
+					<select id="activitySelect" name="activityType">
+						{foreach from=$activityTypes key=k item=activityType}
+							<option value="{$k}">{$activityType}</option>
 						{/foreach}		
 					</select>
 				</li>
+				<li>
+					<label for="sessionService">Session service: </label>
+					<select id="sessionSelect" name="sessionService">
+						{foreach from=$sessionServices key=k item=sessionService}
+							<option value="{$k}">{$sessionService}</option>
+						{/foreach}		
+					</select>
+				</li>
+				
 				<li>
 					<label for="counsellor">Counsellor: </label>
 					<select id="counsellor" name="counsellor">
