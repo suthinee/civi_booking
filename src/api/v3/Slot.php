@@ -117,7 +117,7 @@ function civicrm_api3_slot_get( $params ){
 
       	$events[] = array( 
          'id' => $slot['id'], 
-         'title' => t('Room no: ') . $slot['room_no'] . ', ' . 'Service : ' . $slot['session_service'], 
+         'title' => t('Room no: ') . $slot['room_no'], 
          'start' => $start->format('Y-m-d H:i:s'), 
          'end' => $end->format('Y-m-d H:i:s'),
          'allDay' => false,
