@@ -40,9 +40,9 @@ function civicrm_api3_slot_create( $params ){
 
 	$contactId = $params['contact_id'];	
 	$roomNo = $params['room_no'];	
-	$date = date('Y-m-d H:i:s',$params['date']);	
-	$startTime = date('G:i',$params['start_time']);	
-	$endTime = date('G:i',$params['end_time']);	
+	$date = $params['date'];	
+	$startTime = $params['start_time'];	
+	$endTime = $params['end_time'];	
 	$sessionService = $params['session_service'];	
 	$activityType = $params['activity_type'];
 
@@ -60,19 +60,29 @@ function civicrm_api3_slot_create( $params ){
       ->fields(array(
         'contact_id' => $contactId,
 	    'room_id' => $roomId,
-	    'start_time' => $startTime,
-	    'end_time' => $endTime,
-	    'slot_date' => $date,
+	    'start_time' => date('G:i',$startTime),
+	    'end_time' => date('G:i',$endTime),
+	    'slot_date' => date('Y-m-d H:i:s',$date),
 	    'session_type' => $activityType,
 	    'status ' => 1,
 	    'created_by' => 102,
       ))->execute();
+
+      require_once 'CRM/Booking/Utils/DateTime.php';
+      //get start/end time range
+      $timeRange = CRM_Booking_Utils_DateTime::createTimeRange(date('G:i', $startTime), date('G:i',$endTime), '10 mins');
+      $timeOptions = array();
+      foreach ($timeRange as $key => $time) { 
+        $timeOptions[] =$time; 
+      }
+
       $slot = array(
       	'slot_id' => $id,
- 		'room_id' => $roomId,
+ 		'room_no' => $roomNo,
 	    'start_time' => $startTime,
 	    'end_time' => $endTime,
 	    'slot_date' => $date,
+	    'time_range' => $timeOptions
       );
       $value = array($slot);
       return civicrm_api3_create_success($value,$params,'slot', 'create');
