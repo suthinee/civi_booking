@@ -15,7 +15,7 @@
 <!-- <div class="legend reserved mine">My Reservation</div>-->
 <!-- <div class="legend reserved pending">Pending</div> -->
 <div class="legend pasttime">Past</div>
-<div class="legend restricted">Restricted</div>
+<!-- <div class="legend restricted">Restricted</div> -->
 </div>
 
 <div style="height:10px">&nbsp;</div>
