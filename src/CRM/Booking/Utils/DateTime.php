@@ -43,7 +43,9 @@ class CRM_Booking_Utils_DateTime{
     $dayOfWeek = array();
     for($i = 0; $i <= 6; $i++){
        $day = strtotime('+'. $i .' day', $date);
-       $dayOfWeek[$day] =  date('l d/m/Y', $day); 
+       //$dayOfWeek[$day] =  date('l d/m/Y', $day);
+       $dayOfWeek[$day] =  $day; 
+ 
     }
     return $dayOfWeek;
   }
