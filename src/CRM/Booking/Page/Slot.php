@@ -21,7 +21,61 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
     function run() {
 
         require_once 'CRM/Booking/BAO/Room.php';
+        require_once 'CRM/Booking/BAO/Slot.php';
         require_once 'CRM/Booking/Utils/DateTime.php';
+
+       
+        $daysOfNextweek = CRM_Booking_Utils_DateTime::getDaysOfNextweek();
+
+        $days = array();
+        foreach ($daysOfNextweek as $k => $day) {
+            $days[$k] =  date('l d/m/Y', $day);
+        }       
+
+        $this->assign('daysOfNextweek',$days);
+
+
+        $startDate = array_shift(array_values($daysOfNextweek));
+        $endDate = end($daysOfNextweek);
+
+        $slots = CRM_Booking_BAO_Slot::getSlotByDate(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate));
+
+        //dump($slots);
+
+        $classNames = array();
+
+        //convert slot to use strtotime 
+        foreach($slots as $k => $slot){
+
+            $timeRange = CRM_Booking_Utils_DateTime::createTimeRange($slot['start_time'], $slot['end_time'], '10 mins');
+            $timeOptions = array();
+            foreach ($timeRange as $key => $time) { 
+                $timeOptions[] =$time; 
+                $classNames[] = strtotime($slot['slot_date']) . $slot['room_no'] . $time;
+            }
+            dump($slot['start_time']);
+            $slots[$k]['time_range'] = $timeOptions; //add time range options
+            $slots[$k]['start_time'] = strtotime($slot['start_time']);
+            $slots[$k]['end_time'] = strtotime($slot['end_time']);
+            $slots[$k]['slot_date'] = strtotime($slot['slot_date']);
+         }
+
+         //dump($slots);
+         //dump($classNames);
+         $this->assign('reservedSlots',$classNames);
+
+
+
+        $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '10 mins');
+        $timeOptions = array();
+        foreach ($timeRange as $key => $time) { 
+            $timeOptions[$time] = date('G:i', $time); 
+        }
+
+        $this->assign('timeOptions',$timeOptions);
+
+        $this->assign('startDate',array_shift(array_values($days)));
+        $this->assign('endDate', array_pop(array_values($days)));
 
         $results = CRM_Booking_BAO_Room::getRoom();
 
@@ -33,20 +87,6 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
             $rooms[$id]['floor'] = CRM_Utils_Array::value('floor',$room);   
         } 
         $this->assign('rooms',$rooms);
-       
-        $daysOfNextweek = CRM_Booking_Utils_DateTime::getDaysOfNextweek();
-        $this->assign('daysOfNextweek',$daysOfNextweek);
-
-        $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '10 mins');
-        $timeOptions = array();
-        foreach ($timeRange as $key => $time) { 
-            $timeOptions[$time] = date('G:i', $time); 
-        }
-
-        $this->assign('timeOptions',$timeOptions);
-
-        $this->assign('startDate',array_shift(array_values($daysOfNextweek)));
-        $this->assign('endDate', array_pop(array_values($daysOfNextweek)));
 
 
         require_once 'api/api.php';
