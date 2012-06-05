@@ -38,7 +38,7 @@ class CRM_Booking_Utils_DateTime{
 
   static function getDaysOfNextWeek(){
 
-    $date = strtotime('next Sunday');
+    $date = strtotime('next Monday');
 
     $dayOfWeek = array();
     for($i = 0; $i <= 6; $i++){

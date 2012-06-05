@@ -63,7 +63,8 @@ function civicrm_api3_slot_create( $params ){
 	    'start_time' => date('G:i',$startTime),
 	    'end_time' => date('G:i',$endTime),
 	    'slot_date' => date('Y-m-d H:i:s',$date),
-	    'session_type' => $activityType,
+	    'activity_type' => $activityType,
+  	    'session_service' => $sessionService,
 	    'status ' => 1,
 	    'created_by' => 102,
       ))->execute();
@@ -91,6 +92,48 @@ function civicrm_api3_slot_create( $params ){
     }  
   
 }
+
+
+function civicrm_api3_slot_get( $params ){
+
+	$counsellorId = $params['counsellor_id'];	
+	$activityType = $params['activity_type'];	
+
+
+    try{
+      require_once 'Date.php';
+      require_once 'CRM/Booking/BAO/Slot.php';
+      $results = CRM_Booking_BAO_Slot::getSlotByCounsellorId($counsellorId, $activityType);
+
+      //dump($results);
+      $events = array();
+      foreach($results as $slot){
+      	$date = date('Y-m-d', strtotime ($slot['slot_date'])) ;
+      	$startTime = date('g:i',strtotime($slot['start_time']));
+      	$start = new DateTime($date . ' '. $startTime);
+		
+		$endTime = date('g:i',strtotime($slot['end_time']));
+      	$end = new DateTime($date . ' '. $endTime);
+
+      	$events[] = array( 
+         'id' => $slot['id'], 
+         'title' => t('Room no: ') . $slot['room_no'] . ', ' . 'Service : ' . $slot['session_service'], 
+         'start' => $start->format('Y-m-d H:i:s'), 
+         'end' => $end->format('Y-m-d H:i:s'),
+         'allDay' => false,
+         'description' => $slot['session_service']
+
+      	);
+      }
+	 //$json =  json_encode($events);
+    
+      return civicrm_api3_create_success($events,$params,'slot', 'get');
+    }catch (Exception $e){
+      return civicrm_api3_create_error($e);
+    }  
+  
+}
+
 
 
 function _civicrm_api3_slot_create_spec(&$params){
