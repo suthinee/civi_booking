@@ -13,9 +13,10 @@ function civi_booking_init() {
   drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/calendar.css');
   drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/schedule.css');
   drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/fullcalendar.css');
-  drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/fullcalendar.print.css');
+  //drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/fullcalendar.print.css');
 
-  drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/fullcalendar.min.js');
+  drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/fullcalendar.js');
+  drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/date.js');
 
 }
 
@@ -41,7 +42,7 @@ function civi_booking_civicrm_config(&$config) {
 }
 
   /* @erawat hacked */
-function find_slot($id = 0, $status = 0, $sessionType = null){
+function find_slot($id = 0, $status = 1, $sessionType = null){
   if($id == 0){
     $idSQL = 'civi_booking_slot.id IS NOT NULL ';
   }else{
@@ -53,6 +54,7 @@ function find_slot($id = 0, $status = 0, $sessionType = null){
               civi_booking_slot.start_time as start_time,
               civi_booking_slot.end_time as end_time, 
               civi_booking_slot.slot_date as slot_date,
+              civi_booking_slot.session_service as session_service,
               civi_booking_room.room_no as room_no,
               civicrm_contact.id as contact_id,
               civicrm_contact.sort_name as sort_name
@@ -318,6 +320,7 @@ function civi_booking_civicrm_buildForm($formName, &$form) {
         $activityTypeId == 51 ||
         $activityTypeId == 52 ){ //Hard code for activity type id should change to check name instead of id
 
+        /*
         $results = find_slot(0,0,$activityTypeId);
         $slots = array();
         foreach($results as $slot){
@@ -331,13 +334,46 @@ function civi_booking_civicrm_buildForm($formName, &$form) {
           date('G:i', strtotime(CRM_Utils_Array::value('start_time',$slot)))  . ' - ' . 
           date('G:i', strtotime(CRM_Utils_Array::value('end_time',$slot)))  ;  
            
+        } */
+        /*
+        require_once 'CRM/Booking/BAO/Room.php';
+        $results = CRM_Booking_BAO_Room::getRoom();
+
+        $rooms = array(NULL => '- Select -');
+
+        foreach($results as $room){
+            $id = CRM_Utils_Array::value('id',$room);
+            $rooms[$id] = CRM_Utils_Array::value('room_no',$room);   
         } 
+
         $form->addElement('select', 
+                        'room_id', 
+                        ts('Rooms'),
+                        $rooms);
+        */
+        $counsellorOptions = array( NULL => t('Select counsellor'));
+        $counsellors =  civi_booking_find_contacts();
+        foreach($counsellors as $counsellor){
+          $counsellorOptions[$counsellor['contact_id']] = $counsellor['display_name'];
+        } 
+         $form->addElement('select', 
+                        'consellor_id', 
+                        ts('Counsellor'),
+                        $counsellorOptions);   
+      
+        $form->addElement('text', 
                         'slot_id', 
-                        ts('Avaliable slot'),
-                        $slots
-                        );
-       }
+                        ts('Slot'),
+                        array('size' => 5));
+        
+        //Hacked adding activity_type_id for jQuery 
+        $form->addElement('text', 
+                        'activity_type', 
+                        ts('Activity type'));       
+       
+       $defaults['activity_type'] =   $activityTypeId;
+       $form->setDefaults($defaults); 
+      }
     }
    
   }
@@ -352,10 +388,16 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
         if($activityTypeId == 50 || 
           $activityTypeId == 51 ||
           $activityTypeId == 52 ){  
-          update_slot(1, $activityTypeId, $slotId);
 
-          $results = find_slot($slotId, 1);
+          $slotId = CRM_Utils_Array::value('slot_id',$params);
+        
+
+          update_slot(2, $slotId); //update slot status
+
+          $results = find_slot($slotId, 2);
           $slot = $results[0];
+
+        
 
 
           $startTime = (CRM_Utils_Array::value('start_time',$slot)); 
@@ -379,9 +421,15 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
           $params['custom_34_-1'] = $slotId;
           $params['custom']['34']['-1']['value'] = $slotId;
 
-          //dump($slot);
+          //TODO: add session service
+           //hacked adding session service for custom field'
+          $params['custom_16_-1'] =  CRM_Utils_Array::value('session_service',$slot);;
+          $params['custom']['16']['-1']['value'] =  CRM_Utils_Array::value('session_service',$slot);;
 
-          $assignContactIds = array(0 => CRM_Utils_Array::value('contact_id',$slot));
+          //($params);
+          //exit;
+
+          //$assignContactIds = array(0 => CRM_Utils_Array::value('contact_id',$slot));
 
           // $params['assignee_contact_id'] = $assignContactIds;
 
@@ -393,18 +441,16 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
 }
 
 
-function update_slot($status, $activityTypeId, $slotId) {
+function update_slot($status, $slotId) {
       
     $query = "
 UPDATE civi_booking_slot
-SET status = %1,
-    session_type = %2
-WHERE id = %3
+SET status = %1    
+WHERE id = %2
 ";
  
     $params = array( 1  => array( $status, 'Integer' ),
-                     2  => array( $activityTypeId, 'Integer' ),
-                     3  => array( $slotId, 'Integer' ));
+                     2  => array( $slotId, 'Integer' ));
     CRM_Core_DAO::executeQuery( $query, $params );
 }
 
