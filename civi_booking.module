@@ -12,6 +12,11 @@ function civi_booking_init() {
   drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/booking.css');
   drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/calendar.css');
   drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/schedule.css');
+  drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/fullcalendar.css');
+  drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/fullcalendar.print.css');
+
+  drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/fullcalendar.min.js');
+
 }
 
 
