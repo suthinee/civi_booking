@@ -53,7 +53,6 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                 $timeOptions[] =$time; 
                 $classNames[] = strtotime($slot['slot_date']) . $slot['room_no'] . $time;
             }
-            dump($slot['start_time']);
             $slots[$k]['time_range'] = $timeOptions; //add time range options
             $slots[$k]['start_time'] = strtotime($slot['start_time']);
             $slots[$k]['end_time'] = strtotime($slot['end_time']);
