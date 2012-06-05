@@ -38,7 +38,11 @@
 							{foreach from=$timeOptions key=timeKey item=time}
 								{assign var=dayAndRoom value="$dayKey"|cat:$v}
     							{assign var=classId value="$dayAndRoom"|cat:$timeKey}
-					        	<td colspan="1" class="reservable slot {$classId}">
+					        	{if in_array($classId, $reservedSlots)} 
+					        		<td colspan="1" class="reserved slot {$classId}">
+					        	{else}
+						        	<td colspan="1" class="reservable slot {$classId}">
+					        	{/if}
 					        		<div class='time hide'>{$timeKey}</div>
 							       	<div class='roomNo hide'>{$v}</div>
 							       	<div class='roomId hide'></div>
@@ -125,17 +129,6 @@
 						        var selectedRoom = value.room_no;
 	        
 						        var timeRange = value.time_range;
-
-						        /*
-
-						        console.log(slotId);
-						        console.log(selectedStartTime);
-						        console.log(selectedEndTime);
-						        console.log(selectedDate);
-						        console.log(selectedRoom);
-
- 					        	console.log(timeRange);
- 					        	*/
 						        
 						        for(time in timeRange){
 						        	cj('.' + selectedDate + selectedRoom+ timeRange[time]).removeClass("reservable").addClass("reserved");
