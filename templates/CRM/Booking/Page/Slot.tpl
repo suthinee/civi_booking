@@ -35,9 +35,11 @@
 					{if $k eq 'room_no'}
 						<tr class="slots">
 							<td class="resourcename">{$v}</td>
-							{foreach from=$timeOptions key=k item=time}
-					        	<td colspan="1" class="reservable slot {$k}">
-					        		<div class='time hide'>{$k}</div>
+							{foreach from=$timeOptions key=timeKey item=time}
+								{assign var=dayAndRoom value="$dayKey"|cat:$v}
+    							{assign var=classId value="$dayAndRoom"|cat:$timeKey}
+					        	<td colspan="1" class="reservable slot {$classId}">
+					        		<div class='time hide'>{$timeKey}</div>
 							       	<div class='roomNo hide'>{$v}</div>
 							       	<div class='roomId hide'></div>
 							       	<div class='date hide'>{$day}</div>
@@ -57,29 +59,34 @@
 
 <script type="text/javascript">
 	var crmajaxURL = '{/literal}{php} print base_path(); {/php}{literal}civicrm/ajax/rest';
-	console.log(crmajaxURL);
   	var startTime = null;
     var unixDate = null;
     var roomNo = null;
 	cj(function() {
 		cj("td.slot").live('click', function(){
-        	startTime = cj(this).find('div.time').text();
-        	date = cj(this).find('div.date').text();
-        	unixDate = cj(this).find('div.unixDate').text();
-        	roomNo = cj(this).find('div.roomNo').text();
-        	//roomId = cj(this).find('div.roomId').text();
+			if(cj(this).hasClass('reservable')){
+	        	startTime = cj(this).find('div.time').text();
+	        	date = cj(this).find('div.date').text();
+	        	unixDate = cj(this).find('div.unixDate').text();
+	        	roomNo = cj(this).find('div.roomNo').text();
+	        	//roomId = cj(this).find('div.roomId').text();
 
-        	cj('#dateHolder').text(date);
-        	cj('#roomNo').text(roomNo);
-			cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
-			//cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
+	        	cj('#dateHolder').text(date);
+	        	cj('#roomNo').text(roomNo);
+				cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
+				//cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
 
-        	cj( "#slotDialog" ).data('obj', this)
-        					   .dialog('open');   
+	        	cj( "#slotDialog" ).data('obj', cj(this))
+	        					   .dialog('open');   
+        	}
 		}).hover(function(){
-   			cj(this).css("background","#40d288");
+			if(cj(this).hasClass('reservable')){
+   				cj(this).css("background","#40d288");
+   			}
     	},function(){
-		    cj(this).css("background","#ffffff");
+			if(cj(this).hasClass('reservable')){
+			    cj(this).css("background","#ffffff");
+			}
 		});
 		
 		cj( "#slotDialog" ).dialog({
@@ -96,8 +103,7 @@
 			    		var endTime = cj('select[name="endSelect"]').val(); 
 			    		var sessionService = cj('select[name="sessionService"]').val(); 
 			    		var activityType = cj('select[name="activityType"]').val(); 
-			    		
-			 		    		
+ 		
 			    	    cj().crmAPI ('slot','create',{'version' :'3', 
 			    	    							  'sequential' :'1',
 			    	    							  'contact_id' : contactId, 
@@ -111,23 +117,35 @@
 				           success:function (data){ 
 				            if(data.count != 0){
 				              cj.each(data.values, function(key, value) {
-				           		//console.log(cj(this).data());
-				           		//console.log(cj(this).data());
-				              	//cj(this).data('obj').removeClass("reservable").addClass("reserved");
+				           		
+					    		var slotId = value.slot_id;
+						        var selectedStartTime = value.start_time;
+						        var selectedEndTime = value.end_time;
+						        var selectedDate = value.slot_date;
+						        var selectedRoom = value.room_no;
+	        
+						        var timeRange = value.time_range;
 
-				              	//value.slot_id
-				              	//value.start_time
-				              	//value.end_time
-				              	//value.slot_date
+						        /*
 
-				           		//cj(this).dialog('close');
+						        console.log(slotId);
+						        console.log(selectedStartTime);
+						        console.log(selectedEndTime);
+						        console.log(selectedDate);
+						        console.log(selectedRoom);
 
+ 					        	console.log(timeRange);
+ 					        	*/
+						        
+						        for(time in timeRange){
+						        	cj('.' + selectedDate + selectedRoom+ timeRange[time]).removeClass("reservable").addClass("reserved");
+		    				    }
+    				            cj("#slotDialog").dialog('close');
+    				            return;
 				              });
 				            }  
 				          }
 				        });
-				         
-
         			},
 			        Cancel: function() {
 			            cj(this).dialog('close');
