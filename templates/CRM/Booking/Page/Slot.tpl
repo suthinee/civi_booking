@@ -10,7 +10,7 @@
 
 <div style="text-align: center; margin: auto;">
 <div class="legend reservable">Reservable</div>
-<div class="legend unreservable">Unreservable</div>
+<!--<div class="legend unreservable">Unreservable</div>-->
 <div class="legend reserved">Reserved</div>
 <!-- <div class="legend reserved mine">My Reservation</div>-->
 <!-- <div class="legend reserved pending">Pending</div> -->
