@@ -66,7 +66,7 @@
   	var startTime = null;
     var unixDate = null;
     var roomNo = null;
-	cj(function() {
+	cj(window).load(function(){
 		cj("td.slot").live('click', function(){
 			if(cj(this).hasClass('reservable')){
 	        	startTime = cj(this).find('div.time').text();
@@ -146,6 +146,7 @@
 			    }});
 
 		});
+
 </script>
 
 {/literal}
