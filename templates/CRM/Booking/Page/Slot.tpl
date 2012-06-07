@@ -2,9 +2,11 @@
 <div id="content">
 <div>
 	<div class="schedule_title">
+
 	</div>
 	<div class="schedule_dates">
-		{$startDate} - {$endDate}
+		<a href="{$lastWeekUrl}" ><span class="arrow-left">&nbsp;&nbsp;&nbsp;</span></a>
+		 {$startDate} - {$endDate}<a href="{$nextWeekUrl}"><span class="arrow-right">&nbsp;&nbsp;&nbsp;</span></a>
 	</div>
 </div>
 
@@ -21,38 +23,30 @@
 <div style="height:10px">&nbsp;</div>
 
 
-{foreach from=$daysOfNextweek key=dayKey item=day}
+{foreach from=$slots key=dayKey item=day}
 <table id={$dayKey} class="reservations" border="0" cellpadding="0" width="100%">
-			<tbody><tr>
-			<td class="resdate">{$day}</td>
-				{$timeRange}
-				{foreach from=$timeOptions item=time}
-					<td class="reslabel">{$time}</td>
-				{/foreach}				
-			</tr>
-			{foreach from=$rooms item=room}
-				{foreach from=$room key=k item=v}
-					{if $k eq 'room_no'}
-						<tr class="slots">
-							<td class="resourcename">{$v}</td>
-							{foreach from=$timeOptions key=timeKey item=time}
-								{assign var=dayAndRoom value="$dayKey"|cat:$v}
-    							{assign var=classId value="$dayAndRoom"|cat:$timeKey}
-					        	{if in_array($classId, $reservedSlots)} 
-					        		<td colspan="1" class="reserved slot {$classId}">
-					        	{else}
-						        	<td colspan="1" class="reservable slot {$classId}">
-					        	{/if}
-					        		<div class='time hide'>{$timeKey}</div>
-							       	<div class='roomNo hide'>{$v}</div>
-							       	<div class='roomId hide'></div>
-							       	<div class='date hide'>{$day}</div>
-							       	<div class='unixDate hide'>{$dayKey}</div>
-					        	</td>
-							{/foreach}								
-			   			</tr>
-					{/if}  
-				{/foreach}
+	<tbody>
+		<tr>
+			<td class="resdate">{$day.date}</td>
+			{foreach from=$day.timeOptions item=time}
+			<td class="reslabel">{$time}</td>
+			{/foreach}				
+		</tr>
+			{foreach from=$day.rooms key=roomKey item=room}
+				<tr class="slots">
+					<td class="resourcename">{$room.room_no}</td>
+					{foreach from=$room.tdVals key=key item=value}
+		        	<td id="{$value.tdataId}" colspan="1" class="slot {$value.className}">
+			        	<div style="display:none">
+			        	<span class='time'>{$value.timeKey}</span>
+						<span class='roomNo'>{$room.room_no}</span>
+						<span class='roomId'>{$roomKey}</span>
+						<span class='date'>{$day.date}</span>
+						<span class='unixDate'>{$dayKey}</span>
+						</div>
+					</td>	
+					{/foreach}								
+	  			</tr>
 			{/foreach}
 						
 	</tbody>
@@ -69,10 +63,10 @@
 	cj(window).load(function(){
 		cj("td.slot").live('click', function(){
 			if(cj(this).hasClass('reservable')){
-	        	startTime = cj(this).find('div.time').text();
-	        	date = cj(this).find('div.date').text();
-	        	unixDate = cj(this).find('div.unixDate').text();
-	        	roomNo = cj(this).find('div.roomNo').text();
+	        	startTime = cj(this).find('span.time').text();
+	        	date = cj(this).find('span.date').text();
+	        	unixDate = cj(this).find('span.unixDate').text();
+	        	roomNo = cj(this).find('span.roomNo').text();
 	        	//roomId = cj(this).find('div.roomId').text();
 
 	        	cj('#dateHolder').text(date);
@@ -129,9 +123,18 @@
 						        var selectedRoom = value.room_no;
 	        
 						        var timeRange = value.time_range;
+
+						        console.log(slotId);
+   						        console.log(selectedStartTime);
+						        console.log(selectedEndTime);
+						        console.log(selectedDate);
+						        console.log(selectedRoom);
+
 						        
 						        for(time in timeRange){
-						        	cj('.' + selectedDate + selectedRoom+ timeRange[time]).removeClass("reservable").addClass("reserved");
+						        	var elementId = '#' + selectedDate + selectedRoom + timeRange[time];
+						        	console.log(elementId);
+						        	cj(elementId).removeClass("reservable").addClass("reserved");
 		    				    }
     				            cj("#slotDialog").dialog('close');
     				            return;
