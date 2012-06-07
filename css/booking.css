@@ -1,5 +1,6 @@
-.hide{ display: none;}
 .label_text{font-weight: bold;}
+
+
 
 #slotDialog form ul {
 	padding: 0.3em;
@@ -43,5 +44,17 @@ td.reslabel{
 }
 td.slot{
 	border-bottom: solid #36648B 1px;+
+}
+
+.arrow-left {
+	background-image: url("../img/arrow_large_left.png");
+	background-repeat:no-repeat;
+	background-position:center; 
+}
+
+
+.arrow-right {
+	background-image: url("../img/arrow_large_right.png");
+	background-repeat:no-repeat;
 }
 
