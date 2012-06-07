@@ -36,12 +36,16 @@ class CRM_Booking_Utils_DateTime{
   } 
 
 
-  static function getDaysOfNextWeek(){
+  static function getWeeklyCalendar($startDate = null){
 
-    $date = strtotime('next Monday');
+    if(is_null($startDate)){
+      $date = strtotime('next Monday');
+    }else{
+      $date = $startDate;
+    }
 
     $dayOfWeek = array();
-    for($i = 0; $i <= 6; $i++){
+    for($i = 0; $i <= 5; $i++){
        $day = strtotime('+'. $i .' day', $date);
        //$dayOfWeek[$day] =  date('l d/m/Y', $day);
        $dayOfWeek[$day] =  $day; 
