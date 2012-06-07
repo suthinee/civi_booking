@@ -78,12 +78,12 @@ function civicrm_api3_slot_create( $params ){
       }
 
       $slot = array(
-      	'slot_id' => $id,
- 		'room_no' => $roomNo,
-	    'start_time' => $startTime,
-	    'end_time' => $endTime,
-	    'slot_date' => $date,
-	    'time_range' => $timeOptions
+       'slot_id' => $id,
+ 		   'room_no' => $roomNo,
+	     'start_time' => $startTime,
+	     'end_time' => $endTime,
+	     'slot_date' =>  date('d-m-Y', $date),
+	     'time_range' => $timeOptions
       );
       $value = array($slot);
       return civicrm_api3_create_success($value,$params,'slot', 'create');
