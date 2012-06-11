@@ -41,7 +41,7 @@ function civi_booking_civicrm_config(&$config) {
   set_include_path($include_path);
 }
 
-  /* @erawat hacked */
+  /* @erawat hacked  
 function find_slot($id = 0, $status = 1, $sessionType = null){
   if($id == 0){
     $idSQL = 'civi_booking_slot.id IS NOT NULL ';
@@ -73,240 +73,7 @@ function find_slot($id = 0, $status = 1, $sessionType = null){
        
 }
 
-function civi_booking_create_slot($slot) {
-   // The transaction opens here.
-  $txn = db_transaction();
-
-  try {
-    $id = db_insert('civi_booking_slot')
-      ->fields(array(
-        'contact_id' => $slot['contact_id'],
-        'room_id' => $slot['room_id'],
-        'start_time' => $slot['start_time'],
-        'end_time' => $slot['end_time'],
-        'slot_date' => $slot['slot_date'],
-        'session_type' => $slot['session_type'],
-        'status ' => $slot['status'],
-        'created_by' => $slot['created_by'],
-
-      ))
-      ->execute();
-    return $id;
-  }
-  catch (Exception $e) {
-    // Something went wrong somewhere, so roll back now.
-    $txn->rollback();
-    // Log the exception to watchdog.
-    watchdog_exception('type', $e);
-  }
-}
-
-function civi_booking_create_slot_activity($slot) {
-   // The transaction opens here.
-  $txn = db_transaction();
-
-  try {
-    $id = db_insert('civi_booking_slot_activity')
-      ->fields(array(
-        'slot_id' => $slot['contact_id'],
-        'activity_id' => $slot['room_id'],       
-      ))
-      ->execute();
-    return $id;
-  }
-  catch (Exception $e) {
-    // Something went wrong somewhere, so roll back now.
-    $txn->rollback();
-    // Log the exception to watchdog.
-    watchdog_exception('type', $e);
-  }
-}
-
- 
-function civi_booking_get_rooms(){
-  $query = "SELECT id, room_no, floor
-      FROM civi_booking_room
-      WHERE is_active = 1";
-  civicrm_initialize( );
-  require_once('CRM/Core/DAO.php'); 
-  $dao = CRM_Core_DAO::executeQuery( $query );
-  $results = array ();
-  while ( $dao->fetch( ) ) {
-      $results[] = $dao->toArray();          
-  }
-
-  $rooms = array();
-  foreach($results as $room){
-    $id = CRM_Utils_Array::value('id',$room);
-    $rooms[$id]['id'] = CRM_Utils_Array::value('id',$room);   
-    $rooms[$id]['room_no'] = CRM_Utils_Array::value('room_no',$room);   
-    $rooms[$id]['floor'] = CRM_Utils_Array::value('floor',$room);   
-  } 
-  return $rooms;
-
-}
-
-function civi_booking_find_contacts($type = 'Clinician'){
-  require_once 'api/api.php';
-  $results = civicrm_api("Contact", "get", array ('version' => '3','sequential' =>'1', 'contact_type' =>'Individual', 'contact_sub_type' => $type , 'rowCount' =>'0'));
-              
-  $contacts = array();
-  foreach($results['values'] as $contact){
-    $id = CRM_Utils_Array::value('contact_id',$contact);  
-    $contacts[$id]['contact_id'] = CRM_Utils_Array::value('id',$contact);   
-    $contacts[$id]['display_name'] = CRM_Utils_Array::value('display_name',$contact);   
-  } 
-  return $contacts;
-}
-
-/**
- * Implements hook_menu().
- */
-function civi_booking_menu() {
-   $items['booking/create-slot'] = array(
-    'title' => 'Create a slot',
-    'page callback'    => 'drupal_get_form',
-    'page arguments'   => array('create_slot_form'),
-    'access arguments' => array('access CiviCRM'),
-  );
-  return $items;
-}
-
-
-
-/**
- * A create apponintment form.
- *
- * This form will be rendered by theme('form') (theme_form() by default)
- * because we do not provide a theme function for it here.
- */
-function create_slot_form($form, &$form_state) {
-  $roomOptions = array( NULL => t('Select a room'));
-  $rooms =  civi_booking_get_rooms();
-  foreach($rooms as $room){
-    $roomOptions[$room['id']] = $room['room_no'];
-  } 
-
-
-  $counsellorOptions = array( NULL => t('Select counsellor'));
-  $counsellors =  civi_booking_find_contacts();
-  foreach($counsellors as $counsellor){
-    $counsellorOptions[$counsellor['contact_id']] = $counsellor['display_name'];
-  } 
-   
-  $form['room_id'] = array(
-    '#title' => t('Room'),
-    '#type' => 'select',
-    '#options' => $roomOptions,
-  );
-  $form['contact_id'] = array(
-    '#title' => t('Counsellor'),
-    '#type' => 'select',
-    '#options' => $counsellorOptions,
-  ); 
-
-  $supplementaryAssessment = CRM_Core_OptionGroup::getValue( 'activity_type', 'Supplementary Assessment' );
-  $initialAssessment = CRM_Core_OptionGroup::getValue( 'activity_type', 'Initial Assessment' );
-  $regularSession = CRM_Core_OptionGroup::getValue( 'activity_type', 'Regular Session' );
-
-  $sesionType =  array(
-    NULL => t('Select session type'),
-    $initialAssessment => t('Initial assessment'),
-    $supplementaryAssessment => t('Supplementary assessment'),
-    $regularSession => t('Regular session'),
-  );  
-
-
-  $form['session_type'] = array(
-    '#title' => t('Session type'),
-    '#type' => 'select',
-    '#options' => $sesionType,
-  );  
-
-  $date = strtotime('next Sunday');
-
-  $dayOfWeek = array(NULL => t('Select day'));
-  for($i = 1; $i <= 5; $i++){
-     $day = strtotime('+'. $i .' day', $date);
-     $dayOfWeek[$day] =  date('l d-m-Y', $day); 
-  }
-
-  $form['slot_date'] = array(
-    '#title' => t('Day of week'),
-    '#type' => 'select',
-    '#options' => $dayOfWeek,
-  );  
-
-  // create array of time ranges 
-  $times = create_time_range('9:30', '17:30', '30 mins'); 
-
-  $timeOptions = array(
-    NULL => t('Select time')
-  );
-  // format the unix timestamps 
-  foreach ($times as $key => $time) { 
-    $timeOptions[$time] = date('G:i', $time); 
-    //$times[$key] = date('g:i', $time); 
-  }
-
-  $form['start_time'] = array(
-    '#title' => t('Start time'),
-    '#type' => 'select',
-    '#options' => $timeOptions,
-
-  ); 
-  $form['end_time'] = array(
-    '#title' => t('End time'),
-    '#type' => 'select',
-    '#options' => $timeOptions,
-  ); 
-
- 
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Create appointment'),
-  );
-  
-  return $form;
-}
-
-/**
- * A project landing form submit.
- *
 */
-function create_slot_form_submit($form, &$form_state) {
-  $roomId = $form_state['values']['room_id'];  
-  $contactId = $form_state['values']['contact_id']; 
-  $slotDate = $form_state['values']['slot_date'];  
-  $startTime = $form_state['values']['start_time']; 
-  $endTime = $form_state['values']['end_time'];  
-  $sessionType = $form_state['values']['session_type'];  
- 
-  $slot = array(
-     'contact_id' => $contactId,
-     'room_id' => $roomId,
-     'start_time' =>  date('G:i',$startTime),
-     'end_time' =>  date('G:i',$endTime),
-     'slot_date' => date('Y-m-d H:i:s',$slotDate),
-     'session_type' => $sessionType,
-     'status' => 0,
-     'created_by' => 1,
-  );
-
-  $id = civi_booking_create_slot($slot);
-  if(isset($id)){
-    drupal_set_message('The slot has been created', 'status');
-
-  }else{
-    drupal_set_message('The system cannot create slot', 'error');
-  }
- 
-}
-
-function create_slot_form_validate($form, &$form_state) {
-  // Validation logic.
-}
 
 /**
  * Add functionality to select slots
@@ -320,37 +87,7 @@ function civi_booking_civicrm_buildForm($formName, &$form) {
         $activityTypeId == 51 ||
         $activityTypeId == 52 ){ //Hard code for activity type id should change to check name instead of id
 
-        /*
-        $results = find_slot(0,0,$activityTypeId);
-        $slots = array();
-        foreach($results as $slot){
-          $id = CRM_Utils_Array::value('id',$slot);
 
-          $date = new DateTime(CRM_Utils_Array::value('slot_date',$slot));
-
-          $slots[$id] = CRM_Utils_Array::value('sort_name',$slot) . ', ' . 
-          CRM_Utils_Array::value('room_no',$slot) . ', ' . 
-          date_format($date, 'l d/m/Y' ) . ',' . 
-          date('G:i', strtotime(CRM_Utils_Array::value('start_time',$slot)))  . ' - ' . 
-          date('G:i', strtotime(CRM_Utils_Array::value('end_time',$slot)))  ;  
-           
-        } */
-        /*
-        require_once 'CRM/Booking/BAO/Room.php';
-        $results = CRM_Booking_BAO_Room::getRoom();
-
-        $rooms = array(NULL => '- Select -');
-
-        foreach($results as $room){
-            $id = CRM_Utils_Array::value('id',$room);
-            $rooms[$id] = CRM_Utils_Array::value('room_no',$room);   
-        } 
-
-        $form->addElement('select', 
-                        'room_id', 
-                        ts('Rooms'),
-                        $rooms);
-        */
         $counsellorOptions = array( NULL => t('Select counsellor'));
         $counsellors =  civi_booking_find_contacts();
         foreach($counsellors as $counsellor){
@@ -426,13 +163,7 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
           $params['custom_16_-1'] =  CRM_Utils_Array::value('session_service',$slot);;
           $params['custom']['16']['-1']['value'] =  CRM_Utils_Array::value('session_service',$slot);;
 
-          //($params);
-          //exit;
-
-          //$assignContactIds = array(0 => CRM_Utils_Array::value('contact_id',$slot));
-
-          // $params['assignee_contact_id'] = $assignContactIds;
-
+    
         }
 
 
@@ -534,6 +265,100 @@ function dump($val) {
 }
 
 
+/**
+ * Implements hook_webform_select_options_info().
+ */
+function civi_booking_webform_select_options_info() {
+  $items = array();
+  $items['slots'] = array(
+    'title' => t('Slots'),
+    'options callback' => 'find_slot',
+  );
+  return $items;
+}
+
+function civi_booking_form_alter(&$form, &$form_state, $form_id){
+    if(strstr($form_id, 'webform_client_form_1')){
+
+    }
+}
+
+/**
+ * Modify a Webform submission, prior to saving it in the database.
+ *
+ * @param $node
+ *   The Webform node on which this submission was made.
+ * @param $submission
+ *   The Webform submission that is about to be saved to the database.
+ */
+function civi_booking_webform_submission_presave($node, &$submission) {
+
+}
+
+/**
+ * Respond to a Webform submission being inserted.
+ *
+ * Note that this hook is called after a submission has already been saved to
+ * the database. If needing to modify the submission prior to insertion, use
+ * hook_webform_submission_presave().
+ *
+ * @param $node
+ *   The Webform node on which this submission was made.
+ * @param $submission
+ *   The Webform submission that was just inserted into the database.
+ */
+function civi_booking_webform_submission_insert($node, $submission) {
+  // Insert a record into a 3rd-party module table when a submission is added.
+  /*
+  db_insert('mymodule_table')
+    ->fields(array(
+      'nid' => $node->nid,
+      'sid' => $submission->sid,
+      'foo' => 'foo_data',
+    ))
+    ->execute();
+  */  
+}
+
+
+
+function find_slot(){
+
+  $query = "SELECT
+              civi_booking_slot.id as id, 
+              civi_booking_slot.start_time as start_time,
+              civi_booking_slot.end_time as end_time, 
+              civi_booking_slot.slot_date as slot_date,
+              civi_booking_slot.session_service as session_service,
+              civi_booking_room.room_no as room_no,
+              civicrm_contact.id as contact_id,
+              civicrm_contact.sort_name as sort_name
+            FROM civi_booking_slot 
+            LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.contact_id
+            LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
+            WHERE civi_booking_slot.status = 1";
+  civicrm_initialize( );
+  require_once('CRM/Core/DAO.php');   
+  $dao = CRM_Core_DAO::executeQuery( $query );
+  $results = array ();
+    while ( $dao->fetch( ) ) {
+      $results[] = $dao->toArray();   
+   }
+
+   $slots = array();
+  foreach($results as $slot){
+    $id = CRM_Utils_Array::value('id',$slot);
+    $date = new DateTime(CRM_Utils_Array::value('slot_date',$slot));
+    $slots[$id] = CRM_Utils_Array::value('sort_name',$slot) . ', ' . 
+    CRM_Utils_Array::value('room_no',$slot) . ', ' . 
+    date_format($date, 'l d/m/Y' ) . ',' . 
+    date('G:i', strtotime(CRM_Utils_Array::value('start_time',$slot)))  . ' - ' . 
+    date('G:i', strtotime(CRM_Utils_Array::value('end_time',$slot)))  ;  
+  } 
+  
+  return $slots;
+       
+}
 
 
 
