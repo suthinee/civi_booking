@@ -68,14 +68,17 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
 
 
         $days = array();
+        $rooms = array();
         foreach ($daysOfNextweek as $k => $day) {
             $days[$k]  =  array( 'date' => date('l d/m/Y', $day),
                                  'timeOptions' => $timeOptions);
 
-            $rooms = array();
+            //$rooms = array();
             foreach($roomResults as $room){
                 $roomId = CRM_Utils_Array::value('id',$room);
-                $rooms[$roomId] = array('room_no' => CRM_Utils_Array::value('room_no',$room));  
+                $rooms[$roomId] = array('room_no' => CRM_Utils_Array::value('room_no',$room),
+                                        'room_id' => CRM_Utils_Array::value('id',$room)
+                                        );  
                 $tdVals = array();
                 foreach($timeOptions as $timeKey => $time){
                   $id = date('d-m-Y', $day) . CRM_Utils_Array::value('room_no',$room) .  $timeKey;          
@@ -102,19 +105,13 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         } 
 
         $this->assign('slots',$days);
+        $this->assign('rooms',$rooms);
       
-        //exit;
-
-
         $this->assign('startDate',date('l d/m/Y', $startDate));
         $this->assign('endDate', date('l d/m/Y',  $endDate));
 
-
-
         $lastWeekUrl = CRM_Utils_System::url( 'civicrm/booking/create-slots',
                                   "reset=1&sd=" .strtotime("last Monday" , $startDate));
-        
-
 
         $nextWeekUrl = CRM_Utils_System::url( 'civicrm/booking/create-slots',
                                     "reset=1&sd=" .strtotime("next Monday" , $startDate) );

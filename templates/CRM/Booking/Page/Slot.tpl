@@ -21,7 +21,27 @@
 </div>
 
 <div style="height:10px">&nbsp;</div>
+<form id="filterForm"> 
+	<fieldset>
+	<legend onclick="toggleFieldset(this);">Fillters</legend>	
+	<tabl id="filterTable">
+		<tr>
+			<td>
+				<label for="roomFilter">Room: </label>
+				<select id="roomFilter" name="roomFilter">
+				    <option value="">-- select room --</option>
+				 	{foreach from=$rooms key=k item=r}
+						<option value="{$r.room_id}">{$r.room_no}</option>
+					{/foreach}	
+				</select>
+			</td>
+		</tr>
 
+	</table>
+	
+	</fieldset>
+</form>
+<div style="height:10px">&nbsp;</div>
 
 {foreach from=$slots key=dayKey item=day}
 <table id={$dayKey} class="reservations" border="0" cellpadding="0" width="100%">
@@ -34,7 +54,7 @@
 		</tr>
 			{foreach from=$day.rooms key=roomKey item=room}
 				<tr class="slots">
-					<td class="resourcename">{$room.room_no}</td>
+					<td class="resourcename {$room.room_id}">{$room.room_no}</td>
 					{foreach from=$room.tdVals key=key item=value}
 		        	<td id="{$value.tdataId}" colspan="1" class="slot {$value.className}">
 			        	<div style="display:none">
@@ -61,6 +81,13 @@
     var unixDate = null;
     var roomNo = null;
 	cj(window).load(function(){
+
+		cj("#roomFilter").change(function() {
+			alert('//TODO: Implement filter');
+    		//cj('.resourcename.' + cj(this).val()).hide();
+		});
+
+
 		cj("td.slot").live('click', function(){
 			if(cj(this).hasClass('reservable')){
 	        	startTime = cj(this).find('span.time').text();
@@ -68,7 +95,12 @@
 	        	unixDate = cj(this).find('span.unixDate').text();
 	        	roomNo = cj(this).find('span.roomNo').text();
 	        	//roomId = cj(this).find('div.roomId').text();
-
+	        	/*
+	        	var values = cj(this).map(function() {
+		    		return cj(this).text();
+				}).get();
+				alert(values);
+				*/
 	        	cj('#dateHolder').text(date);
 	        	cj('#roomNo').text(roomNo);
 				cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
@@ -150,8 +182,11 @@
 
 		});
 
-</script>
+	function toggleFieldset(obj){
+		cj('#filterTable').toggle();
+	}
 
+</script>
 {/literal}
 
 <div id="slotDialog" title="Create a slot" class="ui-dialog-content ui-widget-content">
