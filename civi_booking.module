@@ -279,8 +279,13 @@ function civi_booking_webform_select_options_info() {
 
 function civi_booking_form_alter(&$form, &$form_state, $form_id){
     if(strstr($form_id, 'webform_client_form_1')){
-
+      $form['#attached']['js'] = array(
+        drupal_get_path('module', 'civi_booking') . '/js/date.js',
+      );
     }
+
+      drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/webform-signup.js');
+
 }
 
 /**
