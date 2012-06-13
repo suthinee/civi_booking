@@ -96,23 +96,143 @@ function civicrm_api3_slot_create( $params ){
 
 function civicrm_api3_slot_get( $params ){
 
-	$counsellorId = $params['counsellor_id'];	
+	//$counsellorId = $params['counsellor_id'];	
 	$activityType = $params['activity_type'];	
+  $start_date = $params['start_date']; 
+  $end_date = $params['end_date']; 
 
 
-    try{
+   try{
+      $return = array();
       require_once 'Date.php';
       require_once 'CRM/Booking/BAO/Slot.php';
-      $results = CRM_Booking_BAO_Slot::getSlotByCounsellorId($counsellorId, $activityType);
+      require_once 'CRM/Booking/Utils/DateTime.php';
 
-      //dump($results);
+      $results = CRM_Booking_BAO_Slot::getSlots($activityType);
+
+
+      $sd = null;
+      $daysOfNextweek = CRM_Booking_Utils_DateTime::getWeeklyCalendar();
+      if(!is_null($sd)){
+        $daysOfNextweek = CRM_Booking_Utils_DateTime::getWeeklyCalendar($sd);
+      }
+
+      $startDate = array_shift(array_values($daysOfNextweek));
+      $endDate = end($daysOfNextweek);
+
+      $slots = CRM_Booking_BAO_Slot::getSlotByDate(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate));
+
+      $slotTypes = array();
+      $classNames = array();
+        //convert slot to use strtotime 
+      foreach($slots as $k => $slot){
+          $timeRange = CRM_Booking_Utils_DateTime::createTimeRange($slot['start_time'], $slot['end_time'], '10 mins');
+          $timeOptions = array();
+          foreach ($timeRange as $key => $time) { 
+              $timeOptions[] =$time; 
+              $className = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['contact_id'] . $time;
+              $classNames[] = $className;
+              $slotTypes[$className] = $slot['session_service'];
+          }
+      }
+
+      //dump($slotTypes);
+
+
+      $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '10 mins');
+      $timeOptions = array();
+      foreach ($timeRange as $key => $time) { 
+        $timeOptions[$time] = date('G:i', $time); 
+      }
+
+      $results = civicrm_api("Contact","get", array ('version' => '3',
+                          'sequential' =>'1', 
+                          'contact_type' =>'Individual',
+                           'contact_sub_type' => 'Clinician', 
+                          'rowCount' =>'0'));
+
+      $contacts = array();
+      foreach($results['values'] as $contact){
+        $id = CRM_Utils_Array::value('contact_id',$contact);   
+        $contacts[$id]['contact_id'] = CRM_Utils_Array::value('id',$contact); 
+        $contacts[$id]['display_name'] = CRM_Utils_Array::value('display_name',$contact);    
+        $contacts[$id]['sort_name'] = CRM_Utils_Array::value('sort_name',$contact);    
+      } 
+
+        //dump($contacts);
+ 
+        require_once 'CRM/Booking/BAO/Room.php';
+         $roomResults = CRM_Booking_BAO_Room::getRoom();
+
+
+        $days = array();
+        $conts = array();
+        foreach ($daysOfNextweek as $k => $day) {
+            $days[$k]  =  array( 
+                                 'date' => date('l d/m/Y', $day),
+                                 'timeOptions' => $timeOptions);
+
+            foreach($contacts as $contact){
+                $contactId = CRM_Utils_Array::value('contact_id',$contact);
+                $conts[$contactId] = array('display_name' => CRM_Utils_Array::value('display_name',$contact),
+                                        'sort_name' => CRM_Utils_Array::value('sort_name',$contact),
+                                        'conatct_id' => CRM_Utils_Array::value('contact_id',$contact)
+                                        );  
+                $tdVals = array();
+                foreach($timeOptions as $timeKey => $time){
+                  $id = date('d-m-Y', $day) . CRM_Utils_Array::value('contact_id',$contact) .  $timeKey;                            
+                  if (in_array($id, $classNames)) { 
+                    $type = $slotTypes[$id];
+                    $className = null;
+                    switch ($type) {
+                    case 'Counselling':
+                        $className = 'counselling';
+                        break;
+                    case 'Psychotherapy':
+                         $className = 'psychotherapy';
+                         break;
+                    case 'Psychosexual':
+                         $className = 'psychosexual';
+                         break;
+                    case 'Parenting Together':
+                         $className = 'parenting';
+                          break;
+                    case 'Wellbeing':
+                         $className = 'wellbeing';
+                         break;
+                    case 'DSU':
+                         $className = 'dsu';
+                         break;
+                    }               
+                    $tdVals[$id] = array('time' => $time,
+                                       'timeKey' => $timeKey,
+                                       'tdataId' => $id,
+                                       'className' =>  $className );
+                  }else if  ($day < strtotime("now")){
+                    $tdVals[$id] = array('time' => $time,
+                                      'timeKey' => $timeKey,
+                                      'tdataId' => $id,
+                                      'className' => 'pasttime');
+                  }else{
+                    $tdVals[$id] = array('time' => $time,
+                                      'timeKey' => $timeKey,
+                                      'tdataId' => $id,
+                                      'className' => 'reservable');
+                  }
+              }
+              $conts[$contactId]['tdVals'] = $tdVals;
+            }
+            $days[$k]['contacts'] = $conts;
+        } 
+
+      /*
       $events = array();
       foreach($results as $slot){
       	$date = date('Y-m-d', strtotime ($slot['slot_date'])) ;
       	$startTime = date('g:i',strtotime($slot['start_time']));
       	$start = new DateTime($date . ' '. $startTime);
 		
-		$endTime = date('g:i',strtotime($slot['end_time']));
+		    $endTime = date('g:i',strtotime($slot['end_time']));
       	$end = new DateTime($date . ' '. $endTime);
 
       	$events[] = array( 
@@ -120,14 +240,31 @@ function civicrm_api3_slot_get( $params ){
          'title' => t('Room no: ') . $slot['room_no'], 
          'start' => $start->format('Y-m-d H:i:s'), 
          'end' => $end->format('Y-m-d H:i:s'),
-         'allDay' => false,
-         'description' => $slot['session_service']
-
+         'session' => $slot['session_service'],
+         'status' => $slot['status']
       	);
       }
-	 //$json =  json_encode($events);
-    
-      return civicrm_api3_create_success($events,$params,'slot', 'get');
+      */
+      $return['is_error'] = 0;
+      $return['version'] = 3;
+
+      $return['startDate'] = array("strtotime" => $startDate,
+                                 "date" =>  date('l d/m/Y', $startDate));
+      $return['endDate'] = array("strtotime" => $endDate,
+                                  "date" =>  date('l d/m/Y', $endDate));
+      $return['nextWeek'] = strtotime("last Monday" , $startDate);
+      $return['lastWeek'] = strtotime("next Monday" , $startDate);
+
+      $return['days'] = $days;
+
+      //  dump(json_encode($return));
+      //return json_encode($return);
+      //$json = json_encode($return);
+      //require_once 'CRM/Utils/JSON.php';
+
+      //return CRM_Utils_JSON::encode($json);
+      return $return;
+      //return civicrm_api3_create_success(json_encode($return),$params,'slot', 'get');
     }catch (Exception $e){
       return civicrm_api3_create_error($e);
     }  
