@@ -17,7 +17,7 @@ function civi_booking_init() {
 
   drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/fullcalendar.js');
   drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/date.js');
-
+  drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/mustache.js');
 }
 
 
@@ -89,10 +89,10 @@ function civi_booking_civicrm_buildForm($formName, &$form) {
 
 
         $counsellorOptions = array( NULL => t('Select counsellor'));
-        $counsellors =  civi_booking_find_contacts();
-        foreach($counsellors as $counsellor){
+        //$counsellors =  civi_booking_find_contacts();
+        /*foreach($counsellors as $counsellor){
           $counsellorOptions[$counsellor['contact_id']] = $counsellor['display_name'];
-        } 
+        } */
          $form->addElement('select', 
                         'consellor_id', 
                         ts('Counsellor'),
@@ -283,10 +283,14 @@ function civi_booking_form_alter(&$form, &$form_state, $form_id){
         drupal_get_path('module', 'civi_booking') . '/js/date.js',
       );
     }
-
-      drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/webform-signup.js');
+    drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/webform-signup.js', array('type' => 'file'));
 
 }
+
+function ycivi_booking_after_build($form, &$form_state) {
+  return $form;
+}
+
 
 /**
  * Modify a Webform submission, prior to saving it in the database.
@@ -341,7 +345,9 @@ function find_slot(){
             FROM civi_booking_slot 
             LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.contact_id
             LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
-            WHERE civi_booking_slot.status = 1";
+            WHERE civi_booking_slot.status = 1 
+            AND civi_booking_slot.activity_type = 50
+            AND civi_booking_slot.slot_date > now()";
   civicrm_initialize( );
   require_once('CRM/Core/DAO.php');   
   $dao = CRM_Core_DAO::executeQuery( $query );
@@ -350,7 +356,10 @@ function find_slot(){
       $results[] = $dao->toArray();   
    }
 
-   $slots = array();
+  $slots = array();
+  if(sizeof($results) == 0){
+    $slots[] = t('-- No available slots found --');
+  }
   foreach($results as $slot){
     $id = CRM_Utils_Array::value('id',$slot);
     $date = new DateTime(CRM_Utils_Array::value('slot_date',$slot));
