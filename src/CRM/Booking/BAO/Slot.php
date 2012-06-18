@@ -14,7 +14,7 @@ class CRM_Booking_BAO_Slot{
         2 => array( $endDate, 'String')
           );
 
-      $query = "SELECT contact_id, start_time,  end_time, room_no, slot_date, session_service
+      $query = "SELECT civi_booking_slot.id as id, contact_id, start_time,  end_time, room_no, slot_date, session_service
         FROM civi_booking_slot
         LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
         WHERE slot_date BETWEEN %1 AND %2";  

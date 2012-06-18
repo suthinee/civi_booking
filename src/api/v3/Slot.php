@@ -96,10 +96,8 @@ function civicrm_api3_slot_create( $params ){
 
 function civicrm_api3_slot_get( $params ){
 
-	//$counsellorId = $params['counsellor_id'];	
 	$activityType = $params['activity_type'];	
-  $start_date = $params['start_date']; 
-  $end_date = $params['end_date']; 
+  $sd = $params['date']; 
 
 
    try{
@@ -108,10 +106,9 @@ function civicrm_api3_slot_get( $params ){
       require_once 'CRM/Booking/BAO/Slot.php';
       require_once 'CRM/Booking/Utils/DateTime.php';
 
-      $results = CRM_Booking_BAO_Slot::getSlots($activityType);
+      //$results = CRM_Booking_BAO_Slot::getSlots($activityType);
 
-
-      $sd = null;
+      //$sd = null;
       $daysOfNextweek = CRM_Booking_Utils_DateTime::getWeeklyCalendar();
       if(!is_null($sd)){
         $daysOfNextweek = CRM_Booking_Utils_DateTime::getWeeklyCalendar($sd);
@@ -121,7 +118,6 @@ function civicrm_api3_slot_get( $params ){
       $endDate = end($daysOfNextweek);
 
       $slots = CRM_Booking_BAO_Slot::getSlotByDate(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate));
-
       $slotTypes = array();
       $classNames = array();
         //convert slot to use strtotime 
@@ -132,12 +128,13 @@ function civicrm_api3_slot_get( $params ){
               $timeOptions[] =$time; 
               $className = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['contact_id'] . $time;
               $classNames[] = $className;
-              $slotTypes[$className] = $slot['session_service'];
+              $slotTypes[$className] = array( 'sessionService' => $slot['session_service'],
+                                              'slotId' => $slot['id']);
+
           }
       }
 
       //dump($slotTypes);
-
 
       $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '10 mins');
       $timeOptions = array();
@@ -161,8 +158,8 @@ function civicrm_api3_slot_get( $params ){
 
         //dump($contacts);
  
-        require_once 'CRM/Booking/BAO/Room.php';
-         $roomResults = CRM_Booking_BAO_Room::getRoom();
+        //require_once 'CRM/Booking/BAO/Room.php';
+        // $roomResults = CRM_Booking_BAO_Room::getRoom();
 
 
         $days = array();
@@ -176,13 +173,13 @@ function civicrm_api3_slot_get( $params ){
                 $contactId = CRM_Utils_Array::value('contact_id',$contact);
                 $conts[$contactId] = array('display_name' => CRM_Utils_Array::value('display_name',$contact),
                                         'sort_name' => CRM_Utils_Array::value('sort_name',$contact),
-                                        'conatct_id' => CRM_Utils_Array::value('contact_id',$contact)
+                                        'contact_id' => CRM_Utils_Array::value('contact_id',$contact)
                                         );  
                 $tdVals = array();
                 foreach($timeOptions as $timeKey => $time){
-                  $id = date('d-m-Y', $day) . CRM_Utils_Array::value('contact_id',$contact) .  $timeKey;                            
+                  $id = date('d-m-Y', $day) . CRM_Utils_Array::value('contact_id',$contact) .  $timeKey;  
                   if (in_array($id, $classNames)) { 
-                    $type = $slotTypes[$id];
+                    $type = $slotTypes[$id]['sessionService'];
                     $className = null;
                     switch ($type) {
                     case 'Counselling':
@@ -207,7 +204,8 @@ function civicrm_api3_slot_get( $params ){
                     $tdVals[$id] = array('time' => $time,
                                        'timeKey' => $timeKey,
                                        'tdataId' => $id,
-                                       'className' =>  $className );
+                                       'className' =>  $className,
+                                       'slotId' => $slotTypes[$id]['slotId']);
                   }else if  ($day < strtotime("now")){
                     $tdVals[$id] = array('time' => $time,
                                       'timeKey' => $timeKey,
@@ -217,7 +215,7 @@ function civicrm_api3_slot_get( $params ){
                     $tdVals[$id] = array('time' => $time,
                                       'timeKey' => $timeKey,
                                       'tdataId' => $id,
-                                      'className' => 'reservable');
+                                      'className' => 'unavailable');
                   }
               }
               $conts[$contactId]['tdVals'] = $tdVals;
@@ -245,6 +243,7 @@ function civicrm_api3_slot_get( $params ){
       	);
       }
       */
+      $return['sd'] = $sd;
       $return['is_error'] = 0;
       $return['version'] = 3;
 
@@ -252,8 +251,8 @@ function civicrm_api3_slot_get( $params ){
                                  "date" =>  date('l d/m/Y', $startDate));
       $return['endDate'] = array("strtotime" => $endDate,
                                   "date" =>  date('l d/m/Y', $endDate));
-      $return['nextWeek'] = strtotime("last Monday" , $startDate);
-      $return['lastWeek'] = strtotime("next Monday" , $startDate);
+      $return['nextWeek'] = strtotime("next Monday" , $startDate);
+      $return['lastWeek'] = strtotime("last Monday" , $startDate);
 
       $return['days'] = $days;
 

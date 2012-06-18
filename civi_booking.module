@@ -92,15 +92,15 @@ function civi_booking_civicrm_buildForm($formName, &$form) {
         //$counsellors =  civi_booking_find_contacts();
         /*foreach($counsellors as $counsellor){
           $counsellorOptions[$counsellor['contact_id']] = $counsellor['display_name'];
-        } */
+        } 
          $form->addElement('select', 
                         'consellor_id', 
                         ts('Counsellor'),
                         $counsellorOptions);   
-      
+      */
         $form->addElement('text', 
                         'slot_id', 
-                        ts('Slot'),
+                        ts('Slot Ref:'),
                         array('size' => 5));
         
         //Hacked adding activity_type_id for jQuery 
@@ -122,7 +122,7 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
     if($op == 'create'){
         $activityTypeId = CRM_Utils_Array::value('activity_type_id',$params);
       
-        if($activityTypeId == 50 || 
+        if(
           $activityTypeId == 51 ||
           $activityTypeId == 52 ){  
 
@@ -133,9 +133,6 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
 
           $results = find_slot($slotId, 2);
           $slot = $results[0];
-
-        
-
 
           $startTime = (CRM_Utils_Array::value('start_time',$slot)); 
           $endTime   = (CRM_Utils_Array::value('end_time',$slot)); 
@@ -278,18 +275,16 @@ function civi_booking_webform_select_options_info() {
 }
 
 function civi_booking_form_alter(&$form, &$form_state, $form_id){
+    
     if(strstr($form_id, 'webform_client_form_1')){
       $form['#attached']['js'] = array(
         drupal_get_path('module', 'civi_booking') . '/js/date.js',
       );
     }
     drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/webform-signup.js', array('type' => 'file'));
-
+    
 }
 
-function ycivi_booking_after_build($form, &$form_state) {
-  return $form;
-}
 
 
 /**
@@ -301,7 +296,9 @@ function ycivi_booking_after_build($form, &$form_state) {
  *   The Webform submission that is about to be saved to the database.
  */
 function civi_booking_webform_submission_presave($node, &$submission) {
+  //dump($node);
 
+ 
 }
 
 /**
@@ -327,6 +324,12 @@ function civi_booking_webform_submission_insert($node, $submission) {
     ))
     ->execute();
   */  
+  //dump($node);
+  //echo '##################################';  
+ // dump($submission);
+
+  //exit;
+
 }
 
 
@@ -359,6 +362,8 @@ function find_slot(){
   $slots = array();
   if(sizeof($results) == 0){
     $slots[] = t('-- No available slots found --');
+  }else{
+    $slots[] = t('-- Select a slot --');
   }
   foreach($results as $slot){
     $id = CRM_Utils_Array::value('id',$slot);

@@ -200,7 +200,9 @@ td.resourcename.hilite {
 
 div.legend {
     line-height: 25px;
-    width: 100px;
+    /* width: 100px; */
+    padding-left: 10px; 
+	padding-right:10px;
     border: solid #555 2px;
     text-align: center;
     display: inline-block;

@@ -1,7 +1,9 @@
 
 (function ($) {
 	$(document).ready(function () { 
-		//$("#edit-submitted-select-a-slot").change(function() { alert('//TODO: Implement filter'); });
+		if($("#edit-submitted-select-a-slot").length > 0){
+			$("#edit-submitted-select-a-slot").attr("disabled", "disabled");
+		}
 
 
 

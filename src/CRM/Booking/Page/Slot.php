@@ -48,11 +48,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
             foreach ($timeRange as $key => $time) { 
                 $timeOptions[] =$time; 
                 $classNames[] = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['room_no'] . $time;
-            }
-            //$slots[$k]['time_range'] = $timeOptions; //add time range options
-            //$slots[$k]['start_time'] = strtotime($slot['start_time']);
-            //$slots[$k]['end_time'] = strtotime($slot['end_time']);
-            //$slots[$k]['slot_date'] = strtotime($slot['slot_date']);
+            }      
          }
      
         $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '10 mins');
@@ -65,7 +61,6 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
 
  
         $roomResults = CRM_Booking_BAO_Room::getRoom();
-
 
         $days = array();
         $rooms = array();
@@ -147,6 +142,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         $this->assign('activityTypes', $activityTypes);
 
         //TODO: Create BAO for getting these values to avoid five queries
+       $counselling = CRM_Core_OptionGroup::getValue( 'service_20120221114757', 'Counselling' );
        $psychotherapy = CRM_Core_OptionGroup::getValue( 'service_20120221114757', 'Psychotherapy' );
        $psychosexual = CRM_Core_OptionGroup::getValue( 'service_20120221114757', 'Psychosexual' );
        $parentingTogeter = CRM_Core_OptionGroup::getValue( 'service_20120221114757', 'Parenting Together' );
@@ -155,6 +151,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
 
        $sessionServices =  array(
           NULL => t('Select Session service'),
+          $counselling => t('Counselling'),
           $psychotherapy => t('Psychotherapy'),
           $psychosexual => t('Psychosexual'),
           $parentingTogeter => t('Parenting Together'),

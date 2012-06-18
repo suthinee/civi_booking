@@ -84,7 +84,6 @@
 
 		cj("#roomFilter").change(function() {
 			alert('//TODO: Implement filter');
-    		//cj('.resourcename.' + cj(this).val()).hide();
 		});
 
 
@@ -94,17 +93,10 @@
 	        	date = cj(this).find('span.date').text();
 	        	unixDate = cj(this).find('span.unixDate').text();
 	        	roomNo = cj(this).find('span.roomNo').text();
-	        	//roomId = cj(this).find('div.roomId').text();
-	        	/*
-	        	var values = cj(this).map(function() {
-		    		return cj(this).text();
-				}).get();
-				alert(values);
-				*/
+				
 	        	cj('#dateHolder').text(date);
 	        	cj('#roomNo').text(roomNo);
 				cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
-				//cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
 
 	        	cj( "#slotDialog" ).data('obj', cj(this))
 	        					   .dialog('open');   
@@ -123,8 +115,8 @@
 			    autoOpen: false,
 			    resizable: false,
 			    draggable: false,
-			    height:450,
-   			    width:300,
+   			    width:800,
+			    height:600,
 			    modal: true,
 			    buttons: {
 			    	'Create a slot': function() {
@@ -203,7 +195,7 @@
 				</li>
 				<li>
 					<label for="startSelect" >Start Time: </label>
-					<select id="startSelect"  disabled="disabled" name="startSelect">
+					<select id="startSelect" name="startSelect">
 						<option value="">Select Start time</option>
 						{foreach from=$timeOptions key=k item=time}
 							<option value="{$k}">{$time}</option>
@@ -237,13 +229,28 @@
 				</li>
 				
 				<li>
-					<label for="counsellor">Counsellor: </label>
+					<label for="counsellor">Counsellor 1: </label>
 					<select id="counsellor" name="counsellor">
 						<option value="">Select Counsellor</option>
 						{foreach from=$contacts key=k item=contact}
 							<option value="{$k}">{$contact}</option>
 						{/foreach}		
 					</select>
+				</li>	
+				<li>
+					<label for="counsellor">Counsellor 2: </label>
+					<select id="counsellor" name="counsellor">
+						<option value="">Select Counsellor</option>
+						{foreach from=$contacts key=k item=contact}
+							<option value="{$k}">{$contact}</option>
+						{/foreach}		
+					</select>
+				</li>	
+				<li>
+					<label for="decription">Description</label>
+					<textarea rows="3" cols="30" name="description">
+
+					</textarea>
 				</li>				
 			</ul>
 		</form>
