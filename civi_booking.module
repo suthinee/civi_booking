@@ -346,7 +346,7 @@ function find_slot(){
               civicrm_contact.id as contact_id,
               civicrm_contact.sort_name as sort_name
             FROM civi_booking_slot 
-            LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.contact_id
+            LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.clinician_contact_id
             LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
             WHERE civi_booking_slot.status = 1 
             AND civi_booking_slot.activity_type = 50
