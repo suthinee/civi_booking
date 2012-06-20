@@ -39,12 +39,16 @@
 function civicrm_api3_slot_create( $params ){
 
 	$contactId = $params['contact_id'];	
+  $contactId2 = $params['contact_id_2']; 
+
 	$roomNo = $params['room_no'];	
 	$date = $params['date'];	
 	$startTime = $params['start_time'];	
 	$endTime = $params['end_time'];	
 	$sessionService = $params['session_service'];	
 	$activityType = $params['activity_type'];
+  $description = $params['description'];
+
 
 	require_once 'CRM/Booking/BAO/Room.php';
 	$results = CRM_Booking_BAO_Room::getRoomByNo($roomNo);
@@ -58,13 +62,15 @@ function civicrm_api3_slot_create( $params ){
     try{
 	 $id = db_insert('civi_booking_slot')
       ->fields(array(
-        'contact_id' => $contactId,
+      'clinician_contact_id' => $contactId,
+      'attended_clinician_contact_id' => $contactId,
 	    'room_id' => $roomId,
 	    'start_time' => date('G:i',$startTime),
 	    'end_time' => date('G:i',$endTime),
 	    'slot_date' => date('Y-m-d H:i:s',$date),
 	    'activity_type' => $activityType,
-  	    'session_service' => $sessionService,
+  	  'session_service' => $sessionService,
+      'description' => $description,
 	    'status ' => 1,
 	    'created_by' => 102,
       ))->execute();

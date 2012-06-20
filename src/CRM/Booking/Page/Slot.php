@@ -76,19 +76,22 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                                         );  
                 $tdVals = array();
                 foreach($timeOptions as $timeKey => $time){
-                  $id = date('d-m-Y', $day) . CRM_Utils_Array::value('room_no',$room) .  $timeKey;          
+                  $id = date('d-m-Y', $day) . CRM_Utils_Array::value('room_no',$room) .  $timeKey;  
                   if (in_array($id, $classNames)) {                
                     $tdVals[$id] = array('time' => $time,
+                                       'defaultEndTime' => strtotime('+60 mins', $timeKey),
                                        'timeKey' => $timeKey,
                                        'tdataId' => $id,
                                        'className' => 'reserved');
                   }else if  ($day < strtotime("now")){
                     $tdVals[$id] = array('time' => $time,
+                                      'defaultEndTime' => strtotime('+60 mins', $timeKey),
                                       'timeKey' => $timeKey,
                                       'tdataId' => $id,
                                       'className' => 'pasttime');
                   }else{
                     $tdVals[$id] = array('time' => $time,
+                                      'defaultEndTime' => strtotime('+60 mins', $timeKey),
                                       'timeKey' => $timeKey,
                                       'tdataId' => $id,
                                       'className' => 'reservable');

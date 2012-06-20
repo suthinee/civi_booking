@@ -27,11 +27,20 @@
 	<tabl id="filterTable">
 		<tr>
 			<td>
+				<label for="dateFilter">Date: </label>
+				<select id="dateFilter" name="dateFilter">
+				    <option value="all">-- All date --</option>
+					{foreach from=$slots key=k item=day}
+						<option value="{$k}">{$day.date}</option>
+					{/foreach}	
+				</select>
+			</td>
+			<td>
 				<label for="roomFilter">Room: </label>
 				<select id="roomFilter" name="roomFilter">
-				    <option value="">-- select room --</option>
+				    <option value="all">-- All room --</option>
 				 	{foreach from=$rooms key=k item=r}
-						<option value="{$r.room_id}">{$r.room_no}</option>
+						<option value="{$r.room_no}">{$r.room_no}</option>
 					{/foreach}	
 				</select>
 			</td>
@@ -59,6 +68,7 @@
 		        	<td id="{$value.tdataId}" colspan="1" class="slot {$value.className}">
 			        	<div style="display:none">
 			        	<span class='time'>{$value.timeKey}</span>
+			        	<span class='defaultEndtime'>{$value.defaultEndTime}</span>
 						<span class='roomNo'>{$room.room_no}</span>
 						<span class='roomId'>{$roomKey}</span>
 						<span class='date'>{$day.date}</span>
@@ -82,8 +92,39 @@
     var roomNo = null;
 	cj(window).load(function(){
 
-		cj("#roomFilter").change(function() {
-			alert('//TODO: Implement filter');
+		cj("#roomFilter").change(function(event) {
+			var room = cj('select[name="roomFilter"]').val(); 
+			console.log(room);
+    	    cj('tbody tr td.resourcename').each(function() { 
+    	    	if(room != cj(this).text()){
+    	    		cj(this).parent().hide();    	    	
+    	    	}else{
+    	    		cj(this).parent().show();
+    	    	}
+
+    	    	//TODO: change this method to an appropriate way as this is expensive.
+    	    	if(room.localeCompare('all') == 0){
+    	    		cj(this).parent().show();
+    	    	}
+
+   			 //($(this).text().search(new RegExp(query, "i")) < 0) ? $(this).hide().removeClass('visible') : $(this).show().addClass('visible');  
+  			});
+		});
+
+		cj("#dateFilter").change(function(event) {
+			var date = cj('select[name="dateFilter"]').val(); 
+			cj('table.reservations').each(function() { 
+    	    	if(date != cj(this).attr('id')){
+    	    		cj(this).hide();    	    	
+    	    	}else{
+    	    		cj(this).show();
+    	    	}
+    	    	//TODO: change this method to an appropriate way as this is expensive.
+    	    	if(date.localeCompare('all') == 0){
+    	    		cj(this).show();
+    	    	}    	    	
+
+  			});
 		});
 
 
@@ -93,10 +134,12 @@
 	        	date = cj(this).find('span.date').text();
 	        	unixDate = cj(this).find('span.unixDate').text();
 	        	roomNo = cj(this).find('span.roomNo').text();
-				
+	        	defaultEndtime = cj(this).find('span.defaultEndtime').text();
+
 	        	cj('#dateHolder').text(date);
 	        	cj('#roomNo').text(roomNo);
 				cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
+				cj('#endSelect option[value=' +defaultEndtime+ ']').attr('selected', 'selected');
 
 	        	cj( "#slotDialog" ).data('obj', cj(this))
 	        					   .dialog('open');   
@@ -110,31 +153,68 @@
 			    cj(this).css("background","#ffffff");
 			}
 		});
+
+        cj("#dialogForm").validate({
+		  rules: {
+		    startSelect: "required",
+  		    endSelect: {
+  		    	required: function(element) {
+  		    		var sTime = parseInt(cj(element).find(":selected").val());
+  		    		var eTime =	parseInt(cj('select[name="startSelect"]').val());
+  		    		return eTime >= sTime; 		    		
+  		    	
+  		    		//console.log(cj(element).find(":selected").val() >=cj('select[name="startSelect"]').val());
+  		    		/*
+        			if(cj(element).find(":selected").val() >= cj("#startTime").find(":selected").val() ){
+        				return true;
+        			}else{
+        				return false;
+        			} */       			
+
+        		},
+        		range: 
+      		},
+		    counsellor: "required",
+		    sessionSelect: "required",
+   		    activitySelect: "required"
+		  },
+		  debug:true
+		});
 		
 		cj( "#slotDialog" ).dialog({
 			    autoOpen: false,
 			    resizable: false,
 			    draggable: false,
-   			    width:800,
-			    height:600,
+   			    width:500,
+			    height:700,
 			    modal: true,
 			    buttons: {
 			    	'Create a slot': function() {
 			    		var contactId = cj('select[name="counsellor"]').val();    // get the value from a dropdown select
+ 					    var contactId2 = cj('select[name="counsellor2"]').val(); 
 			    		var startTime = cj('select[name="startSelect"]').val(); 
 			    		var endTime = cj('select[name="endSelect"]').val(); 
 			    		var sessionService = cj('select[name="sessionService"]').val(); 
 			    		var activityType = cj('select[name="activityType"]').val(); 
- 		
+			    		var description = cj('#description').val();
+
+
+			    		cj("#dialogForm").valid();
+  						//return false;
+
+			    		/*
+
 			    	    cj().crmAPI ('slot','create',{'version' :'3', 
 			    	    							  'sequential' :'1',
 			    	    							  'contact_id' : contactId, 
+  			    	    							  'contact_id_2' : contactId, 
 			    	    							  'date' : unixDate, 
 			    	    							  'start_time' : startTime, 
 			    	    							  'end_time' : endTime, 
 			    	    							  'session_service' :sessionService, 
 			    	    							  'room_no' : roomNo, 
-			    	    							  'activity_type' : activityType},{
+			    	    							  'activity_type' : activityType,
+			    	    							  'description' : description,},{
 				           ajaxURL: crmajaxURL,
 				           success:function (data){ 
 				            if(data.count != 0){
@@ -166,6 +246,7 @@
 				            }  
 				          }
 				        });
+						*/
         			},
 			        Cancel: function() {
 			            cj(this).dialog('close');
@@ -182,7 +263,7 @@
 {/literal}
 
 <div id="slotDialog" title="Create a slot" class="ui-dialog-content ui-widget-content">
-	<form>
+	<form  class="cmxform" id="dialogForm">
 			<ul>
 				<li>
 					<span class="label_text">Date: </span>
@@ -212,16 +293,16 @@
 					</select>
 				</li>
 				<li>
-					<label for="activityType">Activity type: </label>
-					<select id="activitySelect" name="activityType">
+					<label for="activitySelect">Activity type: </label>
+					<select id="activitySelect" name="sessionSelect">
 						{foreach from=$activityTypes key=k item=activityType}
 							<option value="{$k}">{$activityType}</option>
 						{/foreach}		
 					</select>
 				</li>
 				<li>
-					<label for="sessionService">Session service: </label>
-					<select id="sessionSelect" name="sessionService">
+					<label for="sessionSelect">Session service: </label>
+					<select id="sessionSelect" name="sessionSelect">
 						{foreach from=$sessionServices key=k item=sessionService}
 							<option value="{$k}">{$sessionService}</option>
 						{/foreach}		
@@ -238,8 +319,8 @@
 					</select>
 				</li>	
 				<li>
-					<label for="counsellor">Counsellor 2: </label>
-					<select id="counsellor" name="counsellor">
+					<label for="counsellor2">Counsellor 2: </label>
+					<select id="counsellor2" name="counsellor2">
 						<option value="">Select Counsellor</option>
 						{foreach from=$contacts key=k item=contact}
 							<option value="{$k}">{$contact}</option>
@@ -248,7 +329,7 @@
 				</li>	
 				<li>
 					<label for="decription">Description</label>
-					<textarea rows="3" cols="30" name="description">
+					<textarea rows="4" cols="50" id="description" name="description" style="resize: none;" class="required" >
 
 					</textarea>
 				</li>				
