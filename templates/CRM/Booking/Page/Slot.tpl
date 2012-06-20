@@ -157,11 +157,13 @@
         cj("#dialogForm").validate({
 		  rules: {
 		    startSelect: "required",
+  		    /*
   		    endSelect: {
   		    	required: function(element) {
   		    		var sTime = parseInt(cj(element).find(":selected").val());
   		    		var eTime =	parseInt(cj('select[name="startSelect"]').val());
-  		    		return eTime >= sTime; 		    		
+  		    			return eTime >= sTime; 	
+  		    		}	    		
   		    	
   		    		//console.log(cj(element).find(":selected").val() >=cj('select[name="startSelect"]').val());
   		    		/*
@@ -169,11 +171,10 @@
         				return true;
         			}else{
         				return false;
-        			} */       			
+        			}        			
 
         		},
-        		range: 
-      		},
+      		}, */
 		    counsellor: "required",
 		    sessionSelect: "required",
    		    activitySelect: "required"
