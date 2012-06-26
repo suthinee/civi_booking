@@ -154,35 +154,31 @@
 			}
 		});
 
-        cj("#dialogForm").validate({
-		  rules: {
-		    startSelect: "required",
-  		    /*
-  		    endSelect: {
-  		    	required: function(element) {
-  		    		var sTime = parseInt(cj(element).find(":selected").val());
-  		    		var eTime =	parseInt(cj('select[name="startSelect"]').val());
-  		    			return eTime >= sTime; 	
-  		    		}	    		
-  		    	
-  		    		//console.log(cj(element).find(":selected").val() >=cj('select[name="startSelect"]').val());
-  		    		/*
-        			if(cj(element).find(":selected").val() >= cj("#startTime").find(":selected").val() ){
-        				return true;
-        			}else{
-        				return false;
-        			}        			
+		cj.validator.addMethod("greaterThan", function(value, element) {
+            var sTime = parseInt(cj('select[name="startSelect"]').val());
+  		   	var eTime =	parseInt(cj('select[name="endSelect"]').val());
+  		   	var val = sTime <= eTime || value == "";
+  		    return val; 
+        }, "End time must be after start time");
 
-        		},
-      		}, */
+
+        cj("#dialogForm").validate({
+       	  rules: {
+		    startSelect: "required",
+		    endSelect:  {
+		    	"greaterThan" : true,
+		    	"required" : true
+		    },
+		    activitySelect: "required",
 		    counsellor: "required",
-		    sessionSelect: "required",
-   		    activitySelect: "required"
-		  },
-		  debug:true
+		    sessionSelect: "required",  		  
+		  }
 		});
 		
 		cj( "#slotDialog" ).dialog({
+				open: function(event, ui) {
+					 // cj("#dialogForm").validate().resetForm( );
+				 },
 			    autoOpen: false,
 			    resizable: false,
 			    draggable: false,
@@ -195,64 +191,58 @@
  					    var contactId2 = cj('select[name="counsellor2"]').val(); 
 			    		var startTime = cj('select[name="startSelect"]').val(); 
 			    		var endTime = cj('select[name="endSelect"]').val(); 
-			    		var sessionService = cj('select[name="sessionService"]').val(); 
-			    		var activityType = cj('select[name="activityType"]').val(); 
+			    		var sessionService = cj('select[name="sessionSelect"]').val(); 
+			    		var activityType = cj('select[name="activitySelect"]').val(); 
 			    		var description = cj('#description').val();
-
-
-			    		cj("#dialogForm").valid();
-  						//return false;
-
-			    		/*
-
-			    	    cj().crmAPI ('slot','create',{'version' :'3', 
-			    	    							  'sequential' :'1',
-			    	    							  'contact_id' : contactId, 
-  			    	    							  'contact_id_2' : contactId, 
-			    	    							  'date' : unixDate, 
-			    	    							  'start_time' : startTime, 
-			    	    							  'end_time' : endTime, 
-			    	    							  'session_service' :sessionService, 
-			    	    							  'room_no' : roomNo, 
-			    	    							  'activity_type' : activityType,
-			    	    							  'description' : description,},{
-				           ajaxURL: crmajaxURL,
-				           success:function (data){ 
-				            if(data.count != 0){
-				              cj.each(data.values, function(key, value) {
-				           		
-					    		var slotId = value.slot_id;
-						        var selectedStartTime = value.start_time;
-						        var selectedEndTime = value.end_time;
-						        var selectedDate = value.slot_date;
-						        var selectedRoom = value.room_no;
-	        
-						        var timeRange = value.time_range;
-
-						        console.log(slotId);
-   						        console.log(selectedStartTime);
-						        console.log(selectedEndTime);
-						        console.log(selectedDate);
-						        console.log(selectedRoom);
-
-						        
-						        for(time in timeRange){
-						        	var elementId = '#' + selectedDate + selectedRoom + timeRange[time];
-						        	console.log(elementId);
-						        	cj(elementId).removeClass("reservable").addClass("reserved");
-		    				    }
-    				            cj("#slotDialog").dialog('close');
-    				            return;
-				              });
-				            }  
-				          }
-				        });
-						*/
-        			},
-			        Cancel: function() {
-			            cj(this).dialog('close');
-			        }			        
-			    }});
+			    		
+			    		if(cj("#dialogForm").valid()){			    			
+				    	    
+				    	    cj().crmAPI ('slot','create',{'version' :'3', 
+				    	    							  'sequential' :'1',
+				    	    							  'contact_id' : contactId, 
+	  			    	    							  'contact_id_2' : contactId, 
+				    	    							  'date' : unixDate, 
+				    	    							  'start_time' : startTime, 
+				    	    							  'end_time' : endTime, 
+				    	    							  'session_service' :sessionService, 
+				    	    							  'room_no' : roomNo, 
+				    	    							  'activity_type' : activityType,
+				    	    							  'description' : description},{
+					           ajaxURL: crmajaxURL,
+					           success:function (data){ 
+					           	if(data.values[0].is_created == 1){
+						            if(data.count != 0){
+						              cj.each(data.values, function(key, value) {
+						           		
+							    		var slotId = value.slot_id;
+								        var selectedStartTime = value.start_time;
+								        var selectedEndTime = value.end_time;
+								        var selectedDate = value.slot_date;
+								        var selectedRoom = value.room_no;
+			        
+								        var timeRange = value.time_range;
+								      							        
+								        for(time in timeRange){
+								        	var elementId = '#' + selectedDate + selectedRoom + timeRange[time];
+								        	console.log(elementId);
+								        	cj(elementId).removeClass("reservable").addClass("reserved");
+				    				    }
+		    				            cj("#slotDialog").dialog('close');
+		    				            return;
+						              });
+						            }
+					           }else {
+					            	var errorMessage = data.values[0].error_message;
+					           		 cj('#creatError').html('' + errorMessage.toString());
+					            } 
+					          }
+					        });
+					}
+        		},
+			    Cancel: function() {
+			        cj(this).dialog('close');
+			    }			        
+			}});
 
 		});
 
@@ -264,6 +254,7 @@
 {/literal}
 
 <div id="slotDialog" title="Create a slot" class="ui-dialog-content ui-widget-content">
+	<div id="creatError" class="creatError"> </div>
 	<form  class="cmxform" id="dialogForm">
 			<ul>
 				<li>
@@ -294,8 +285,8 @@
 					</select>
 				</li>
 				<li>
-					<label for="activitySelect">Activity type: </label>
-					<select id="activitySelect" name="sessionSelect">
+					<label for="activitySelect">Activity type: </label>			
+					<select id="activitySelect" name="activitySelect">
 						{foreach from=$activityTypes key=k item=activityType}
 							<option value="{$k}">{$activityType}</option>
 						{/foreach}		
@@ -307,10 +298,9 @@
 						{foreach from=$sessionServices key=k item=sessionService}
 							<option value="{$k}">{$sessionService}</option>
 						{/foreach}		
-					</select>
+					</select>	
 				</li>
-				
-				<li>
+				<li>				
 					<label for="counsellor">Counsellor 1: </label>
 					<select id="counsellor" name="counsellor">
 						<option value="">Select Counsellor</option>
@@ -318,8 +308,8 @@
 							<option value="{$k}">{$contact}</option>
 						{/foreach}		
 					</select>
-				</li>	
-				<li>
+				</li>
+				<li>					
 					<label for="counsellor2">Counsellor 2: </label>
 					<select id="counsellor2" name="counsellor2">
 						<option value="">Select Counsellor</option>
@@ -327,13 +317,11 @@
 							<option value="{$k}">{$contact}</option>
 						{/foreach}		
 					</select>
-				</li>	
+				</li>
 				<li>
 					<label for="decription">Description</label>
-					<textarea rows="4" cols="50" id="description" name="description" style="resize: none;" class="required" >
-
-					</textarea>
-				</li>				
+					<textarea rows="4" cols="50" id="description" name="description" style="resize: none;" class="required" ></textarea>
+				</li>
 			</ul>
 		</form>
 </div>

@@ -38,64 +38,88 @@
 
 function civicrm_api3_slot_create( $params ){
 
-	$contactId = $params['contact_id'];	
+  $contactId = $params['contact_id']; 
   $contactId2 = $params['contact_id_2']; 
 
-	$roomNo = $params['room_no'];	
-	$date = $params['date'];	
-	$startTime = $params['start_time'];	
-	$endTime = $params['end_time'];	
-	$sessionService = $params['session_service'];	
-	$activityType = $params['activity_type'];
+  $roomNo = $params['room_no']; 
+  $date = $params['date'];  
+  $startTime = $params['start_time']; 
+  $endTime = $params['end_time']; 
+  $sessionService = $params['session_service']; 
+  $activityType = $params['activity_type'];
   $description = $params['description'];
 
 
-	require_once 'CRM/Booking/BAO/Room.php';
-	$results = CRM_Booking_BAO_Room::getRoomByNo($roomNo);
+  $args = array("date" =>  date('Y-m-d H:i:s', $date),
+                "startTime" => date('G:i',$startTime),
+                "endTime" => date('G:i',$endTime),
+                "roomNo" => $roomNo,
+                "contactId" => $contactId,
+                "contactId2" => $contactId2);
+ 
 
-	$roomId = null;
-	foreach($results as $room){
-	    $roomId = CRM_Utils_Array::value('id',$room);
-	    //break; //break as expected one
-	} 
-    $txn = db_transaction();
-    try{
-	 $id = db_insert('civi_booking_slot')
-      ->fields(array(
-      'clinician_contact_id' => $contactId,
-      'attended_clinician_contact_id' => $contactId,
-	    'room_id' => $roomId,
-	    'start_time' => date('G:i',$startTime),
-	    'end_time' => date('G:i',$endTime),
-	    'slot_date' => date('Y-m-d H:i:s',$date),
-	    'activity_type' => $activityType,
-  	  'session_service' => $sessionService,
-      'description' => $description,
-	    'status ' => 1,
-	    'created_by' => 102,
-      ))->execute();
+  require_once 'CRM/Booking/BAO/Slot.php';
+  $result = CRM_Booking_BAO_Slot::isSlotCreatable($args);
+  $isSlotCreatable = count($result) > 0 ? false : true;
+  if($isSlotCreatable){
 
-      require_once 'CRM/Booking/Utils/DateTime.php';
-      //get start/end time range
-      $timeRange = CRM_Booking_Utils_DateTime::createTimeRange(date('G:i', $startTime), date('G:i',$endTime), '10 mins');
-      $timeOptions = array();
-      foreach ($timeRange as $key => $time) { 
-        $timeOptions[] =$time; 
-      }
+  	require_once 'CRM/Booking/BAO/Room.php';
+  	$results = CRM_Booking_BAO_Room::getRoomByNo($roomNo);
 
-      $slot = array(
-       'slot_id' => $id,
- 		   'room_no' => $roomNo,
-	     'start_time' => $startTime,
-	     'end_time' => $endTime,
-	     'slot_date' =>  date('d-m-Y', $date),
-	     'time_range' => $timeOptions
-      );
-      $value = array($slot);
-      return civicrm_api3_create_success($value,$params,'slot', 'create');
-    }catch (Exception $e){
-      return civicrm_api3_create_error(  $e  );
-    }  
+  	$roomId = null;
+  	foreach($results as $room){
+  	    $roomId = CRM_Utils_Array::value('id',$room);
+  	    //break; //break as expected one
+  	} 
+      $txn = db_transaction();
+      try{
+  	 $id = db_insert('civi_booking_slot')
+        ->fields(array(
+        'clinician_contact_id' => $contactId,
+        'attended_clinician_contact_id' => $contactId2,
+  	    'room_id' => $roomId,
+  	    'start_time' => date('G:i',$startTime),
+  	    'end_time' => date('G:i',$endTime),
+  	    'slot_date' => date('Y-m-d H:i:s',$date),
+  	    'activity_type' => $activityType,
+    	  'session_service' => $sessionService,
+        'description' => $description,
+  	    'status ' => 1,
+  	    'created_by' => 102,
+        ))->execute();
+
+        require_once 'CRM/Booking/Utils/DateTime.php';
+        //get start/end time range
+        $timeRange = CRM_Booking_Utils_DateTime::createTimeRange(date('G:i', $startTime), date('G:i',$endTime), '10 mins');
+        $timeOptions = array();
+        foreach ($timeRange as $key => $time) { 
+          $timeOptions[] =$time; 
+        }
+
+        $slot = array(
+         'slot_id' => $id,
+   		   'room_no' => $roomNo,
+  	     'start_time' => $startTime,
+  	     'end_time' => $endTime,
+  	     'slot_date' =>  date('d-m-Y', $date),
+  	     'time_range' => $timeOptions,
+         'is_created' => 1
+        );
+        $value = array($slot);
+        return civicrm_api3_create_success($value,$params,'slot', 'create');
+      }catch (Exception $e){
+        $error = array("is_created" => 0,
+                       "error_message" => get_object_vars($e));
+        $value = array($error);
+        //jQuery cannot handle JSON that create_error function return so use create_success instead.
+        return civicrm_api3_create_success($value, $params, 'slot', 'create');
+      }  
+    }else{
+        $error = array("is_created" => 0,
+                       "error_message" => "Cannot create a slot. Please check the the input data are available");
+        $value = array($error);
+       return civicrm_api3_create_success($value,$params,'slot', 'create'); 
+    }
   
 }
 
@@ -140,8 +164,6 @@ function civicrm_api3_slot_get( $params ){
           }
       }
 
-      //dump($slotTypes);
-
       $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '10 mins');
       $timeOptions = array();
       foreach ($timeRange as $key => $time) { 
@@ -161,12 +183,6 @@ function civicrm_api3_slot_get( $params ){
         $contacts[$id]['display_name'] = CRM_Utils_Array::value('display_name',$contact);    
         $contacts[$id]['sort_name'] = CRM_Utils_Array::value('sort_name',$contact);    
       } 
-
-        //dump($contacts);
- 
-        //require_once 'CRM/Booking/BAO/Room.php';
-        // $roomResults = CRM_Booking_BAO_Room::getRoom();
-
 
         $days = array();
         $conts = array();

@@ -8,6 +8,35 @@ class CRM_Booking_BAO_Slot{
 
     }
 
+    static function isSlotCreatable($args){
+
+      //TODO: 
+      //Check if if  
+      $params = array(
+        1 => array( $args['date'], 'String'),
+        2 => array($args['startTime'], 'String'),
+        3 => array($args['endTime'], 'String'),
+        4 => array($args['contactId'], 'Integer'),
+        5 => array($args['contactId2'], 'Integer')
+      );
+      $query = "SELECT civi_booking_slot.id
+            FROM civi_booking_slot 
+            LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.clinician_contact_id
+            WHERE civi_booking_slot.status = 1 
+            AND civi_booking_slot.slot_date  = %1
+            AND civi_booking_slot.clinician_contact_id = %4
+            AND (civi_booking_slot.start_time BETWEEN %2 AND %3 OR civi_booking_slot.end_time BETWEEN %2 AND %3)";
+
+      civicrm_initialize( );
+      require_once('CRM/Core/DAO.php');   
+      $dao = CRM_Core_DAO::executeQuery( $query , $params );
+      $results = array ();
+        while ( $dao->fetch( ) ) {
+          $results[] = $dao->toArray();   
+       }    
+      return $results;
+    }
+
     static function getSlotByDate($startDate, $endDate){
       $params = array(
         1 => array( $startDate, 'String'),
