@@ -29,7 +29,7 @@
 			<td>
 				<label for="dateFilter">Date: </label>
 				<select id="dateFilter" name="dateFilter">
-				    <option value="all">-- All date --</option>
+				    <option value="all">-- All dates --</option>
 					{foreach from=$slots key=k item=day}
 						<option value="{$k}">{$day.date}</option>
 					{/foreach}	
@@ -38,7 +38,7 @@
 			<td>
 				<label for="roomFilter">Room: </label>
 				<select id="roomFilter" name="roomFilter">
-				    <option value="all">-- All room --</option>
+				    <option value="all">-- All rooms --</option>
 				 	{foreach from=$rooms key=k item=r}
 						<option value="{$r.room_no}">{$r.room_no}</option>
 					{/foreach}	
@@ -58,14 +58,18 @@
 		<tr>
 			<td class="resdate">{$day.date}</td>
 			{foreach from=$day.timeOptions item=time}
-			<td class="reslabel">{$time}</td>
+				{if $time.isDisplay eq 1}
+				<td class="reslabel">{$time.time}</td>
+				{else}
+				<td class="reslabel"></td>
+				{/if}
 			{/foreach}				
 		</tr>
 			{foreach from=$day.rooms key=roomKey item=room}
 				<tr class="slots">
 					<td class="resourcename {$room.room_id}">{$room.room_no}</td>
 					{foreach from=$room.tdVals key=key item=value}
-		        	<td id="{$value.tdataId}" colspan="1" class="slot {$value.className}">
+		        	<td id="{$value.tdataId}" colspan="1" class="slot {$value.className}" title="{$value.title}">
 			        	<div style="display:none">
 			        	<span class='time'>{$value.timeKey}</span>
 			        	<span class='defaultEndtime'>{$value.defaultEndTime}</span>
@@ -84,12 +88,15 @@
 {/foreach}
 </div>
 {literal}
-
 <script type="text/javascript">
 	var crmajaxURL = '{/literal}{php} print base_path(); {/php}{literal}civicrm/ajax/rest';
   	var startTime = null;
     var unixDate = null;
     var roomNo = null;
+
+    //set noConflict for tooltips to work
+    var jq = jQuery.noConflict();
+
 	cj(window).load(function(){
 
 		cj("#roomFilter").change(function(event) {
@@ -154,6 +161,7 @@
 			}
 		});
 
+		
 		cj.validator.addMethod("greaterThan", function(value, element) {
             var sTime = parseInt(cj('select[name="startSelect"]').val());
   		   	var eTime =	parseInt(cj('select[name="endSelect"]').val());
@@ -167,7 +175,6 @@
   		   	var val = contactId != contactId2 || value == "";
   		    return val; 
         }, "Counsellor 2 must not be same as Counsellor 1");
-
 
         var validator = cj("#dialogForm").validate({
        	  rules: {
@@ -283,7 +290,7 @@
 					<select id="startSelect" name="startSelect">
 						<option value="">Select Start time</option>
 						{foreach from=$timeOptions key=k item=time}
-							<option value="{$k}">{$time}</option>
+							<option value="{$k}">{$time.time}</option>
 						{/foreach}					
 					</select>
 				</li>
@@ -292,7 +299,7 @@
 					<select id="endSelect" name="endSelect">
 						<option value="">Select End time</option>
 						{foreach from=$timeOptions key=k item=time}
-							<option value="{$k}">{$time}</option>
+							<option value="{$k}">{$time.time}</option>
 						{/foreach}					
 					</select>
 				</li>

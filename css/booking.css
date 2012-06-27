@@ -18,10 +18,11 @@
 }
 
 .reslabel{
+  /*
   -moz-transform: rotate(270deg);
   -moz-transform-origin: 50% 50%;
   -webkit-transform: rotate(270deg);
-  -webkit-transform-origin: 50% 50%;
+  -webkit-transform-origin: 50% 50%; */
 }
 
 .reservations td {

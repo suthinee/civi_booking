@@ -43,9 +43,17 @@ class CRM_Booking_BAO_Slot{
         2 => array( $endDate, 'String')
           );
 
-      $query = "SELECT civi_booking_slot.id as id, clinician_contact_id, start_time,  end_time, room_no, slot_date, session_service
+      $query = "SELECT civi_booking_slot.id as id,
+               civicrm_contact.display_name as display_name,
+               clinician_contact_id, 
+               start_time,  
+               end_time, 
+               room_no,
+               slot_date,
+                session_service
         FROM civi_booking_slot
         LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
+        LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.clinician_contact_id
         WHERE slot_date BETWEEN %1 AND %2";  
          
       require_once('CRM/Core/DAO.php'); 

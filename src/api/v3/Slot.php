@@ -90,7 +90,7 @@ function civicrm_api3_slot_create( $params ){
 
         require_once 'CRM/Booking/Utils/DateTime.php';
         //get start/end time range
-        $timeRange = CRM_Booking_Utils_DateTime::createTimeRange(date('G:i', $startTime), date('G:i',$endTime), '10 mins');
+        $timeRange = CRM_Booking_Utils_DateTime::createTimeRange(date('G:i', $startTime), date('G:i',$endTime), '5 mins');
         $timeOptions = array();
         foreach ($timeRange as $key => $time) { 
           $timeOptions[] =$time; 
@@ -152,7 +152,7 @@ function civicrm_api3_slot_get( $params ){
       $classNames = array();
         //convert slot to use strtotime 
       foreach($slots as $k => $slot){
-          $timeRange = CRM_Booking_Utils_DateTime::createTimeRange($slot['start_time'], $slot['end_time'], '10 mins');
+          $timeRange = CRM_Booking_Utils_DateTime::createTimeRange($slot['start_time'], $slot['end_time'], '5 mins');
           $timeOptions = array();
           foreach ($timeRange as $key => $time) { 
               $timeOptions[] =$time; 
@@ -164,7 +164,7 @@ function civicrm_api3_slot_get( $params ){
           }
       }
 
-      $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '10 mins');
+      $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '5 mins');
       $timeOptions = array();
       foreach ($timeRange as $key => $time) { 
         $timeOptions[$time] = date('G:i', $time); 

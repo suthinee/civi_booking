@@ -38,17 +38,15 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         $endDate = end($daysOfNextweek);
 
         $slots = CRM_Booking_BAO_Slot::getSlotByDate(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate));
-
         $classNames = array();
         //convert slot to use strtotime 
         foreach($slots as $k => $slot){
-            $timeRange = CRM_Booking_Utils_DateTime::createTimeRange($slot['start_time'], $slot['end_time'], '10 mins');
+            $timeRange = CRM_Booking_Utils_DateTime::createTimeRange($slot['start_time'], $slot['end_time'], '5 mins');
             //$timeOptions = array();
             $lastKey = end(array_keys($timeRange));
-
             foreach ($timeRange as $key => $time) { 
                $generated = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['room_no'] . $time;
-               //$classNames[$generated] = $generated;
+               $classNames[$generated]['tooltip'] = $slot['display_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'];
                if ($key == $lastKey) {
                   $classNames[$generated]['lastKey'] = true;
                 } else {
@@ -58,15 +56,22 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
          }
 
     
-        $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '10 mins');
+        $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '5 mins');
+        $timeDisplayRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '30 mins'); //for screen to display
         $timeOptions = array();
         foreach ($timeRange as $key => $time) { 
-            $timeOptions[$time] = date('G:i', $time); 
+            $timeOptions[$time]['time'] = date('G:i', $time); 
+            if(in_array($time, $timeDisplayRange)){
+              $timeOptions[$time]['isDisplay'] = true;
+            }else{
+              $timeOptions[$time]['isDisplay'] = false;
+            }
         }
 
         $this->assign('timeOptions',$timeOptions);
 
- 
+
+     
         $roomResults = CRM_Booking_BAO_Room::getRoom();
 
         $days = array();
@@ -85,19 +90,24 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                 foreach($timeOptions as $timeKey => $time){
                   //generated Id
                   $id = date('d-m-Y', $day) . CRM_Utils_Array::value('room_no',$room) .  $timeKey;  
+                  $title = '';
                   //check if generated Id is in the className array
                   //if (in_array($id, $classNames)) {   
                   if (isset($classNames[$id])){
-                  $class = 'reserved';
-                  $isLastKey = $classNames[$id]['lastKey'];
-                  if($isLastKey){
-                      $class = 'reservable';
-                  }   
-                  $tdVals[$id] = array('time' => $time,
+                    $isLastKey = $classNames[$id]['lastKey'];
+                    if($isLastKey){
+                        $class = 'reservable'; //set the last block of time to be reseveable
+                    }else{
+                       $title = $classNames[$id]['tooltip'];
+                       $class = 'reserved';
+                    }
+
+                    $tdVals[$id] = array('time' => $time,
                                        'defaultEndTime' => strtotime('+60 mins', $timeKey),
                                        'timeKey' => $timeKey,
                                        'tdataId' => $id,
-                                       'className' =>  $class );
+                                       'className' =>  $class,
+                                       'title' => $title );
                   }else if  ($day < strtotime("now")){
                     $tdVals[$id] = array('time' => $time,
                                       'defaultEndTime' => strtotime('+60 mins', $timeKey),

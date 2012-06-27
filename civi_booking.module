@@ -21,6 +21,9 @@ function civi_booking_init() {
   //jQuery validation
   drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/jquery.validate.min.js');
   drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/additional-methods.min.js');
+  //jQuery tooltips
+  drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/jquery.tooltip.min.js');
+
 
 }
 
