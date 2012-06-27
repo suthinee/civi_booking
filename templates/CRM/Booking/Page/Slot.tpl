@@ -23,7 +23,7 @@
 <div style="height:10px">&nbsp;</div>
 <form id="filterForm"> 
 	<fieldset>
-	<legend onclick="toggleFieldset(this);">Fillters</legend>	
+	<legend onclick="toggleFieldset(this);">Filters</legend>	
 	<tabl id="filterTable">
 		<tr>
 			<td>
@@ -157,12 +157,19 @@
 		cj.validator.addMethod("greaterThan", function(value, element) {
             var sTime = parseInt(cj('select[name="startSelect"]').val());
   		   	var eTime =	parseInt(cj('select[name="endSelect"]').val());
-  		   	var val = sTime <= eTime || value == "";
+  		   	var val = sTime < eTime || value == "";
   		    return val; 
         }, "End time must be after start time");
 
+        cj.validator.addMethod("notEqaulTo", function(value, element) {
+           	var contactId = cj('select[name="counsellor"]').val();    // get the value from a dropdown select
+ 			var contactId2 = cj('select[name="counsellor2"]').val(); 
+  		   	var val = contactId != contactId2 || value == "";
+  		    return val; 
+        }, "Counsellor 2 must not be same as Counsellor 1");
 
-        cj("#dialogForm").validate({
+
+        var validator = cj("#dialogForm").validate({
        	  rules: {
 		    startSelect: "required",
 		    endSelect:  {
@@ -171,19 +178,17 @@
 		    },
 		    activitySelect: "required",
 		    counsellor: "required",
-		    sessionSelect: "required",  		  
+		    sessionSelect: "required",
+		    counsellor2: "notEqaulTo"		  
 		  }
 		});
 		
-		cj( "#slotDialog" ).dialog({
-				open: function(event, ui) {
-					 // cj("#dialogForm").validate().resetForm( );
-				 },
+		cj( "#slotDialog" ).dialog({				
 			    autoOpen: false,
 			    resizable: false,
 			    draggable: false,
-   			    width:500,
-			    height:700,
+   			    width:450,
+			    height:600,
 			    modal: true,
 			    buttons: {
 			    	'Create a slot': function() {
@@ -211,7 +216,11 @@
 					           ajaxURL: crmajaxURL,
 					           success:function (data){ 
 					           	if(data.values[0].is_created == 1){
+					           		window.location.reload(true);
+					           		/*
 						            if(data.count != 0){
+						             
+											
 						              cj.each(data.values, function(key, value) {
 						           		
 							    		var slotId = value.slot_id;
@@ -230,7 +239,8 @@
 		    				            cj("#slotDialog").dialog('close');
 		    				            return;
 						              });
-						            }
+									  
+						            } */
 					           }else {
 					            	var errorMessage = data.values[0].error_message;
 					           		 cj('#creatError').html('' + errorMessage.toString());
@@ -240,6 +250,8 @@
 					}
         		},
 			    Cancel: function() {
+			    	validator.resetForm();
+    				cj("#dialogForm")[0].reset();
 			        cj(this).dialog('close');
 			    }			        
 			}});
