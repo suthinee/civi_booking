@@ -116,7 +116,7 @@ function civicrm_api3_slot_create( $params ){
       }  
     }else{
         $error = array("is_created" => 0,
-                       "error_message" => "Cannot create a slot. Please check the the input data are available");
+                       "error_message" => "Unable to create slot. Please check the slot times are valid and that both clinicians are available for that date or time.");
         $value = array($error);
        return civicrm_api3_create_success($value,$params,'slot', 'create'); 
     }
