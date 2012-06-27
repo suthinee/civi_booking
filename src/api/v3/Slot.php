@@ -156,7 +156,7 @@ function civicrm_api3_slot_get( $params ){
           $timeOptions = array();
           foreach ($timeRange as $key => $time) { 
               $timeOptions[] =$time; 
-              $className = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['contact_id'] . $time;
+              $className = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['clinician_contact_id'] . $time;
               $classNames[] = $className;
               $slotTypes[$className] = array( 'sessionService' => $slot['session_service'],
                                               'slotId' => $slot['id']);
@@ -183,7 +183,6 @@ function civicrm_api3_slot_get( $params ){
         $contacts[$id]['display_name'] = CRM_Utils_Array::value('display_name',$contact);    
         $contacts[$id]['sort_name'] = CRM_Utils_Array::value('sort_name',$contact);    
       } 
-
         $days = array();
         $conts = array();
         foreach ($daysOfNextweek as $k => $day) {
@@ -202,7 +201,7 @@ function civicrm_api3_slot_get( $params ){
                   $id = date('d-m-Y', $day) . CRM_Utils_Array::value('contact_id',$contact) .  $timeKey;  
                   if (in_array($id, $classNames)) { 
                     $type = $slotTypes[$id]['sessionService'];
-                    $className = null;
+                    $className = null;                  
                     switch ($type) {
                     case 'Counselling':
                         $className = 'counselling';

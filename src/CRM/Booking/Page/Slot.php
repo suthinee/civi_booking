@@ -42,15 +42,22 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         $classNames = array();
         //convert slot to use strtotime 
         foreach($slots as $k => $slot){
-
             $timeRange = CRM_Booking_Utils_DateTime::createTimeRange($slot['start_time'], $slot['end_time'], '10 mins');
-            $timeOptions = array();
+            //$timeOptions = array();
+            $lastKey = end(array_keys($timeRange));
+
             foreach ($timeRange as $key => $time) { 
-                $timeOptions[] =$time; 
-                $classNames[] = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['room_no'] . $time;
+               $generated = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['room_no'] . $time;
+               //$classNames[$generated] = $generated;
+               if ($key == $lastKey) {
+                  $classNames[$generated]['lastKey'] = true;
+                } else {
+                  $classNames[$generated]['lastKey'] = false;
+                }               
             }      
          }
-     
+
+    
         $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '10 mins');
         $timeOptions = array();
         foreach ($timeRange as $key => $time) { 
@@ -76,13 +83,21 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                                         );  
                 $tdVals = array();
                 foreach($timeOptions as $timeKey => $time){
+                  //generated Id
                   $id = date('d-m-Y', $day) . CRM_Utils_Array::value('room_no',$room) .  $timeKey;  
-                  if (in_array($id, $classNames)) {                
-                    $tdVals[$id] = array('time' => $time,
+                  //check if generated Id is in the className array
+                  //if (in_array($id, $classNames)) {   
+                  if (isset($classNames[$id])){
+                  $class = 'reserved';
+                  $isLastKey = $classNames[$id]['lastKey'];
+                  if($isLastKey){
+                      $class = 'reservable';
+                  }   
+                  $tdVals[$id] = array('time' => $time,
                                        'defaultEndTime' => strtotime('+60 mins', $timeKey),
                                        'timeKey' => $timeKey,
                                        'tdataId' => $id,
-                                       'className' => 'reserved');
+                                       'className' =>  $class );
                   }else if  ($day < strtotime("now")){
                     $tdVals[$id] = array('time' => $time,
                                       'defaultEndTime' => strtotime('+60 mins', $timeKey),
