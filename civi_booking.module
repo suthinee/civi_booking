@@ -260,7 +260,7 @@ function civicrm_civicrm_navigationMenu( &$params ) {
 }
 
 function civi_booking_civicrm_xmlMenu( &$files ) {
-      //$files[] = drupal_get_path('module', 'civi_booking') . "/menu.xml";
+      $files[] = drupal_get_path('module', 'civi_booking') . "/menu.xml";
  }
 
 

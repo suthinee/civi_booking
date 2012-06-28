@@ -7,4 +7,11 @@
      <page_type>1</page_type>
      <weight>9000</weight>
   </item>
+  <item>
+     <path>civicrm/booking/mananage-rooms</path>
+     <title>Manage Room</title> 
+     <page_callback>CRM_Booking_Page_Room</page_callback>
+     <page_type>1</page_type>
+     <weight>9000</weight>
+  </item>
 </menu>
