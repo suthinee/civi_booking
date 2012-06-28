@@ -212,7 +212,7 @@
 				    	    cj().crmAPI ('slot','create',{'version' :'3', 
 				    	    							  'sequential' :'1',
 				    	    							  'contact_id' : contactId, 
-	  			    	    							  'contact_id_2' : contactId, 
+	  			    	    							  'contact_id_2' : contactId2, 
 				    	    							  'date' : unixDate, 
 				    	    							  'start_time' : startTime, 
 				    	    							  'end_time' : endTime, 

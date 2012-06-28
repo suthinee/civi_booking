@@ -46,7 +46,11 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
             $lastKey = end(array_keys($timeRange));
             foreach ($timeRange as $key => $time) { 
                $generated = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['room_no'] . $time;
-               $classNames[$generated]['tooltip'] = $slot['display_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'];
+               if($slot['attended_clinician_name'] == null){
+                $classNames[$generated]['tooltip'] = $slot['display_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'];
+               }else{
+                $classNames[$generated]['tooltip'] = $slot['display_name'] . ' and ' . $slot['attended_clinician_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'];
+               }          
                if ($key == $lastKey) {
                   $classNames[$generated]['lastKey'] = true;
                 } else {
