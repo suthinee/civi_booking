@@ -22,7 +22,7 @@ function civi_booking_init() {
   drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/jquery.validate.min.js');
   drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/additional-methods.min.js');
   //jQuery tooltips
-  drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/jquery.tooltip.min.js');
+  //////////drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/jquery.qtip-1.0.0-rc3.min.js');
 
 
 }
@@ -221,6 +221,7 @@ function create_time_range($start, $end, $by='30 mins') {
 function civicrm_civicrm_navigationMenu( &$params ) {
  
     //  Get the maximum key of $params
+  /*
     $maxKey = ( max( array_keys($params) ) );
 
     $params[$maxKey+1] = 
@@ -254,12 +255,12 @@ function civicrm_civicrm_navigationMenu( &$params ) {
                                 'active' => '1',
                               ),
                               'child' => NULL,
-                            )));
+                            ))); */
  
 }
 
 function civi_booking_civicrm_xmlMenu( &$files ) {
-      $files[] = drupal_get_path('module', 'civi_booking') . "/menu.xml";
+      //$files[] = drupal_get_path('module', 'civi_booking') . "/menu.xml";
  }
 
 

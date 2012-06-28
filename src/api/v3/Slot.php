@@ -71,8 +71,12 @@ function civicrm_api3_slot_create( $params ){
   	    $roomId = CRM_Utils_Array::value('id',$room);
   	    //break; //break as expected one
   	} 
-      $txn = db_transaction();
-      try{
+    $txn = db_transaction();
+    try{
+     if($contactId2 === ''){
+       $contactId2 = null;
+     }
+
   	 $id = db_insert('civi_booking_slot')
         ->fields(array(
         'clinician_contact_id' => $contactId,

@@ -32,26 +32,28 @@ class CRM_Booking_BAO_Slot{
         while ( $dao->fetch( ) ) {
           $results[] = $dao->toArray();   
        } 
-       if(empty($results) && !is_null($args['contactId2'])){
-         $params = array(
-          1 => array( $args['date'], 'String'),
-          2 => array($args['startTime'], 'String'),
-          3 => array($args['endTime'], 'String'),
-          4 => array($args['contactId2'], 'Integer')
-        );
-        $query = "SELECT civi_booking_slot.id
-              FROM civi_booking_slot 
-              LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.attended_clinician_contact_id
-              WHERE civi_booking_slot.status = 1 
-              AND civi_booking_slot.slot_date  = %1
-              AND civi_booking_slot.attended_clinician_contact_id = %4
-              AND (civi_booking_slot.start_time BETWEEN %2 AND %3 OR civi_booking_slot.end_time BETWEEN %2 AND %3)";
+       if(!is_null($args['contactId2'])){
+         if(empty($results) && !$args['contactId2'] == ''){
+           $params = array(
+            1 => array( $args['date'], 'String'),
+            2 => array($args['startTime'], 'String'),
+            3 => array($args['endTime'], 'String'),
+            4 => array($args['contactId2'], 'Integer')
+          );
+          $query = "SELECT civi_booking_slot.id
+                FROM civi_booking_slot 
+                LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.attended_clinician_contact_id
+                WHERE civi_booking_slot.status = 1 
+                AND civi_booking_slot.slot_date  = %1
+                AND civi_booking_slot.attended_clinician_contact_id = %4
+                AND (civi_booking_slot.start_time BETWEEN %2 AND %3 OR civi_booking_slot.end_time BETWEEN %2 AND %3)";
 
-        require_once('CRM/Core/DAO.php');   
-        $dao = CRM_Core_DAO::executeQuery( $query , $params );
-         while ( $dao->fetch( ) ) {
-            $results[] = $dao->toArray();   
-         } 
+          require_once('CRM/Core/DAO.php');   
+          $dao = CRM_Core_DAO::executeQuery( $query , $params );
+           while ( $dao->fetch( ) ) {
+              $results[] = $dao->toArray();   
+           } 
+         }
        }
       return $results;
     }
@@ -70,11 +72,11 @@ class CRM_Booking_BAO_Slot{
                end_time, 
                room_no,
                slot_date,
-                session_service
+               session_service
         FROM civi_booking_slot
         LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
         LEFT JOIN civicrm_contact con1 ON con1.id = civi_booking_slot.clinician_contact_id 
-        JOIN civicrm_contact con2 on con2.id = civi_booking_slot.attended_clinician_contact_id
+        LEFT JOIN civicrm_contact con2 ON con2.id = civi_booking_slot.attended_clinician_contact_id
         WHERE slot_date BETWEEN %1 AND %2";  
          
       require_once('CRM/Core/DAO.php'); 
