@@ -101,3 +101,15 @@ td.slot{
 
 label.error { float: none; color: red; padding-left: .5em; vertical-align: top; }
 div.creatError{float: none; color: red; padding-left: .5em; vertical-align: top;}
+
+/*Jitesh add down arrow */
+
+ .filters legend{
+
+padding-left: 16px !important;
+background: url(../img/down_arrow.gif) no-repeat 0% 40% !important;
+cursor: pointer !important;
+ 
+ }
+ 
+/*////////////////////////////////// */
