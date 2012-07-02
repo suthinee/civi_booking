@@ -363,11 +363,10 @@ if(isset($action) && $action == 'get'){
             LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
             WHERE civi_booking_slot.status = 1
             AND civi_booking_slot.activity_type = 50
-            AND civi_booking_slot.session_service = %1";
-            //AND civi_booking_slot.slot_date BETWEEN %3 AND %4";
+            AND civi_booking_slot.session_service = %1
+            AND civi_booking_slot.slot_date BETWEEN %3 AND %4";
   if(isset($centre) && ($centre == 'WS' || $centre == 'AL')){
     $query .=  "\n AND civi_booking_room.building = %2";
-    dump('test');
   }
   civicrm_initialize( );
   require_once 'CRM/Booking/Utils/DateTime.php';
@@ -389,17 +388,17 @@ if(isset($action) && $action == 'get'){
   $dao = CRM_Core_DAO::executeQuery( $query, $params);
   $results = array ();
   $results['is_error'] = "0";
-  $results['results']['slots'] = "";
+  //$results['results'] = 0;
   $results['nextWeek'] = strtotime("next Monday" , $startDate);
   $results['lastWeek'] = strtotime("last Monday" , $startDate);
   while ( $dao->fetch( ) ) {
       $daoArr = $dao->toArray();
       $id = $daoArr['id'];
-      $results['results']['slots'][$id]['slot_id'] = $id; 
-      $results['results']['slots'][$id]['slot_date'] = date('d/m/Y', strtotime($daoArr['slot_date']));
-      $results['results']['slots'][$id]['slot_day'] = date(l, strtotime($daoArr['slot_date']));; 
-      $results['results']['slots'][$id]['start_time'] = date('G:i', strtotime($daoArr['start_time'])); 
-      $results['results']['slots'][$id]['end_time'] = date('G:i', strtotime($daoArr['end_time'])); 
+      $results['results'][$id]['slot_id'] = $id; 
+      $results['results'][$id]['slot_date'] = date('d/m/Y', strtotime($daoArr['slot_date']));
+      $results['results'][$id]['slot_day'] = date(l, strtotime($daoArr['slot_date']));; 
+      $results['results'][$id]['start_time'] = date('G:i', strtotime($daoArr['start_time'])); 
+      $results['results'][$id]['end_time'] = date('G:i', strtotime($daoArr['end_time'])); 
 
   }
 }
