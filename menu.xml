@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <menu>
  <item>
-     <path>civicrm/booking/create-slots</path>
+     <path>civicrm/booking/slot/create</path>
      <title>Create slots</title> 
      <page_callback>CRM_Booking_Page_Slot</page_callback>
      <page_type>1</page_type>
      <weight>9000</weight>
   </item>
   <item>
-     <path>civicrm/booking/mananage-rooms</path>
-     <title>Manage Room</title> 
+     <path>civicrm/booking/room/manage</path>
+     <title>Manage Rooms</title> 
      <page_callback>CRM_Booking_Page_Room</page_callback>
      <page_type>1</page_type>
-     <weight>9000</weight>
+     <weight>9001</weight>
+  </item>
+  <item>
+     <path>civicrm/booking/room/edit</path>
+     <title>Manage Rooms</title> 
+     <page_callback>CRM_Booking_Form_Room</page_callback>
+     <page_type>1</page_type>
+     <weight>9002</weight>
   </item>
 </menu>

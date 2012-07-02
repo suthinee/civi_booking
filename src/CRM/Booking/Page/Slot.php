@@ -76,7 +76,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
 
 
      
-        $roomResults = CRM_Booking_BAO_Room::getRoom();
+        $roomResults = CRM_Booking_BAO_Room::getRooms();
 
         $days = array();
         $rooms = array();
