@@ -94,10 +94,9 @@
     var unixDate = null;
     var roomNo = null;
 
-    //set noConflict for tooltips to work
-    var jq = jQuery.noConflict();
-
 	cj(window).load(function(){
+
+		cj('#filterTable').hide();
 
 		cj("#roomFilter").change(function(event) {
 			var room = cj('select[name="roomFilter"]').val(); 
