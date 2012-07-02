@@ -353,8 +353,6 @@ function civi_booking_menu() {
 function _avability_slots($action, $service, $centre = null, $startDate = null) {
 if(isset($action) && $action == 'get'){
 
-
-
   $query = "SELECT
               civi_booking_slot.id as id, 
               civi_booking_slot.start_time as start_time,
@@ -367,9 +365,9 @@ if(isset($action) && $action == 'get'){
             AND civi_booking_slot.activity_type = 50
             AND civi_booking_slot.session_service = %1";
             //AND civi_booking_slot.slot_date BETWEEN %3 AND %4";
-
-  if(isset($centre) && $centre != ''){
+  if(isset($centre) && ($centre == 'WS' || $centre == 'AL')){
     $query .=  "\n AND civi_booking_room.building = %2";
+    dump('test');
   }
   civicrm_initialize( );
   require_once 'CRM/Booking/Utils/DateTime.php';
@@ -406,8 +404,8 @@ if(isset($action) && $action == 'get'){
   }
 }
 
-
 echo json_encode ($results);
+
 }
 
 function dump($val) {

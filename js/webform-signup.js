@@ -53,7 +53,7 @@
 		var service = $('select[name="submitted[civicrm_1_activity_1_cg7_custom_15]"]').val(); 
 		var basePath = window.location.hostname + '/';
 		console.log(basePath);
-		var url = "/tccr/apis/slot/get/" + centre + "/" + service;
+		var url = "/tccr/slot/get/" + service + "/" + centre;
 		console.log(url);
 		$.getJSON(url, function(data){
 				console.log(data);
