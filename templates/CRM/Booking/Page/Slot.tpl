@@ -22,7 +22,7 @@
 
 <div style="height:10px">&nbsp;</div>
 <form id="filterForm"> 
-	<fieldset>
+	<fieldset class="filters">
 	<legend onclick="toggleFieldset(this);">Filters</legend>	
 	<tabl id="filterTable">
 		<tr>
