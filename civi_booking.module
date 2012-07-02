@@ -263,13 +263,6 @@ function civi_booking_civicrm_xmlMenu( &$files ) {
       $files[] = drupal_get_path('module', 'civi_booking') . "/menu.xml";
  }
 
-
-function dump($val) {
-    echo '<pre>'.var_export($val,true).'</pre>';
-    return $val;
-}
-
-
 /**
  * Implements hook_webform_select_options_info().
  */
@@ -344,9 +337,12 @@ function civi_booking_webform_submission_insert($node, $submission) {
  * Implements hook_menu().
 */
 function civi_booking_menu() {
-
-  $items['apis/slot/get/%/%/%/%'] = array(
+  /**
+  * @Params (centre, services, start_date, end_date)
+  */
+  $items['slot/get/%'] = array(
      'page callback' => '_avability_slots',
+     'page arguments' => array(1,2,3,4,5),
      'access arguments' => array('access content'),
   );
   
@@ -354,81 +350,71 @@ function civi_booking_menu() {
 
 }
 
-function _avability_slots() {
-   
+function _avability_slots($action, $service, $centre = null, $startDate = null) {
+if(isset($action) && $action == 'get'){
+
+
+
   $query = "SELECT
               civi_booking_slot.id as id, 
               civi_booking_slot.start_time as start_time,
               civi_booking_slot.end_time as end_time, 
-              civi_booking_slot.slot_date as slot_date,
-              civi_booking_slot.session_service as session_service,
-              civi_booking_room.room_no as room_no,
-              civicrm_contact.id as contact_id,
-              civicrm_contact.sort_name as sort_name
+              civi_booking_slot.slot_date as slot_date
             FROM civi_booking_slot 
             LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.clinician_contact_id
             LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
-            WHERE civi_booking_slot.status = 1 
+            WHERE civi_booking_slot.status = 1
             AND civi_booking_slot.activity_type = 50
-            AND civi_booking_slot.slot_date < now()";
+            AND civi_booking_slot.session_service = %1";
+            //AND civi_booking_slot.slot_date BETWEEN %3 AND %4";
+
+  if(isset($centre) && $centre != ''){
+    $query .=  "\n AND civi_booking_room.building = %2";
+  }
   civicrm_initialize( );
+  require_once 'CRM/Booking/Utils/DateTime.php';
+  if(isset($startDate) && $startDate != ''){
+    $daysOfNextweek = CRM_Booking_Utils_DateTime::getWeeklyCalendar($startDate);
+  }else{
+    $daysOfNextweek = CRM_Booking_Utils_DateTime::getWeeklyCalendar();
+  }
+  $startDate = array_shift(array_values($daysOfNextweek));
+  $endDate =  end($daysOfNextweek); 
+
+  $query .= "\n ORDER BY civi_booking_slot.slot_date";
+
+  $params = array( 1 => array( $service, 'String'),
+                   2 => array( $centre, 'String'),
+                   3 => array(date('Y-m-d H:i:s', $startDate), 'String'),
+                   4 => array( date('Y-m-d H:i:s',$endDate), 'String'));
   require_once('CRM/Core/DAO.php');   
-  $dao = CRM_Core_DAO::executeQuery( $query );
+  $dao = CRM_Core_DAO::executeQuery( $query, $params);
   $results = array ();
   $results['is_error'] = "0";
+  $results['results']['slots'] = "";
+  $results['nextWeek'] = strtotime("next Monday" , $startDate);
+  $results['lastWeek'] = strtotime("last Monday" , $startDate);
   while ( $dao->fetch( ) ) {
-      $results['results'][] = $dao->toArray();   
-  }
+      $daoArr = $dao->toArray();
+      $id = $daoArr['id'];
+      $results['results']['slots'][$id]['slot_id'] = $id; 
+      $results['results']['slots'][$id]['slot_date'] = date('d/m/Y', strtotime($daoArr['slot_date']));
+      $results['results']['slots'][$id]['slot_day'] = date(l, strtotime($daoArr['slot_date']));; 
+      $results['results']['slots'][$id]['start_time'] = date('G:i', strtotime($daoArr['start_time'])); 
+      $results['results']['slots'][$id]['end_time'] = date('G:i', strtotime($daoArr['end_time'])); 
 
-  echo json_encode ($results);
+  }
 }
 
 
-
-function find_slot(){
-
-  $query = "SELECT
-              civi_booking_slot.id as id, 
-              civi_booking_slot.start_time as start_time,
-              civi_booking_slot.end_time as end_time, 
-              civi_booking_slot.slot_date as slot_date,
-              civi_booking_slot.session_service as session_service,
-              civi_booking_room.room_no as room_no,
-              civicrm_contact.id as contact_id,
-              civicrm_contact.sort_name as sort_name
-            FROM civi_booking_slot 
-            LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.clinician_contact_id
-            LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
-            WHERE civi_booking_slot.status = 1 
-            AND civi_booking_slot.activity_type = 50
-            AND civi_booking_slot.slot_date < now()";
-  civicrm_initialize( );
-  require_once('CRM/Core/DAO.php');   
-  $dao = CRM_Core_DAO::executeQuery( $query );
-  $results = array ();
-    while ( $dao->fetch( ) ) {
-      $results[] = $dao->toArray();   
-   }
-
-  $slots = array();
-  if(sizeof($results) == 0){
-    $slots[] = t('-- No available slots found --');
-  }else{
-    $slots[] = t('-- Select a slot --');
-  }
-  foreach($results as $slot){
-    $id = CRM_Utils_Array::value('id',$slot);
-    $date = new DateTime(CRM_Utils_Array::value('slot_date',$slot));
-    $slots[$id] = CRM_Utils_Array::value('sort_name',$slot) . ', ' . 
-    CRM_Utils_Array::value('room_no',$slot) . ', ' . 
-    date_format($date, 'l d/m/Y' ) . ',' . 
-    date('G:i', strtotime(CRM_Utils_Array::value('start_time',$slot)))  . ' - ' . 
-    date('G:i', strtotime(CRM_Utils_Array::value('end_time',$slot)))  ;  
-  } 
-  
-  return $slots;
-       
+echo json_encode ($results);
 }
+
+function dump($val) {
+    echo '<pre>'.var_export($val,true).'</pre>';
+    return $val;
+}
+
 
 
 
