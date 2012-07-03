@@ -55,7 +55,8 @@ function civi_booking_civicrm_config(&$config) {
  */
 function civi_booking_civicrm_buildForm($formName, &$form) {
   if ($formName == 'CRM_Case_Form_Activity') {
-    if($form->getAction() == CRM_Core_Action::ADD){
+    if($form->getAction() == CRM_Core_Action::ADD 
+      || $form->getAction() == CRM_Core_Action::UPDATE){
 
       $activityTypeId =  $form->_activityTypeId;
       if($activityTypeId == 50 || 
