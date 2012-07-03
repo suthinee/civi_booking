@@ -96,71 +96,162 @@ function civi_booking_civicrm_buildForm($formName, &$form) {
   }
 }
 
+function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
+  //dump($op);
+  dump($objectId);
+  //dump($objectName);
+  dump($objectRef);
+  if($objectName == 'Activity'){
+    $activityTypeId = $objectRef->activity_type_id;
+    $originalId = $objectRef->original_id;    
+    dump($originalId);
+    if(isset($activityTypeId) &&
+          $activityTypeId == 51 ||
+          $activityTypeId == 52 ){
+      if($op == 'create' && $objectRef->original_id){
+        //$results = CRM_Activity_BAO_Activity::getPriorAcitivities($objectId, true);
+        $priorObj = array_shift(array_values($results));
+        $lastedId = $priorObj['id'];
+        dump($lastedId);
+        $query = "
+SELECT max(ca.id) as activityID
+FROM civicrm_log cl, civicrm_contact c, civicrm_activity ca
+WHERE (ca.id = %1 OR ca.original_id = %1)
+AND cl.entity_table = 'civicrm_activity'
+AND cl.entity_id    = ca.id
+AND cl.modified_id  = c.id
+AND ca.id < {$objectId}
+ORDER BY ca.id DESC";
+       
+               
+
+      $params = array( 1 => array( $originalId, 'Integer' ) );
+      $activityID    = CRM_Core_DAO::singleValueQuery( $query, $params );
+      /*          
+      $results = array ();
+      while ( $dao->fetch( ) ) {
+          $results[] = $dao->toArray();          
+      }*/
+      dump($activityID);
+
+      $query = "SELECT cc.slot_id_34
+        FROM civicrm_value_additional_activity_info_8 cc
+        WHERE cc.entity_id = %1";
+         
+      $params = array( 1 => array( $activityID, 'Integer' ) );
+      $priorActSlotId = CRM_Core_DAO::singleValueQuery( $query,  $params );
+
+      $params = array( 1 => array( $objectId, 'Integer' ) );
+      $currentActSlotId = CRM_Core_DAO::singleValueQuery( $query,  $params );
+      if($priorActSlotId != $currentActSlotId){ //A slot has been changed
+          //release a slot
+          CRM_Booking_BAO_Slot::setSlotStatus(array('slot_id' => $priorActSlotId ,'status' => 1)); 
+      }
+     // $results = array ();
+      //while ( $dao->fetch( ) ) {
+      //    $results[] = $dao->toArray();          
+     // }
+      //dump($dao);
+      //xit;
+      }
+    }
+  }
+  //dump($results);
+  //exit;
+}
 
 function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
   if($objectName == 'Activity'){
     $activityTypeId = CRM_Utils_Array::value('activity_type_id',$params);
+   
     if(isset($activityTypeId) &&
           $activityTypeId == 51 ||
           $activityTypeId == 52 ){ 
 
       if($op == 'create'){
 
-        $slotId = CRM_Utils_Array::value('slot_id',$params);
-        //TODO Check if $slotId exist;
-        if(is_null($slotId) && $slotId == ''){
-          return;
-        }
-        civicrm_initialize( );
-        require_once 'CRM/Booking/BAO/Slot.php';
-        CRM_Booking_BAO_Slot::setSlotStatus(array('slot_id' => $slotId ,'status' => 2)); //set status to 2 to reserved 
 
-        $results = CRM_Booking_BAO_Slot::getSlotById($slotId);
-        $slot = $results[0];
+                                                      
+        //if(CRM_Utils_Array::value('original_id',$params)){ //if original id exist, edit
+          /*
+           $results = civicrm_api("Activity","get", array ('version' => '3',
+                                                           'sequential' =>'1',
+                                                           'is_current_revision' => 0,
+                                                           'original_id' => $originalId ));
 
-        $startTime = (CRM_Utils_Array::value('start_time',$slot)); 
-        $endTime   = (CRM_Utils_Array::value('end_time',$slot)); 
+           $parentActivityId = CRM_Activity_BAO_Activity::getParentActivity($originalId);
+           $currentActivityId = CRM_Activity_BAO_Activity::getParentActivity($originalId);
 
-        //Convert date to slot timestamp
-        $slotTimestamp = strtotime(CRM_Utils_Array::value('slot_date',$slot));
+           //dump($parentActivityId);
+           //dump($currentActivityId);
+           dump($results);
+           if($results['values'] == null){
+             $results = civicrm_api("Activity","get", array ('version' => '3',
+                                                           'sequential' =>'1',
+                                                           'is_current_revision' => 0,
+                                                           'id' => $originalId ));
+           }
 
-        //Convert timestamp to date formate thst CiviCRM uses.
-        $params['activity_date_time'] =  date('m/d/Y', $slotTimestamp);
-        $params['activity_date_time_time'] = date('g:iA', strtotime($startTime));
+           dump($results);
+           exit;
+          */
 
-        //process date for proper formate
-        $params['activity_date_time'] = CRM_Utils_Date::processDate( $params['activity_date_time'], $params['activity_date_time_time'] );
-          
-        //set assignee contact ids
-        $params['assignee_contact_id'] = array();
-        $params['assignee_contact_id'][0] = CRM_Utils_Array::value('clinician_contact_id',$slot);
-        if(CRM_Utils_Array::value('attended_clinician_contact_id',$slot)){
-          $params['assignee_contact_id'][1] = CRM_Utils_Array::value('attended_clinician_contact_id',$slot);
-        }
+        //}else{
+        //  echo 'add';
+          //exit;
 
-        //set activity location
-        $params['location'] = CRM_Utils_Array::value('room_no',$slot);
-        $params['duration'] = round(abs(strtotime($endTime) - strtotime($startTime)) / 60,2);
+          //$slotId = CRM_Utils_Array::value('slot_id',$params);
+          $slotId = $params['custom']['34']['-1']['value'];
 
-        //hacked adding slot id for custom field'
-        //$params['custom_34_-1'] = $slotId;
-        //$params['custom']['34']['-1']['value'] = $slotId;
+          //exit;
+          //TODO Check if $slotId exist;
+          if(is_null($slotId) && $slotId == ''){
+            return;
+          }
+          civicrm_initialize( );
+          require_once 'CRM/Booking/BAO/Slot.php';
+          CRM_Booking_BAO_Slot::setSlotStatus(array('slot_id' => $slotId ,'status' => 2)); //set status to 2 to reserved 
 
-        //TODO: add session service
-        //hacked adding session service for custom field'
-        $params['custom_16_-1'] =  CRM_Utils_Array::value('session_service',$slot);
-        $params['custom']['16']['-1']['value'] =  CRM_Utils_Array::value('session_service',$slot);
+          $results = CRM_Booking_BAO_Slot::getSlotById($slotId);
+          $slot = $results[0];
 
-        $params['custom_22_-1'] = CRM_Utils_Array::value('centre',$slot);
-        $params['custom']['22']['-1']['value'] = CRM_Utils_Array::value('centre',$slot);
-        
-       
-        }else if($op == 'edit'){
+          $startTime = (CRM_Utils_Array::value('start_time',$slot)); 
+          $endTime   = (CRM_Utils_Array::value('end_time',$slot)); 
 
-          echo 'edit';
-          exit;
+          //Convert date to slot timestamp
+          $slotTimestamp = strtotime(CRM_Utils_Array::value('slot_date',$slot));
 
-        }
+          //Convert timestamp to date formate thst CiviCRM uses.
+          $params['activity_date_time'] =  date('m/d/Y', $slotTimestamp);
+          $params['activity_date_time_time'] = date('g:iA', strtotime($startTime));
+
+          //process date for proper formate
+          $params['activity_date_time'] = CRM_Utils_Date::processDate( $params['activity_date_time'], $params['activity_date_time_time'] );
+            
+          //set assignee contact ids
+          $params['assignee_contact_id'] = array();
+          $params['assignee_contact_id'][0] = CRM_Utils_Array::value('clinician_contact_id',$slot);
+          if(CRM_Utils_Array::value('attended_clinician_contact_id',$slot)){
+            $params['assignee_contact_id'][1] = CRM_Utils_Array::value('attended_clinician_contact_id',$slot);
+          }
+
+          //set activity location
+          $params['location'] = CRM_Utils_Array::value('room_no',$slot);
+          $params['duration'] = round(abs(strtotime($endTime) - strtotime($startTime)) / 60,2);
+
+          //hacked adding slot id for custom field'
+          //$params['custom_34_-1'] = $slotId;
+          //$params['custom']['34']['-1']['value'] = $slotId;
+
+          //TODO: add session service
+          //hacked adding session service for custom field'
+          $params['custom_16_-1'] =  CRM_Utils_Array::value('session_service',$slot);
+          $params['custom']['16']['-1']['value'] =  CRM_Utils_Array::value('session_service',$slot);
+
+          $params['custom_22_-1'] = CRM_Utils_Array::value('centre',$slot);
+          $params['custom']['22']['-1']['value'] = CRM_Utils_Array::value('centre',$slot);
+       //}
+      }
     }
   }
 }
