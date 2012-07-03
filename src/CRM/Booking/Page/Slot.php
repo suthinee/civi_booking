@@ -171,7 +171,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         );  
 
 
-        $this->assign('activityTypes', $activityTypes);
+      $this->assign('activityTypes', $activityTypes);
 
         //TODO: Create BAO for getting these values to avoid five queries
        $counselling = CRM_Core_OptionGroup::getValue( 'service_20120221114757', 'Counselling' );
