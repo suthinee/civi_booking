@@ -97,22 +97,16 @@ function civi_booking_civicrm_buildForm($formName, &$form) {
 }
 
 function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
-  //dump($op);
-  dump($objectId);
-  //dump($objectName);
-  dump($objectRef);
+
   if($objectName == 'Activity'){
     $activityTypeId = $objectRef->activity_type_id;
     $originalId = $objectRef->original_id;    
-    dump($originalId);
+ 
     if(isset($activityTypeId) &&
           $activityTypeId == 51 ||
           $activityTypeId == 52 ){
-      if($op == 'create' && $objectRef->original_id){
-        //$results = CRM_Activity_BAO_Activity::getPriorAcitivities($objectId, true);
-        $priorObj = array_shift(array_values($results));
-        $lastedId = $priorObj['id'];
-        dump($lastedId);
+      if($op == 'create' && isset($originalId)){
+        //Query for the prior activity
         $query = "
 SELECT max(ca.id) as activityID
 FROM civicrm_log cl, civicrm_contact c, civicrm_activity ca
@@ -123,15 +117,10 @@ AND cl.modified_id  = c.id
 AND ca.id < {$objectId}
 ORDER BY ca.id DESC";
        
-               
-
+              
       $params = array( 1 => array( $originalId, 'Integer' ) );
       $activityID    = CRM_Core_DAO::singleValueQuery( $query, $params );
-      /*          
-      $results = array ();
-      while ( $dao->fetch( ) ) {
-          $results[] = $dao->toArray();          
-      }*/
+ 
       dump($activityID);
 
       $query = "SELECT cc.slot_id_34
@@ -147,17 +136,10 @@ ORDER BY ca.id DESC";
           //release a slot
           CRM_Booking_BAO_Slot::setSlotStatus(array('slot_id' => $priorActSlotId ,'status' => 1)); 
       }
-     // $results = array ();
-      //while ( $dao->fetch( ) ) {
-      //    $results[] = $dao->toArray();          
-     // }
-      //dump($dao);
-      //xit;
+   
       }
     }
   }
-  //dump($results);
-  //exit;
 }
 
 function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
@@ -169,36 +151,6 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
           $activityTypeId == 52 ){ 
 
       if($op == 'create'){
-
-
-                                                      
-        //if(CRM_Utils_Array::value('original_id',$params)){ //if original id exist, edit
-          /*
-           $results = civicrm_api("Activity","get", array ('version' => '3',
-                                                           'sequential' =>'1',
-                                                           'is_current_revision' => 0,
-                                                           'original_id' => $originalId ));
-
-           $parentActivityId = CRM_Activity_BAO_Activity::getParentActivity($originalId);
-           $currentActivityId = CRM_Activity_BAO_Activity::getParentActivity($originalId);
-
-           //dump($parentActivityId);
-           //dump($currentActivityId);
-           dump($results);
-           if($results['values'] == null){
-             $results = civicrm_api("Activity","get", array ('version' => '3',
-                                                           'sequential' =>'1',
-                                                           'is_current_revision' => 0,
-                                                           'id' => $originalId ));
-           }
-
-           dump($results);
-           exit;
-          */
-
-        //}else{
-        //  echo 'add';
-          //exit;
 
           //$slotId = CRM_Utils_Array::value('slot_id',$params);
           $slotId = $params['custom']['34']['-1']['value'];
@@ -250,7 +202,7 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
 
           $params['custom_22_-1'] = CRM_Utils_Array::value('centre',$slot);
           $params['custom']['22']['-1']['value'] = CRM_Utils_Array::value('centre',$slot);
-       //}
+       
       }
     }
   }
