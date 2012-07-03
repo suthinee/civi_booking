@@ -111,8 +111,7 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
         }
         civicrm_initialize( );
         require_once 'CRM/Booking/BAO/Slot.php';
-        CRM_Booking_BAO_Slot::setSlotStatus(new array('slot_id') => $slotId
-                                                      'status', = 2); //set status to 2 to reserved 
+        CRM_Booking_BAO_Slot::setSlotStatus(array('slot_id' => $slotId ,'status' => 2)); //set status to 2 to reserved 
 
         $results = CRM_Booking_BAO_Slot::getSlotById($slotId);
         $slot = $results[0];
