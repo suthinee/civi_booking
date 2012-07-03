@@ -21,8 +21,7 @@ class CRM_Booking_BAO_Slot{
       $query = "SELECT civi_booking_slot.id
             FROM civi_booking_slot 
             LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.clinician_contact_id
-            WHERE civi_booking_slot.status = 1 
-            AND civi_booking_slot.slot_date  = %1
+            WHERE civi_booking_slot.slot_date  = %1
             AND civi_booking_slot.clinician_contact_id = %4
             AND (civi_booking_slot.start_time BETWEEN %2 AND %3 OR civi_booking_slot.end_time BETWEEN %2 AND %3)";
 
@@ -42,8 +41,7 @@ class CRM_Booking_BAO_Slot{
           );
           $query = "SELECT civi_booking_slot.id
                 FROM civi_booking_slot 
-                LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.attended_clinician_contact_id
-                WHERE civi_booking_slot.status = 1 
+                WHERE LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.attended_clinician_contact_id
                 AND civi_booking_slot.slot_date  = %1
                 AND civi_booking_slot.attended_clinician_contact_id = %4
                 AND (civi_booking_slot.start_time BETWEEN %2 AND %3 OR civi_booking_slot.end_time BETWEEN %2 AND %3)";
@@ -58,7 +56,7 @@ class CRM_Booking_BAO_Slot{
       return $results;
     }
 
-    static function getSlots($startDate = null, $endDate = null, $activityType = 0){  
+    static function getSlots($startDate = null, $endDate = null, $activityType = 0, $status = 1){  
       $query = "SELECT civi_booking_slot.id as id,
                con1.display_name as display_name,
                con2.display_name as attended_clinician_name,
@@ -72,7 +70,7 @@ class CRM_Booking_BAO_Slot{
         LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
         LEFT JOIN civicrm_contact con1 ON con1.id = civi_booking_slot.clinician_contact_id
         LEFT JOIN civicrm_contact con2 ON con2.id = civi_booking_slot.attended_clinician_contact_id
-        WHERE 1 = 1";
+        WHERE civi_booking_slot.status = %4";
 
       if(isset($startDate) && isset($endDate)){  
         $query .= "\n AND civi_booking_slot.slot_date BETWEEN %1 AND %2";
@@ -83,7 +81,8 @@ class CRM_Booking_BAO_Slot{
       $params = array(
         1 => array( $startDate, 'String'),
         2 => array( $endDate, 'String'),
-        3 => array( $activityType, 'Integer')
+        3 => array( $activityType, 'Integer'),
+        4 => array( $status, 'Integer')
       ); 
       require_once('CRM/Core/DAO.php'); 
       $dao = CRM_Core_DAO::executeQuery( $query,  $params );
