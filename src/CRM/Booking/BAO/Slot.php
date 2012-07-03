@@ -41,8 +41,8 @@ class CRM_Booking_BAO_Slot{
           );
           $query = "SELECT civi_booking_slot.id
                 FROM civi_booking_slot 
-                WHERE LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.attended_clinician_contact_id
-                AND civi_booking_slot.slot_date  = %1
+                LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.attended_clinician_contact_id
+                WHERE civi_booking_slot.slot_date  = %1
                 AND civi_booking_slot.attended_clinician_contact_id = %4
                 AND (civi_booking_slot.start_time BETWEEN %2 AND %3 OR civi_booking_slot.end_time BETWEEN %2 AND %3)";
 
@@ -102,6 +102,7 @@ class CRM_Booking_BAO_Slot{
      * @access public
      */
     static function setSlotStatus($params){
+    
        if ( !$params['slot_id'] && !$params['status'] ) {
             return;
        }
@@ -122,17 +123,19 @@ WHERE id = %2
         return;
       }
       $params = array(1 => array( $id, 'Integer'));
-      $query = "SELECT id, 
+      $query = "SELECT civi_booking_slot.id, 
                       start_time,
                       end_time,
                       slot_date, 
-                      room_id,
+                      room_no,
                       session_service,
                       clinician_contact_id,
                       attended_clinician_contact_id,
-                      status
+                      status,
+                      civi_booking_room.building as centre
         FROM civi_booking_slot
-        WHERE id = %1";
+        LEFT JOIN civi_booking_room ON civi_booking_slot.room_id = civi_booking_room.id
+        WHERE civi_booking_slot.id = %1";
          
       
       require_once('CRM/Core/DAO.php'); 

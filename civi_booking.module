@@ -106,6 +106,7 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
       if($op == 'create'){
 
         $slotId = CRM_Utils_Array::value('slot_id',$params);
+        //TODO Check if $slotId exist;
         if(is_null($slotId) && $slotId == ''){
           return;
         }
@@ -135,24 +136,24 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
         if(CRM_Utils_Array::value('attended_clinician_contact_id',$slot)){
           $params['assignee_contact_id'][1] = CRM_Utils_Array::value('attended_clinician_contact_id',$slot);
         }
-      
+
         //set activity location
         $params['location'] = CRM_Utils_Array::value('room_no',$slot);
         $params['duration'] = round(abs(strtotime($endTime) - strtotime($startTime)) / 60,2);
 
         //hacked adding slot id for custom field'
-        $params['custom_34_-1'] = $slotId;
-        $params['custom']['34']['-1']['value'] = $slotId;
+        //$params['custom_34_-1'] = $slotId;
+        //$params['custom']['34']['-1']['value'] = $slotId;
 
         //TODO: add session service
         //hacked adding session service for custom field'
-        $params['custom_16_-1'] =  CRM_Utils_Array::value('session_service',$slot);;
+        $params['custom_16_-1'] =  CRM_Utils_Array::value('session_service',$slot);
         $params['custom']['16']['-1']['value'] =  CRM_Utils_Array::value('session_service',$slot);
-        dump($params);
 
-        exit;
-
-    
+        $params['custom_22_-1'] = CRM_Utils_Array::value('centre',$slot);
+        $params['custom']['22']['-1']['value'] = CRM_Utils_Array::value('centre',$slot);
+        
+       
         }else if($op == 'edit'){
 
           echo 'edit';
