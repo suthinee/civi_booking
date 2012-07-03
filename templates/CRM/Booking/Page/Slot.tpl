@@ -24,7 +24,7 @@
 <form id="filterForm"> 
 	<fieldset class="filters">
 	<legend onclick="toggleFieldset(this);">Filters</legend>	
-	<tabl id="filterTable">
+	<tabl id="filterTable" style="display: none;">
 		<tr>
 			<td>
 				<label for="dateFilter">Date: </label>

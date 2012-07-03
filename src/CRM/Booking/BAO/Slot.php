@@ -58,12 +58,7 @@ class CRM_Booking_BAO_Slot{
       return $results;
     }
 
-    static function getSlotByDate($startDate, $endDate){
-      $params = array(
-        1 => array( $startDate, 'String'),
-        2 => array( $endDate, 'String')
-          );
-
+    static function getSlots($startDate = null, $endDate = null, $activityType = 0){  
       $query = "SELECT civi_booking_slot.id as id,
                con1.display_name as display_name,
                con2.display_name as attended_clinician_name,
@@ -75,10 +70,21 @@ class CRM_Booking_BAO_Slot{
                session_service
         FROM civi_booking_slot
         LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
-        LEFT JOIN civicrm_contact con1 ON con1.id = civi_booking_slot.clinician_contact_id 
+        LEFT JOIN civicrm_contact con1 ON con1.id = civi_booking_slot.clinician_contact_id
         LEFT JOIN civicrm_contact con2 ON con2.id = civi_booking_slot.attended_clinician_contact_id
-        WHERE slot_date BETWEEN %1 AND %2";  
-         
+        WHERE 1 = 1";
+
+      if(isset($startDate) && isset($endDate)){  
+        $query .= "\n AND civi_booking_slot.slot_date BETWEEN %1 AND %2";
+      }  
+      if(isset($activityType) && $activityType != 0){
+        $query .= "\n AND civi_booking_slot.activity_type = %3";
+      }
+      $params = array(
+        1 => array( $startDate, 'String'),
+        2 => array( $endDate, 'String'),
+        3 => array( $activityType, 'Integer')
+      ); 
       require_once('CRM/Core/DAO.php'); 
       $dao = CRM_Core_DAO::executeQuery( $query,  $params );
       $results = array ();
@@ -86,9 +92,8 @@ class CRM_Booking_BAO_Slot{
           $results[] = $dao->toArray();          
       }
       return $results;
-
     }
-
+    /*
     static function getSlots($activityType, $startDate = null, $endDate = null){
       $params = array(1 => array( $activityType, 'Integer'));
       $query = "SELECT civi_booking_slot.id, 
@@ -116,6 +121,7 @@ class CRM_Booking_BAO_Slot{
       }
       return $results;
     }
+    */
 
 }
      

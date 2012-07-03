@@ -133,7 +133,6 @@ function civicrm_api3_slot_get( $params ){
 	$activityType = $params['activity_type'];	
   $sd = $params['date']; 
 
-
    try{
       $return = array();
       require_once 'Date.php';
@@ -151,15 +150,16 @@ function civicrm_api3_slot_get( $params ){
       $startDate = array_shift(array_values($daysOfNextweek));
       $endDate = end($daysOfNextweek);
 
-      $slots = CRM_Booking_BAO_Slot::getSlotByDate(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate));
+      $slots = CRM_Booking_BAO_Slot::getSlots(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate), $activityType);
+  
       $slotTypes = array();
       $classNames = array();
         //convert slot to use strtotime 
       foreach($slots as $k => $slot){
           $timeRange = CRM_Booking_Utils_DateTime::createTimeRange($slot['start_time'], $slot['end_time'], '5 mins');
-          $timeOptions = array();
+          //$timeOptions = array();
           foreach ($timeRange as $key => $time) { 
-              $timeOptions[] =$time; 
+              //$timeOptions[] =$time; 
               $className = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['clinician_contact_id'] . $time;
               $classNames[] = $className;
               $slotTypes[$className] = array( 'sessionService' => $slot['session_service'],
@@ -169,15 +169,21 @@ function civicrm_api3_slot_get( $params ){
       }
 
       $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '5 mins');
+      $timeDisplayRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '30 mins'); //for screen to display
       $timeOptions = array();
       foreach ($timeRange as $key => $time) { 
-        $timeOptions[$time] = date('G:i', $time); 
+        $timeOptions[$time]['time'] = date('G:i', $time); 
+        if(in_array($time, $timeDisplayRange)){
+          $timeOptions[$time]['isDisplay'] = true;
+        }else{
+          $timeOptions[$time]['isDisplay'] = false;
+        } 
       }
 
       $results = civicrm_api("Contact","get", array ('version' => '3',
                           'sequential' =>'1', 
                           'contact_type' =>'Individual',
-                           'contact_sub_type' => 'Clinician', 
+                          'contact_sub_type' => 'Clinician', 
                           'rowCount' =>'0'));
 
       $contacts = array();

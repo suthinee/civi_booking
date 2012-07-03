@@ -37,7 +37,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         $startDate = array_shift(array_values($daysOfNextweek));
         $endDate = end($daysOfNextweek);
 
-        $slots = CRM_Booking_BAO_Slot::getSlotByDate(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate));
+        $slots = CRM_Booking_BAO_Slot::getSlots(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate));
         $classNames = array();
         //convert slot to use strtotime 
         foreach($slots as $k => $slot){
