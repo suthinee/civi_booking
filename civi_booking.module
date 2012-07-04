@@ -236,61 +236,25 @@ function create_time_range($start, $end, $by='30 mins') {
     return $times; 
 } 
 
-function civicrm_civicrm_navigationMenu( &$params ) {
- 
-    //  Get the maximum key of $params
-  /*
-    $maxKey = ( max( array_keys($params) ) );
-
-    $params[$maxKey+1] = 
-                        array (
-                          'attributes' => 
-                          array (
-                            'label' => 'Booking',
-                            'name' => 'Booking',
-                            'url' => NULL,
-                            'permission' => NULL,
-                            'operator' => '',
-                            'separator' => NULL,
-                            'parentID' => NULL,
-                            'navID' => $maxKey+1,
-                            'active' => '1',
-                          ),
-                          'child' => 
-                          array (
-                            $maxKey+2 => 
-                            array (
-                              'attributes' => 
-                              array (
-                                'label' => 'Create Slots',
-                                'name' => 'Create slots',
-                                'url' => 'civicrm/booking/create-slots&reset=1',
-                                'permission' => NULL,
-                                'operator' => '',
-                                'separator' => NULL,
-                                'parentID' => $maxKey+1,
-                                'navID' => $maxKey+2,
-                                'active' => '1',
-                              ),
-                              'child' => NULL,
-                            ))); */
- 
-}
-
 function civi_booking_civicrm_xmlMenu( &$files ) {
       $files[] = drupal_get_path('module', 'civi_booking') . "/menu.xml";
  }
 
-/**
- * Implements hook_webform_select_options_info().
- 
+/*
+  Implements hook_webform_select_options_info().
+
 function civi_booking_webform_select_options_info() {
   $items = array();
   $items['slots'] = array(
     'title' => t('Slots'),
-    'options callback' => 'find_slot',
+    'options callback' => '_default_slot_options',
   );
   return $items;
+}
+
+function _default_slot_options(){
+  $options = array();
+  return $options;
 }
 */
 function civi_booking_form_alter(&$form, &$form_state, $form_id){
@@ -343,11 +307,13 @@ function civi_booking_webform_submission_insert($node, $submission) {
     ))
     ->execute();
   */  
-  //dump($node);
-  //echo '##################################';  
- // dump($submission);
+  dump($node);
 
-  //exit;
+
+  echo '##################################';  
+  //dump($submission);
+
+  exit;
 
 }
 
