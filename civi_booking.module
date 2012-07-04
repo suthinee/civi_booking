@@ -100,12 +100,11 @@ function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
 
   if($objectName == 'Activity'){
     $activityTypeId = $objectRef->activity_type_id;
-    $originalId = $objectRef->original_id;    
  
-    if(isset($activityTypeId) &&
-          $activityTypeId == 50 || 
-          $activityTypeId == 51 ||
-          $activityTypeId == 52 ){
+    if($activityTypeId == 50 || 
+       $activityTypeId == 51 ||
+       $activityTypeId == 52 ){
+      $originalId = $objectRef->original_id;    
       if($op == 'create' && isset($originalId)){
         //Query for the prior activity
         $query = "
@@ -142,6 +141,7 @@ ORDER BY ca.id DESC";
 }
 
 function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
+
   if($objectName == 'Activity'){
     $activityTypeId = CRM_Utils_Array::value('activity_type_id',$params);
    
@@ -188,10 +188,11 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
           }
 
           //set activity location
-          $params['location'] = CRM_Utils_Array::value('room_no',$slot);
+          $params['location'] = CRM_Utils_Array::value('centre',$slot);
+          $params['details'] = 'Room No: ' . CRM_Utils_Array::value('room_no',$slot);
           $params['duration'] = round(abs(strtotime($endTime) - strtotime($startTime)) / 60,2);
 
-          //hacked adding slot id for custom field'
+          //hacked adding slot id for custom field to makesure the slot id has been assigned
           //$params['custom_34_-1'] = $slotId;
           //$params['custom']['34']['-1']['value'] = $slotId;
 
@@ -202,7 +203,6 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
 
           $params['custom_22_-1'] = CRM_Utils_Array::value('centre',$slot);
           $params['custom']['22']['-1']['value'] = CRM_Utils_Array::value('centre',$slot);
-       
       }
     }
   }
@@ -268,54 +268,6 @@ function civi_booking_form_alter(&$form, &$form_state, $form_id){
     
 }
 
-
-
-/**
- * Modify a Webform submission, prior to saving it in the database.
- *
- * @param $node
- *   The Webform node on which this submission was made.
- * @param $submission
- *   The Webform submission that is about to be saved to the database.
- */
-function civi_booking_webform_submission_presave($node, &$submission) {
-  //dump($node);
-
- 
-}
-
-/**
- * Respond to a Webform submission being inserted.
- *
- * Note that this hook is called after a submission has already been saved to
- * the database. If needing to modify the submission prior to insertion, use
- * hook_webform_submission_presave().
- *
- * @param $node
- *   The Webform node on which this submission was made.
- * @param $submission
- *   The Webform submission that was just inserted into the database.
- */
-function civi_booking_webform_submission_insert($node, $submission) {
-  // Insert a record into a 3rd-party module table when a submission is added.
-  /*
-  db_insert('mymodule_table')
-    ->fields(array(
-      'nid' => $node->nid,
-      'sid' => $submission->sid,
-      'foo' => 'foo_data',
-    ))
-    ->execute();
-  */  
-  dump($node);
-
-
-  echo '##################################';  
-  //dump($submission);
-
-  exit;
-
-}
 
 /**
  * Implements hook_menu().
