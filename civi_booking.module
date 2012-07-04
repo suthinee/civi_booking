@@ -103,6 +103,7 @@ function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
     $originalId = $objectRef->original_id;    
  
     if(isset($activityTypeId) &&
+          $activityTypeId == 50 || 
           $activityTypeId == 51 ||
           $activityTypeId == 52 ){
       if($op == 'create' && isset($originalId)){
@@ -121,8 +122,6 @@ ORDER BY ca.id DESC";
       $params = array( 1 => array( $originalId, 'Integer' ) );
       $activityID    = CRM_Core_DAO::singleValueQuery( $query, $params );
  
-      dump($activityID);
-
       $query = "SELECT cc.slot_id_34
         FROM civicrm_value_additional_activity_info_8 cc
         WHERE cc.entity_id = %1";
@@ -147,6 +146,7 @@ function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
     $activityTypeId = CRM_Utils_Array::value('activity_type_id',$params);
    
     if(isset($activityTypeId) &&
+          $activityTypeId == 50 || 
           $activityTypeId == 51 ||
           $activityTypeId == 52 ){ 
 
