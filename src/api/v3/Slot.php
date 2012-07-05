@@ -162,8 +162,14 @@ function civicrm_api3_slot_get( $params ){
               //$timeOptions[] =$time; 
               $className = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['clinician_contact_id'] . $time;
               $classNames[] = $className;
+              if($slot['attended_clinician_name'] == null){
+                $tooltip = $slot['display_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'];
+              }else{
+                $tooltip = $slot['display_name'] . ' and ' . $slot['attended_clinician_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'];
+              }      
               $slotTypes[$className] = array( 'sessionService' => $slot['session_service'],
-                                              'slotId' => $slot['id']);
+                                              'slotId' => $slot['id'],
+                                              'title' => $tooltip);
 
           }
       }
@@ -231,22 +237,26 @@ function civicrm_api3_slot_get( $params ){
                     case 'DSU':
                          $className = 'dsu';
                          break;
-                    }               
+                    } 
+                              
                     $tdVals[$id] = array('time' => $time,
                                        'timeKey' => $timeKey,
                                        'tdataId' => $id,
                                        'className' =>  $className,
-                                       'slotId' => $slotTypes[$id]['slotId']);
+                                       'slotId' => $slotTypes[$id]['slotId'],
+                                       'title' => $slotTypes[$id]['title']);
                   }else if  ($day < strtotime("now")){
                     $tdVals[$id] = array('time' => $time,
                                       'timeKey' => $timeKey,
                                       'tdataId' => $id,
-                                      'className' => 'pasttime');
+                                      'className' => 'pasttime',
+                                      'title' => 0);
                   }else{
                     $tdVals[$id] = array('time' => $time,
                                       'timeKey' => $timeKey,
                                       'tdataId' => $id,
-                                      'className' => 'unavailable');
+                                      'className' => 'unavailable',
+                                       'title' => 0);
                   }
               }
               $conts[$contactId]['tdVals'] = $tdVals;
