@@ -37,7 +37,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         $startDate = array_shift(array_values($daysOfNextweek));
         $endDate = end($daysOfNextweek);
 
-        $slots = CRM_Booking_BAO_Slot::getSlots(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate));
+        $slots = CRM_Booking_BAO_Slot::getSlots(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate), 0, 0);
         $classNames = array();
         //convert slot to use strtotime 
         foreach($slots as $k => $slot){
@@ -46,6 +46,8 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
             $lastKey = end(array_keys($timeRange));
             foreach ($timeRange as $key => $time) { 
                $generated = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['room_no'] . $time;
+               $classNames[$generated]['status'] = $slot['status'];
+               $classNames[$generated]['slotId'] = $slot['id']; 
                if($slot['attended_clinician_name'] == null){
                 $classNames[$generated]['tooltip'] = $slot['display_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'];
                }else{
@@ -73,8 +75,6 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         }
 
         $this->assign('timeOptions',$timeOptions);
-
-
      
         $roomResults = CRM_Booking_BAO_Room::getRooms();
 
@@ -95,15 +95,26 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                   //generated Id
                   $id = date('d-m-Y', $day) . CRM_Utils_Array::value('room_no',$room) .  $timeKey;  
                   $title = '';
+                  $slotId = 0;
                   //check if generated Id is in the className array
                   //if (in_array($id, $classNames)) {   
                   if (isset($classNames[$id])){
                     $isLastKey = $classNames[$id]['lastKey'];
                     if($isLastKey){
-                        $class = 'reservable'; //set the last block of time to be reseveable
+                        if($day < strtotime("now")){
+                          $class = 'pasttime'; //set the last block of time to be reseveable
+                        }else{
+                          $class = 'reservable'; //set the last block of time to be reseveable
+                        }
                     }else{
                        $title = $classNames[$id]['tooltip'];
-                       $class = 'reserved';
+                       $status = $classNames[$id]['status'];
+                       $slotId = $classNames[$id]['slotId'];
+                       if($status == 1){
+                        $class = 'reserved editable';
+                       }else if($status == 2 || $status == 3){ //
+                        $class = 'reserved'; //uneditable
+                       }
                     }
 
                     $tdVals[$id] = array('time' => $time,
@@ -111,7 +122,8 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                                        'timeKey' => $timeKey,
                                        'tdataId' => $id,
                                        'className' =>  $class,
-                                       'title' => $title );
+                                       'title' => $title,
+                                       'slotId' => $slotId );
                   }else if  ($day < strtotime("now")){
                     $tdVals[$id] = array('time' => $time,
                                       'defaultEndTime' => strtotime('+60 mins', $timeKey),

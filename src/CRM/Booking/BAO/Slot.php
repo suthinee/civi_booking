@@ -65,12 +65,17 @@ class CRM_Booking_BAO_Slot{
                end_time, 
                room_no,
                slot_date,
-               session_service
+               session_service,
+               status
         FROM civi_booking_slot
         LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
         LEFT JOIN civicrm_contact con1 ON con1.id = civi_booking_slot.clinician_contact_id
         LEFT JOIN civicrm_contact con2 ON con2.id = civi_booking_slot.attended_clinician_contact_id
-        WHERE civi_booking_slot.status = %4";
+        WHERE 1";
+      
+      if($status != 0){
+        $query .= "\n AND civi_booking_slot.status = %4";
+      }
 
       if(isset($startDate) && isset($endDate)){  
         $query .= "\n AND civi_booking_slot.slot_date BETWEEN %1 AND %2";

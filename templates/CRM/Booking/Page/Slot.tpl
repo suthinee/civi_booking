@@ -14,7 +14,6 @@
 <div class="legend reservable">Reservable</div>
 <!--<div class="legend unreservable">Unreservable</div>-->
 <div class="legend reserved">Reserved</div>
-<!-- <div class="legend reserved mine">My Reservation</div>-->
 <!-- <div class="legend reserved pending">Pending</div> -->
 <div class="legend pasttime">Past</div>
 <!-- <div class="legend restricted">Restricted</div> -->
@@ -77,6 +76,7 @@
 						<span class='roomId'>{$roomKey}</span>
 						<span class='date'>{$day.date}</span>
 						<span class='unixDate'>{$dayKey}</span>
+						<span class='slotId'>{$value.slotId}</span>
 						</div>
 					</td>	
 					{/foreach}								
@@ -144,10 +144,12 @@
 	        	cj('#roomNo').text(roomNo);
 				cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
 				cj('#endSelect option[value=' +defaultEndtime+ ']').attr('selected', 'selected');
-
 	        	cj( "#slotDialog" ).data('obj', cj(this))
 	        					   .dialog('open');   
-        	}
+        	}/* else if(cj(this).hasClass('editable')){
+        		slotId = cj(this).find('span.slotId').text();
+
+        	} */
 		}).hover(function(){
 			if(cj(this).hasClass('reservable')){
    				cj(this).css("background","#40d288");

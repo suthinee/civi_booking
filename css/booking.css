@@ -94,6 +94,11 @@ td.slot{
 	background-color:#BDBDBD;
 }
 
+.editable{
+	background-color:#6F9BAE;
+	color: #E0E0E0;
+}
+
 
 .unavailable{
 	background-color:white;
