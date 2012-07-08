@@ -146,10 +146,9 @@
 				cj('#endSelect option[value=' +defaultEndtime+ ']').attr('selected', 'selected');
 	        	cj( "#slotDialog" ).data('obj', cj(this))
 	        					   .dialog('open');   
-        	}/* else if(cj(this).hasClass('editable')){
+        	}else if(cj(this).hasClass('reserved')){
         		slotId = cj(this).find('span.slotId').text();
-
-        	} */
+        	} 
 		}).hover(function(){
 			if(cj(this).hasClass('reservable')){
    				cj(this).css("background","#40d288");

@@ -60,8 +60,6 @@ function civi_booking_civicrm_tabs( &$tabs, $contactID ) {
     $url = CRM_Utils_System::url( 'civicrm/booking/calendar/contact/',
                                   "reset=1&cid={$contactID}&snippet=1" );
 
-        echo $url;
-
     $tabs[] = array( 'id'    => 'calendarView',
                      'url'   => $url,
                      'title' => 'Calendar',

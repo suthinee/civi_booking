@@ -6,12 +6,12 @@ require_once 'CRM/Core/Page.php';
  *  Calendar view for contact
  */
 class CRM_Booking_Page_Calendar_Contact extends CRM_Core_Page {
-
+    public static $_contactId = null;
 
     function preProcess() {
         $this->_contactId = CRM_Utils_Request::retrieve( 'cid', 'Positive', $this, true );
         $this->assign( 'contactId', $this->_contactId );
-
+        
         require_once 'CRM/Contact/BAO/Contact.php';
         $displayName = CRM_Contact_BAO_Contact::displayName( $this->_contactId );
         $this->assign( 'displayName', $displayName );
