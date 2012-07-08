@@ -1,4 +1,5 @@
 {* *}
+<input id="addRoom" type="button" value="Add Room"/>
 <table id="rooms">
     <thead>
         <tr>
@@ -7,8 +8,8 @@
             <th>Room Size</th>
             <th>Floor</th>
             <th>Building</th>
-            <th>Active?</th>
-            <td></th>
+            <th>Phone extension</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -19,14 +20,15 @@
             <td>{$room.size}</td>
             <td>{$room.floor}</td>
             <td>{$room.building}</td>
-            <td>{$room.is_active}</td>
-            <td><a href="/tccr/civicrm/booking/room/edit/?id={$room.id}&reset=1">Edit</a></td>
+            <td>{$room.phone_extension_no}</td>
+            <td><a href="{php} print base_path(); {/php}{civicrm/booking/room/edit/?roomId={$room.id}&reset=1">Edit</a></td>
         </tr>
         {/foreach}	
     </tbody>
 </table>
 {literal}
 <script type="text/javascript">
+    var createRoomURL = '{/literal}{php} print base_path(); {/php}{literal}civicrm/booking/room/add/?reset=1';
 	var crmajaxURL = '{/literal}{php} print base_path(); {/php}{literal}civicrm/ajax/rest';
 
 	cj(document).ready(function() {
@@ -38,6 +40,11 @@
 	        "bInfo": false,
 	        "bAutoWidth": false
     	});
+
+        cj('#addRoom').click(function(){
+            alert(createRoomURL);
+            window.location.href = createRoomURL;
+        });
 	
 	});
 

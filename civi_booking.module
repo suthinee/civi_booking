@@ -12,10 +12,10 @@ function civi_booking_init() {
   drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/booking.css');
   drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/calendar.css');
   drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/schedule.css');
-  drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/fullcalendar.css');
+  //drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/fullcalendar.css');
   //drupal_add_css(drupal_get_path('module', 'civi_booking') . '/css/fullcalendar.print.css');
 
-  drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/fullcalendar.js');
+  //drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/fullcalendar.js');
   drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/date.js');
   //drupal_add_js(drupal_get_path('module', 'civi_booking') . '/js/mustache.js');
   //jQuery validation
@@ -46,6 +46,26 @@ function civi_booking_civicrm_config(&$config) {
   // Also fix php include path
   $include_path = $root . 'src' . DIRECTORY_SEPARATOR . PATH_SEPARATOR . get_include_path();
   set_include_path($include_path);
+}
+
+
+function civi_booking_civicrm_tabs( &$tabs, $contactID ) {
+
+    $subType = CRM_Contact_BAO_Contact::getContactSubType($contactID);
+    
+    if(empty($subType) || !in_array('Clinician', $subType)){
+      return;
+    }
+
+    $url = CRM_Utils_System::url( 'civicrm/booking/calendar/contact/',
+                                  "reset=1&cid={$contactID}&snippet=1" );
+
+        echo $url;
+
+    $tabs[] = array( 'id'    => 'calendarView',
+                     'url'   => $url,
+                     'title' => 'Calendar',
+                     'weight' => 300 );
 }
 
   

@@ -151,6 +151,35 @@ WHERE id = %2
       }
       return $results;
     }
+
+     static function getSlotsByContact($id, $startDate = null, $endDate = null){
+      if(!isset($id)){
+        return;
+      }
+      $params = array(1 => array( $id, 'Integer'));
+      $query = "SELECT civi_booking_slot.id, 
+                      start_time,
+                      end_time,
+                      slot_date, 
+                      room_no,
+                      session_service,
+                      clinician_contact_id,
+                      attended_clinician_contact_id,
+                      status,
+                      civi_booking_room.building as centre
+        FROM civi_booking_slot
+        LEFT JOIN civi_booking_room ON civi_booking_slot.room_id = civi_booking_room.id
+        WHERE civi_booking_slot.clinician_contact_id = %1";
+         
+      
+      require_once('CRM/Core/DAO.php'); 
+      $dao = CRM_Core_DAO::executeQuery( $query,  $params );
+      $results = array ();
+      while ( $dao->fetch( ) ) {
+          $results[] = $dao->toArray();          
+      }
+      return $results;
+    }
     
 
 }

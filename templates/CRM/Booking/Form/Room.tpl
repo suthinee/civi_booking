@@ -23,29 +23,45 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{* template for assigning the current case to another client*}
-<div class="crm-block crm-form-block crm-case-editclient-form-block">
-<div class="messages status">
-    <div class="icon inform-icon"></div> {ts 1=$currentClientName}This is case is currently assigned to %1.{/ts}
-</div>
 <div class="crm-form-block">
 <table class="form-layout-compressed">
-    <tr class="crm-case-editclient-form-block-change_client_id">
-        <td class="label">
-            {$form.change_client_id.label}
+    <tr class="crm-room-form-block-room_no" >
+        <td class="label">{$form.room_no.label}</td>
+        <td class="view-value">{$form.room_no.html}            
         </td>
-	<td id='client'>
-	    {$form.change_client_id.html|crmReplace:class:big}
-	</td>
     </tr>
-    <tr>
-        <td></td>
-        <td><span class="crm-button crm-button-type-submit">&nbsp;{$form._qf_EditClient_next_edit_client.html}</span>
-            <span class="crm-button crm-button-type-submit">&nbsp;{$form._qf_EditClient_cancel_edit_client.html}</span>
-	</td>
+     <tr class="crm-room-form-block-type" >
+        <td class="label">{$form.type.label}</td>
+        <td class="view-value">{$form.type.html}            
+        </td>
+    </tr> 
+    <tr class="crm-room-form-block-size" >
+        <td class="label">{$form.size.label}</td>
+        <td class="view-value">{$form.size.html}            
+        </td>
+    </tr>
+    <tr class="crm-room-form-block-floor" >
+        <td class="label">{$form.floor.label}</td>
+        <td class="view-value">{$form.floor.html}            
+        </td>
+    </tr>
+    <tr class="crm-room-form-block-centre" >
+        <td class="label">{$form.centre.label}</td>
+        <td class="view-value">{$form.centre.html}            
+        </td>
+    </tr>  
+     <tr class="crm-room-form-block-extension" >
+        <td class="label">{$form.extension.label}</td>
+        <td class="view-value">{$form.extension.html}            
+    </td>
+     <tr class="crm-room-form-block-status" >
+        <td class="label">{$form.status.label}</td>
+        <td class="view-value">{$form.status.html}            
+    </td>
     </tr>
 </table>
-</div>
+{include file="CRM/common/formButtons.tpl" }
+
 </div>
 {literal}
 <script type="text/javascript"> 

@@ -99,10 +99,46 @@ td.slot{
 	color: #E0E0E0;
 }
 
-
 .unavailable{
 	background-color:white;
+
 }
+
+.contact-reserved{
+	background-color: #408AD2;
+	color:white;
+	line-height: 25px;
+	padding-left: 10px;
+	padding-right: 10px;
+	border: solid #408AD2 2px;
+	text-align: center;
+	display: inline-block;
+	margin: 0px 2px;
+}
+
+.contact-appointment{
+	background-color: #CF9D9B;
+	color:white;
+	line-height: 25px;
+	padding-left: 10px;
+	padding-right: 10px;
+	border: solid #CF9D9B 2px;
+	text-align: center;
+	display: inline-block;
+	margin: 0px 2px;
+}
+
+.contact-unavailable{
+	background-color:#BDBDBD;
+	line-height: 25px;
+	padding-left: 10px;
+	padding-right: 10px;
+	border: solid #BDBDBD 2px;
+	text-align: center;
+	display: inline-block;
+	margin: 0px 2px;
+}
+
 
 label.error { float: none; color: red; padding-left: .5em; vertical-align: top; }
 div.creatError{float: none; color: red; padding-left: .5em; vertical-align: top;}

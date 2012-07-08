@@ -16,9 +16,23 @@
   </item>
   <item>
      <path>civicrm/booking/room/edit</path>
-     <title>Manage Rooms</title> 
+     <title>Edit Rooms</title> 
      <page_callback>CRM_Booking_Form_Room</page_callback>
      <page_type>1</page_type>
      <weight>9002</weight>
   </item>
+  <item>
+     <path>civicrm/booking/room/add</path>
+     <title>Add Rooms</title> 
+     <page_callback>CRM_Booking_Form_Room</page_callback>
+     <page_type>1</page_type>
+     <weight>9002</weight>
+  </item>
+  <item>
+     <path>civicrm/booking/calendar/contact</path>
+     <page_callback>CRM_Booking_Page_Calendar_Contact</page_callback>
+     <page_type>1</page_type>
+     <weight>9002</weight>
+  </item>
+
 </menu>

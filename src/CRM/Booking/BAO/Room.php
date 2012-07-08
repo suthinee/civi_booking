@@ -17,6 +17,7 @@ class CRM_Booking_BAO_Room{
                   size,
                   floor,
                   building,
+                  phone_extension_no,
                   is_active
       FROM civi_booking_room
       WHERE is_active = %1";  

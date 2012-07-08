@@ -127,6 +127,44 @@ function civicrm_api3_slot_create( $params ){
   
 }
 
+function civicrm_api3_slot_get_by_contact( $params ){
+
+  $cid = CRM_Utils_Array::value('cid',$params);
+  require_once 'CRM/Booking/BAO/Slot.php';
+  $slots = CRM_Booking_BAO_Slot::getSlotsByContact($cid);
+  $events = array();
+  foreach($slots as $k => $slot){
+
+    $date = strtotime(($slot['slot_date']));
+    $stime = strtotime(($slot['start_time'])) ;
+    $etime = strtotime(($slot['end_time'])) ;
+
+    $st = date('Y-m-d', $date) . ' ' . date('H:i:s', $stime);
+    $et = date('Y-m-d', $date) . ' ' . date('H:i:s', $etime);
+    //dump($st);
+    //dump($et);
+
+    $events[$k]['title'] = $slot['session_service'];
+    $events[$k]['start'] = $st;
+    $events[$k]['end'] = $et;
+    $events[$k]['allDay'] = false;
+    if($slot['status'] == 2){
+      $events[$k]['color'] = '#CF9D9B';
+    }else{
+      $events[$k]['color'] = '#408AD2';
+    }
+
+  }
+
+  $return = array();
+  $return['is_error'] = 0;
+  $return['version'] = 3;
+  $return['results'] = $events;
+
+  return $return;
+
+}
+
 
 function civicrm_api3_slot_get( $params ){
 
@@ -264,26 +302,6 @@ function civicrm_api3_slot_get( $params ){
             $days[$k]['contacts'] = $conts;
         } 
 
-      /*
-      $events = array();
-      foreach($results as $slot){
-      	$date = date('Y-m-d', strtotime ($slot['slot_date'])) ;
-      	$startTime = date('g:i',strtotime($slot['start_time']));
-      	$start = new DateTime($date . ' '. $startTime);
-		
-		    $endTime = date('g:i',strtotime($slot['end_time']));
-      	$end = new DateTime($date . ' '. $endTime);
-
-      	$events[] = array( 
-         'id' => $slot['id'], 
-         'title' => t('Room no: ') . $slot['room_no'], 
-         'start' => $start->format('Y-m-d H:i:s'), 
-         'end' => $end->format('Y-m-d H:i:s'),
-         'session' => $slot['session_service'],
-         'status' => $slot['status']
-      	);
-      }
-      */
       $return['sd'] = $sd;
       $return['is_error'] = 0;
       $return['version'] = 3;
@@ -296,15 +314,8 @@ function civicrm_api3_slot_get( $params ){
       $return['lastWeek'] = strtotime("last Monday" , $startDate);
 
       $return['days'] = $days;
-
-      //  dump(json_encode($return));
-      //return json_encode($return);
-      //$json = json_encode($return);
-      //require_once 'CRM/Utils/JSON.php';
-
-      //return CRM_Utils_JSON::encode($json);
+      
       return $return;
-      //return civicrm_api3_create_success(json_encode($return),$params,'slot', 'get');
     }catch (Exception $e){
       return civicrm_api3_create_error($e);
     }  
