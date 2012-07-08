@@ -295,7 +295,7 @@ function civi_booking_menu() {
   * @Params (centre, services, start_date, end_date)
   */
   $items['slot/get/%'] = array(
-     'page callback' => '_avability_slots',
+     'page callback' => '_get available slots',
      'page arguments' => array(1,2,3,4,5),
      'access arguments' => array('access content'),
   );
@@ -304,7 +304,7 @@ function civi_booking_menu() {
 
 }
 
-function _avability_slots($action, $service, $centre = null, $startDate = null) {
+function _get_available_slots($action, $service, $centre = null, $startDate = null) {
 if(isset($action) && $action == 'get'){
 
   $query = "SELECT
