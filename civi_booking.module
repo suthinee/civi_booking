@@ -311,11 +311,12 @@ if(isset($action) && $action == 'get'){
               civi_booking_slot.id as id, 
               civi_booking_slot.start_time as start_time,
               civi_booking_slot.end_time as end_time, 
-              civi_booking_slot.slot_date as slot_date
+              civi_booking_slot.slot_date as slot_date,
+              civi_booking_slot.status as status
             FROM civi_booking_slot 
             LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.clinician_contact_id
             LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
-            WHERE civi_booking_slot.status = 1
+            WHERE civi_booking_slot.status IN (1, 2)
             AND civi_booking_slot.activity_type = 50
             AND civi_booking_slot.session_service = %1
             AND civi_booking_slot.slot_date BETWEEN %3 AND %4";
@@ -353,6 +354,7 @@ if(isset($action) && $action == 'get'){
       $results['results'][$id]['slot_day'] = date(l, strtotime($daoArr['slot_date']));; 
       $results['results'][$id]['start_time'] = date('G:i', strtotime($daoArr['start_time'])); 
       $results['results'][$id]['end_time'] = date('G:i', strtotime($daoArr['end_time'])); 
+      $results['results'][$id]['status'] = $daoArrp['status'];
 
   }
 }
