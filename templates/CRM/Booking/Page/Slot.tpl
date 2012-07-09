@@ -7,6 +7,7 @@
 	<div class="schedule_dates">
 		<a href="{$lastWeekUrl}" ><span class="arrow-left">&nbsp;&nbsp;&nbsp;</span></a>
 		 {$startDate} - {$endDate}<a href="{$nextWeekUrl}"><span class="arrow-right">&nbsp;&nbsp;&nbsp;</span></a>
+		 <div style="text-align:right"><input type="button" value="Copy slots"></div>
 	</div>
 </div>
 
@@ -72,11 +73,11 @@
 			        	<div style="display:none">
 			        	<span class='time'>{$value.timeKey}</span>
 			        	<span class='defaultEndtime'>{$value.defaultEndTime}</span>
-						<span class='roomNo'>{$room.room_no}</span>
-						<span class='roomId'>{$roomKey}</span>
-						<span class='date'>{$day.date}</span>
-						<span class='unixDate'>{$dayKey}</span>
-						<span class='slotId'>{$value.slotId}</span>
+								<span class='roomNo'>{$room.room_no}</span>
+								<span class='roomId'>{$roomKey}</span>
+								<span class='date'>{$day.date}</span>
+								<span class='unixDate'>{$dayKey}</span>
+								<span class='slotId'>{$value.slotId}</span>
 						</div>
 					</td>	
 					{/foreach}								
@@ -142,12 +143,15 @@
 
 	        	cj('#dateHolder').text(date);
 	        	cj('#roomNo').text(roomNo);
-				cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
-				cj('#endSelect option[value=' +defaultEndtime+ ']').attr('selected', 'selected');
+					  cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
+						cj('#endSelect option[value=' +defaultEndtime+ ']').attr('selected', 'selected');
 	        	cj( "#slotDialog" ).data('obj', cj(this))
 	        					   .dialog('open');   
         	}else if(cj(this).hasClass('reserved')){
         		slotId = cj(this).find('span.slotId').text();
+        		cj( "#slotDetailDialog" ).data('obj', slotId)
+	        					   .dialog('open');   
+
         	} 
 		}).hover(function(){
 			if(cj(this).hasClass('reservable')){
@@ -161,38 +165,129 @@
 
 		
 		cj.validator.addMethod("greaterThan", function(value, element) {
-            var sTime = parseInt(cj('select[name="startSelect"]').val());
+          var sTime = parseInt(cj('select[name="startSelect"]').val());
   		   	var eTime =	parseInt(cj('select[name="endSelect"]').val());
   		   	var val = sTime < eTime || value == "";
   		    return val; 
-        }, "End time must be after start time");
+     }, "End time must be after start time");
 
-        cj.validator.addMethod("notEqaulTo", function(value, element) {
-           	var contactId = cj('select[name="counsellor"]').val();    // get the value from a dropdown select
+    cj.validator.addMethod("notEqaulTo", function(value, element) {
+      var contactId = cj('select[name="counsellor"]').val();    // get the value from a dropdown select
  			var contactId2 = cj('select[name="counsellor2"]').val(); 
-  		   	var val = contactId != contactId2 || value == "";
-  		    return val; 
-        }, "Counsellor 2 must not be same as Counsellor 1");
+  		var val = contactId != contactId2 || value == "";
+  		 return val; 
+    }, "Counsellor 2 must not be same as Counsellor 1");
 
-        var validator = cj("#dialogForm").validate({
+    var validator = cj("#dialogForm").validate({
        	  rules: {
-		    startSelect: "required",
-		    endSelect:  {
-		    	"greaterThan" : true,
-		    	"required" : true
-		    },
-		    activitySelect: "required",
-		    counsellor: "required",
-		    sessionSelect: "required",
-		    counsellor2: "notEqaulTo"		  
-		  }
+		    		startSelect: "required",
+		   		  endSelect:  {
+		    			"greaterThan" : true,
+		    			"required" : true
+		    		},
+				    activitySelect: "required",
+				    counsellor: "required",
+				    sessionSelect: "required",
+				    counsellor2: "notEqaulTo"		  
+		 			}
+		});
+
+		cj("#delButton").live('click', function(event){
+			var sid = cj('#viewSlotId').text();
+			cj( "#confirm-dialog" ).data('obj', sid)
+	        					  			 .dialog('open');  
+    });
+
+    cj("#confirm-dialog").dialog({
+    	  stack: true,
+    	  autoOpen: false,
+				modal: true,
+			  resizable: false,
+			  draggable: false,
+	      buttons : {      
+	        "Confirm" : function() {
+	        	 var sid = cj(this).data('obj'); // Get the stored result
+	        	 cj().crmAPI ('slot','delete',{'version' :'3','id' : sid},{
+	        	 	 ajaxURL: crmajaxURL,
+					     success:function (data){
+					     		window.location.reload(true);
+					     }});				    
+	        },
+	        "Cancel" : function() {
+	          cj(this).dialog("close");
+	        }
+	      }				
+    	});
+
+		cj( "#slotDetailDialog" ).dialog({				
+			    autoOpen: false,
+			    resizable: false,
+			    draggable: false,
+   			  width:450,
+			    height:400,
+			    modal: true,
+			    title: "View slot" ,
+   				open: function(event, ui) { 
+   					var sid = cj(this).data('obj'); // Get the stored result
+   					cj().crmAPI ('slot','get_by_id',{'version' :'3', 'sequential' :'1','sid' : sid},{
+					           ajaxURL: crmajaxURL,
+					           success:function (data){ 
+					           	var slot = data.values[0];
+					           	console.log(slot);
+					           	var counsellor2 = (slot.attended_clinician_contact_sort_name == null) ? '-' : slot.attended_clinician_contact_sort_name
+					           	var status = (slot.status == 1) ? 'Avalibale' :'Appointment';
+					           	var slotHtml = '<table class="crm-info-panel" id="crm-activity-view-table"> <!-- reused activity css -->';
+					           	slotHtml += '<tr><td class="label">Slot reference Id</td><td id="viewSlotId">' + slot.id + '</td></tr>';
+					           	slotHtml += '<tr><td class="label">Slot date</td><td>' +  slot.slot_date + '</td></tr>';
+					           	slotHtml += '<tr><td class="label">Start time</td><td>' + slot.start_time + '</td></tr>';
+					           	slotHtml += '<tr><td class="label">End time</td><td>' + slot.end_time + '</td></tr>';
+					           	slotHtml += '<tr><td class="label">Counsellor 1</td><td>' + slot.clinician_contact_sort_name + '</td></tr>';
+					           	slotHtml += '<tr><td class="label">Counsellor 2</td><td>' + counsellor2 + '</td></tr>';
+					           	slotHtml += '<tr><td class="label">Activity type</td><td>' + slot.activity_type + '</td></tr>';
+					           	slotHtml += '<tr><td class="label">Session service</td><td>' + slot.session_service + '</td></tr>';
+					           	slotHtml += '<tr><td class="label">Status</td><td>' + status + '</td></tr>';
+					           	slotHtml += '<tr><td class="label">Description</td><td>' + slot.description + '</td></tr>';
+					           	slotHtml += '</table>';
+					           	if(slot.status == 1){
+					           		slotHtml += '<div><button id="delButton" type="button" class="deleteButton"><span class="">Delete slot</span></button></div>';
+					            }
+					           	cj('#activity-content').html(slotHtml);
+					         	
+					          }
+					  }); 
+   				},
+			    buttons:{
+			    	'Edit slot': function() {
+			    		var editDialog = 	cj( "#slotDialog" );
+			    		editDialog.dialog( "option", "title", "Edit a slot" );
+			    		editDialog.dialog('option', 'buttons', {
+																    'Edit slot': function() {
+																    	alert(cj("#dialogForm").valid());		    			
+
+																    },
+																    Cancel: function(){
+																    		cj(this).dialog('close');
+																    }
+																});
+							editDialog.bind( "dialogopen", function(event, ui) { 
+								var sid = cj(this).data('slotId'); // Get the stored result
+				
+							});
+							editDialog.data('slotId', cj('#viewSlotId').text()).dialog('open'); 
+	        	  cj(this).dialog('close');
+	        	},
+			    	Close: function() {
+			        cj(this).dialog('close');
+			    	}	
+			    }
+			        
 		});
 		
 		cj( "#slotDialog" ).dialog({				
 			    autoOpen: false,
 			    resizable: false,
 			    draggable: false,
-   			    width:450,
+   			  width:450,
 			    height:600,
 			    modal: true,
 			    buttons: {
@@ -257,7 +352,7 @@
 			    Cancel: function() {
 			    	validator.resetForm();
     				cj("#dialogForm")[0].reset();
-			        cj(this).dialog('close');
+			      cj(this).dialog('close');
 			    }			        
 			}});
 
@@ -269,6 +364,14 @@
 
 </script>
 {/literal}
+<div id="confirm-dialog">This cannot be undone, Are you sure you with to continue?</div>
+<div id="slotDetailDialog"> 
+	<div id="slotDetailsError" class="creatError"> </div>
+
+	<div id="activity-content">
+		
+	</div >
+</div>
 
 <div id="slotDialog" title="Create a slot" class="ui-dialog-content ui-widget-content">
 	<div id="creatError" class="creatError"> </div>

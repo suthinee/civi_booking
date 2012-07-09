@@ -111,22 +111,54 @@ function civicrm_api3_slot_create( $params ){
         );
         $value = array($slot);
         return civicrm_api3_create_success($value,$params,'slot', 'create');
-      }catch (Exception $e){
+    }catch (Exception $e){
         $error = array("is_created" => 0,
                        "error_message" => get_object_vars($e));
         $value = array($error);
         //jQuery cannot handle JSON that create_error function return so use create_success instead.
         return civicrm_api3_create_success($value, $params, 'slot', 'create');
-      }  
-    }else{
-        $error = array("is_created" => 0,
-                       "error_message" => "Unable to create slot. Please check the slot times are valid and that both clinicians are available for that date or time.");
-        $value = array($error);
-       return civicrm_api3_create_success($value,$params,'slot', 'create'); 
-    }
+    }  
+  }else{
+      $error = array("is_created" => 0,
+                      "error_message" => "Unable to create slot. Please check the slot times are valid and that both clinicians are available for that date or time.");
+      $value = array($error);
+      return civicrm_api3_create_success($value,$params,'slot', 'create'); 
+  }
   
 }
 
+//an APIs for displaying a slot using slot id
+function civicrm_api3_slot_get_by_id($params){
+  $sid = CRM_Utils_Array::value('sid',$params);
+  try{
+    if(!isset($sid)) throw new Exception('Slot id not found.');
+    require_once 'CRM/Booking/BAO/Slot.php';
+    $results = CRM_Booking_BAO_Slot::getSlotById($sid);
+    $value = array();
+    foreach ($results as $key => $slot) {
+      $value[$key]['id'] = $slot['id'];
+      $value[$key]['start_time'] = $slot['start_time'];
+      $value[$key]['end_time'] = $slot['end_time'];
+      $value[$key]['slot_date'] = date('l d/m/Y', $slot['slot_date']);
+      $value[$key]['room_no'] = $slot['room_no'];
+      $value[$key]['centre'] = $slot['centre'];
+      $value[$key]['session_service'] = $slot['session_service'];
+      $value[$key]['activity_type'] = $slot['activity_type'];
+      $value[$key]['clinician_contact_sort_name'] = $slot['clinician_contact_sort_name'];
+      $value[$key]['attended_clinician_contact_sort_name'] = $slot['attended_clinician_contact_sort_name'];
+      $value[$key]['status'] = $slot['status'];
+      $value[$key]['description'] = $slot['description'];
+
+      break;
+    }
+    return civicrm_api3_create_success($value, $params, 'slot', 'get_by_id');
+
+  }catch(Exception $e){
+      return civicrm_api3_create_error($e->getMessage());
+  }
+}
+
+//an APIs for displaying individual clinician's slot
 function civicrm_api3_slot_get_by_contact( $params ){
 
   $cid = CRM_Utils_Array::value('cid',$params);
@@ -163,6 +195,24 @@ function civicrm_api3_slot_get_by_contact( $params ){
 
   return $return;
 
+}
+
+function civicrm_api3_slot_delete($params){
+
+  $sid = CRM_Utils_Array::value('id',$params);
+  try{
+    if(!isset($sid)) throw new Exception('Slot id not found.'); 
+    require_once 'CRM/Booking/BAO/Slot.php';
+    $status = CRM_Booking_BAO_Slot::getSlotStatus($sid);
+    $isDeletable = $status == 1 ? true : false;
+    if(!$isDeletable) throw new Exception('Cannot delete a slot, the slot is in used');
+    CRM_Booking_BAO_Slot::deleteSlot($sid);
+    $value = array('id' => $sid);
+    return civicrm_api3_create_success($value, $params, 'slot', 'delete');
+  }catch(Exception $e){
+    return civicrm_api3_create_error($e->getMessage());
+
+  }
 }
 
 
