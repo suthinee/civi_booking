@@ -295,7 +295,7 @@ function civi_booking_menu() {
   * @Params (centre, services, start_date, end_date)
   */
   $items['slot/get/%'] = array(
-     'page callback' => '_get available slots',
+     'page callback' => '_get_available_slots',
      'page arguments' => array(1,2,3,4,5),
      'access arguments' => array('access content'),
   );
@@ -314,7 +314,6 @@ if(isset($action) && $action == 'get'){
               civi_booking_slot.slot_date as slot_date,
               civi_booking_slot.status as status
             FROM civi_booking_slot 
-            LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.clinician_contact_id
             LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
             WHERE civi_booking_slot.status IN (1, 2)
             AND civi_booking_slot.activity_type = 50
@@ -358,7 +357,6 @@ if(isset($action) && $action == 'get'){
 
   }
 }
-
 echo json_encode ($results);
 
 }

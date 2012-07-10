@@ -7,7 +7,7 @@
 	<div class="schedule_dates">
 		<a href="{$lastWeekUrl}" ><span class="arrow-left">&nbsp;&nbsp;&nbsp;</span></a>
 		 {$startDate} - {$endDate}<a href="{$nextWeekUrl}"><span class="arrow-right">&nbsp;&nbsp;&nbsp;</span></a>
-		 <div style="text-align:right"><input type="button" value="Copy slots"></div>
+		 <div style="text-align:right"></div>
 	</div>
 </div>
 
@@ -19,7 +19,7 @@
 <div class="legend pasttime">Past</div>
 <!-- <div class="legend restricted">Restricted</div> -->
 </div>
-
+<div style="text-align: right; margin: auto;"><input id="copySlot" type="button" value="Copy slots" /></div>
 <div style="height:10px">&nbsp;</div>
 <form id="filterForm"> 
 	<fieldset class="filters">
@@ -282,12 +282,13 @@
 					           ajaxURL: crmajaxURL,
 					           success:function (data){ 
 					           	var slot = data.values[0];
+					           	var date = new Date(slot.slot_date);
 					           	var counsellor2 = (slot.attended_clinician_contact_sort_name == null) ? '-' : slot.attended_clinician_contact_sort_name
 					           	var status = (slot.status == 1) ? 'Avalibale' :'Appointment';
 					           	var slotHtml = '<table class="crm-info-panel" id="crm-activity-view-table"> <!-- reused activity css -->';
 					           	slotHtml += '<tr><td class="label">Slot reference Id</td><td id="viewSlotId">' + slot.id + '</td></tr>';
-					           	slotHtml += '<tr><td class="label">Slot date</td><td id="viewSlotDate">' +  slot.slot_date + '</td></tr>';
-					           	slotHtml += '<tr><td class="label">Start time</td><td>' + slot.start_time + '</td></tr>';
+					           	slotHtml += '<tr><td class="label">Slot date</td><td id="viewSlotDate">' + cj.datepicker.formatDate('DD, d/MM/yy', date); + '</td></tr>';
+					           	slotHtml += '<tr><td class="label">Start time</td><td id="viewStartTime">' + slot.start_time + '</td></tr>';
 					           	slotHtml += '<tr><td class="label">End time</td><td>' + slot.end_time + '</td></tr>';
 					           	slotHtml += '<tr><td class="label">Counsellor 1</td><td>' + slot.clinician_contact_sort_name + '</td></tr>';
 					           	slotHtml += '<tr><td class="label">Counsellor 2</td><td>' + counsellor2 + '</td></tr>';
@@ -307,6 +308,7 @@
    				},
 			    buttons:{
 			    	'Edit a slot': function() {
+			    		cj('#slotDetailDialog').dialog('close');
 			    		cj( "#slotDialog" ).dialog({	
 			    			title: 'Edit a slot',			
 						    autoOpen: false,
@@ -316,47 +318,15 @@
 						    height:600,
 						    modal: true,
 						    open: function(event, ui) { 
+						    	alert('//TODO: Implement edit mode');
 						    	cj('#dateHolder').text(cj('#viewSlotDate').text());
 	        				cj('#roomNo').text(roomNo);
-					  			cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
-									cj('#endSelect option[value=' +defaultEndtime+ ']').attr('selected', 'selected'); 
+	        				cj(this).dialog('destroy');
 								},
 						    buttons: {
 						    	'Save a slot': function() {
 						    		cj("#dialogForm").valid();
-						    		/*
-						    		var contactId = cj('select[name="counsellor"]').val();    // get the value from a dropdown select
-			 					    var contactId2 = cj('select[name="counsellor2"]').val(); 
-						    		var startTime = cj('select[name="startSelect"]').val(); 
-						    		var endTime = cj('select[name="endSelect"]').val(); 
-						    		var sessionService = cj('select[name="sessionSelect"]').val(); 
-						    		var activityType = cj('select[name="activitySelect"]').val(); 
-						    		var description = cj('#description').val();
-						    		
-						    		if(cj("#dialogForm").valid()){			    			
-							    	    
-							    	    cj().crmAPI ('slot','create',{'version' :'3', 
-							    	    							  'sequential' :'1',
-							    	    							  'contact_id' : contactId, 
-				  			    	    							  'contact_id_2' : contactId2, 
-							    	    							  'date' : unixDate, 
-							    	    							  'start_time' : startTime, 
-							    	    							  'end_time' : endTime, 
-							    	    							  'session_service' :sessionService, 
-							    	    							  'room_no' : roomNo, 
-							    	    							  'activity_type' : activityType,
-							    	    							  'description' : description},{
-								           ajaxURL: crmajaxURL,
-								           success:function (data){ 
-								           	if(data.values[0].is_created == 1){
-								           		window.location.reload(true);
-								           }else {
-								            	var errorMessage = data.values[0].error_message;
-								           		 cj('#creatError').html('' + errorMessage.toString());
-								            } 
-								          }
-								        });
-										}*/
+						    	
 			        		},
 						    	Cancel: function() {
 						    		validator.resetForm();
@@ -366,7 +336,6 @@
 								}
 							});
 							cj( "#slotDialog" ).dialog('open'); 
-	        	  cj('#slotDetailDialog').dialog('close');
 	        	},
 			    	Close: function() {
 			        cj(this).dialog('close');
@@ -375,9 +344,36 @@
 			        
 		});
 		
-		cj( "#slotDialog" ).dialog({				
-			    autoOpen: false	    
+		cj( "#slotDialog" ).dialog({ autoOpen: false });
+
+		cj( "#slotCopyPanel" ).dialog({	autoOpen: false	});
+
+
+		cj("#copySlot").live('click', function(){
+			cj( "#slotCopyPanel" ).dialog('destroy')
+			cj( "#slotCopyPanel" ).dialog({				
+				autoOpen: true,
+				resizable: false,
+				draggable: false,
+		   	width:400,
+				height:200,
+				modal: true,
+				open: function(event, ui) { 
+				
+				},
+				buttons: {
+					'Copy slots': function() {						    	
+			     
+			    },
+					Cancel: function() {
+						    		
+						cj(this).dialog('destroy');
+					}			        
+				}		   
+			});
+		//	cj( "#slotCopyPanel" ).dialog('open'); 
 		});
+
 
 		});
 
@@ -387,6 +383,28 @@
 
 </script>
 {/literal}
+<div id="slotCopyPanel"  class="ui-dialog-content ui-widget-content">
+		<form  class="cmxform" id="dialogForm">
+			<ul style="list-style-type:none;">
+				<li>
+					<span class="label_text">Week: </span>
+					<span id="Week">{$startDate} - {$endDate}</span> 
+				</li>
+				<li>
+					<label class="label_text" for="weekForward" style="display:inline;">Weeks forward: </label>
+					<select id="weekForward" name="weekForward" style="">
+						<option value="">-- Select ---</option>
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+						<option value="6">7</option>					
+					</select>
+				</li>
+			</ul>
+		</form>
+</div>
 <div id="confirm-dialog">This cannot be undone, Are you sure you with to continue?</div>
 <div id="slotDetailDialog"> 
 	<div id="slotDetailsError" class="creatError"> </div>

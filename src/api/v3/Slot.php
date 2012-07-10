@@ -139,7 +139,7 @@ function civicrm_api3_slot_get_by_id($params){
       $value[$key]['id'] = $slot['id'];
       $value[$key]['start_time'] = date('G:i', strtotime($slot['start_time']));
       $value[$key]['end_time'] = date('G:i', strtotime($slot['end_time']));
-      $value[$key]['slot_date'] = date('l d/m/Y', strtotime($slot['slot_date']));
+      $value[$key]['slot_date'] = $slot['slot_date'];
       $value[$key]['room_no'] = $slot['room_no'];
       $value[$key]['centre'] = $slot['centre'];
       $value[$key]['session_service'] = $slot['session_service'];

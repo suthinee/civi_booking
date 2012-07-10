@@ -180,3 +180,67 @@ cursor: pointer !important;
  }
  
 /*////////////////////////////////// */
+/* Modify webform by koobitor */
+.loading {
+	background: url(../img/loading1.gif);
+	width:16px;
+	height:16px;
+	position: absolute;
+	top: 29px;
+	left: 240px;
+	display: none;
+}
+.node-type-webform #webform-component-civicrm-1-case-1-cg6-custom-9 {
+	position: relative;
+}
+.node-type-webform #webform-component-seleted-slot-id #edit-submitted-seleted-slot-id, .node-type-webform #webform-component-seleted-slot-id .description, .node-type-webform  #webform-component-seleted-slot-id{
+	display: none;
+}
+.node-type-webform #webform-component-seleted-slot-id ul {
+	padding: 0;
+	margin-bottom: 0;
+}
+.node-type-webform #webform-component-seleted-slot-id ul div.left {
+	float:left;
+}
+.node-type-webform #webform-component-seleted-slot-id ul div.first {
+	width: 150px;
+}
+.node-type-webform #webform-component-seleted-slot-id ul div.middle {
+	width: 150px;
+	text-align: center;
+}
+.node-type-webform #webform-component-seleted-slot-id ul div.last {
+	width: 150px;
+	text-align: center;
+}
+.node-type-webform #webform-component-seleted-slot-id ul li.item {
+	list-style: none;
+	height: 50px;
+}
+.node-type-webform #webform-component-seleted-slot-id .options {
+	border: 1px solid #ccc;
+	padding: 5px 10px;
+	width: 230px;
+	margin: 15px 0;
+}
+.node-type-webform #webform-component-seleted-slot-id .change-week {
+	margin-top: 10px;
+	margin-bottom: 15px;
+}
+.node-type-webform #webform-component-seleted-slot-id .change-week span{
+	margin-right:	10px;
+}
+.node-type-webform #webform-component-seleted-slot-id .change-week .pre , .node-type-webform #webform-component-seleted-slot-id .change-week .next{
+	border: 3px solid #888;
+	background: #ccc;
+	padding: 5px;
+	cursor: pointer;
+}
+.node-type-webform #webform-component-seleted-slot-id .change-week .pre:hover , .node-type-webform #webform-component-seleted-slot-id .change-week .next:hover {
+	border: 3px solid #AAA;
+	background: #EEE;
+}
+.page-node-submission-edit .slot {
+	display: none;
+}
