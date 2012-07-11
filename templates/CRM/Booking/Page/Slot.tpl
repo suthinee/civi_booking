@@ -73,7 +73,7 @@
 		</tr>
 			{foreach from=$day.rooms key=roomKey item=room}
 				<tr class="slots">
-					<td class="resourcename {$room.room_id}">{$room.room_no}, Centre: {$room.room_centre} </td>
+					<td class="resourcename {$room.room_id}">{$room.room_no}, {$room.room_centre} </td>
 					{foreach from=$room.tdVals key=key item=value}
 		        	<td id="{$value.tdataId}" colspan="1" class="slot {$value.className}" title="{$value.title}">
 			        	<div style="display:none">
