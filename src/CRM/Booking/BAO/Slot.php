@@ -10,8 +10,7 @@ class CRM_Booking_BAO_Slot{
 
     static function isSlotCreatable($args){
 
-      civicrm_initialize( );
-
+      //civicrm_initialize( );
       $params = array(
         1 => array( $args['date'], 'String'),
         2 => array($args['startTime'], 'String'),
@@ -28,7 +27,7 @@ class CRM_Booking_BAO_Slot{
       require_once('CRM/Core/DAO.php');   
       $dao = CRM_Core_DAO::executeQuery( $query , $params );
       $results = array ();
-        while ( $dao->fetch( ) ) {
+      while ( $dao->fetch( ) ) {
           $results[] = $dao->toArray();   
        } 
        if(!is_null($args['contactId2'])){
@@ -160,6 +159,7 @@ WHERE id = %2
                       s.start_time as start_time,
                       s.end_time as end_time,
                       s.slot_date as slot_date, 
+                      s.room_id as room_id,
                       r.room_no as room_no,
                       s.session_service as session_service,
                       s.clinician_contact_id as clinician_contact_id,
@@ -168,8 +168,8 @@ WHERE id = %2
                       s.status as status,
                       s.description as description,
                       r.building as centre,
-                      con1.sort_name as clinician_contact_sort_name,
-                      con2.sort_name as attended_clinician_contact_sort_name
+                      con1.display_name as clinician_contact_display_name,
+                      con2.display_name as attended_clinician_contact_display_name
         FROM civi_booking_slot s
         LEFT JOIN civi_booking_room r ON s.room_id = r.id
         LEFT JOIN civicrm_contact con1 ON con1.id = s.clinician_contact_id

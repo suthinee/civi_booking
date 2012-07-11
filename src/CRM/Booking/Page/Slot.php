@@ -88,6 +88,9 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
             foreach($roomResults as $room){
                 $roomId = CRM_Utils_Array::value('id',$room);
                 $rooms[$roomId] = array('room_no' => CRM_Utils_Array::value('room_no',$room),
+                                        'room_type' => CRM_Utils_Array::value('type',$room),
+                                        'room_floor' => CRM_Utils_Array::value('floor',$room),
+                                        'room_centre' => CRM_Utils_Array::value('building',$room),
                                         'room_id' => CRM_Utils_Array::value('id',$room)
                                         );  
                 $tdVals = array();
@@ -177,9 +180,9 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
 
        $activityTypes =  array(
           NULL => t('Select Activity type'),
-          $initialAssessment => t('Initial assessment'),
-          $supplementaryAssessment => t('Supplementary assessment'),
-          $regularSession => t('Regular session'),
+          $initialAssessment => t('Initial Assessment'),
+          $supplementaryAssessment => t('Supplementary Assessment'),
+          $regularSession => t('Regular Session'),
         );  
 
 
