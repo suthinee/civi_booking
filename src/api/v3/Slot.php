@@ -54,7 +54,7 @@ function civicrm_api3_slot_update($params){
   $endTime = $params['end_time']; 
   $sessionService = $params['session_service']; 
   $activityType = $params['activity_type'];
-  $description = $params['description'];
+  $description = strip_tags($params['description']);
   $roomId = $params['room_id'];
 
 
@@ -83,7 +83,7 @@ function civicrm_api3_slot_update($params){
               'slot_date' =>   $d->format('Y-m-d H:i:s'),
               'activity_type' => $activityType,
               'session_service' => $sessionService,
-              'description' => $description,
+              'description' => strip_tags($description),
               'status ' => 1, //set status to free
               'updated_by' => $userId,
               'updated_date' => date('Y-m-d H:i:s')

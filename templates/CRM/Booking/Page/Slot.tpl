@@ -39,6 +39,7 @@
 					{/foreach}	
 				</select>
 			</td>
+			<!--
 			<td>
 				<label for="roomFilter">Room: </label>
 				<select id="roomFilter" name="roomFilter">
@@ -48,6 +49,7 @@
 					{/foreach}	
 				</select>
 			</td>
+			-->
 		</tr>
 
 	</table>
@@ -336,8 +338,6 @@
 		});
 
 		
-	
-
 		cj("#delButton").live('click', function(event){
 			var sid = cj('#viewSlotId').text();
 			cj( "#confirm-dialog" ).data('obj', sid)
@@ -462,6 +462,7 @@
              				 cj('#sessionSelect').attr('disabled', 'disabled');
              				 cj('#counsellor').attr('disabled', 'disabled');
              				 cj('#counsellor2').attr('disabled', 'disabled');
+             				 cj('#creatError').html('The selected slot is linked to an activity. <br/>The description can only be updated.');
              			}
 
 						    	//var slot = cj('#viewSlotId').text();
