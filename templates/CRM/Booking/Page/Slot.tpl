@@ -14,8 +14,12 @@
 <div style="text-align: center; margin: auto;">
 <div class="legend reservable">Reservable</div>
 <!--<div class="legend unreservable">Unreservable</div>-->
-<div class="legend reserved">Reserved</div>
-<!-- <div class="legend reserved pending">Pending</div> -->
+<div class="legend counselling">Counselling</div>
+<div class="legend psychotherapy">Psychotherapy</div>
+<div class="legend psychosexual">Psychosexual</div>
+<div class="legend parenting">Parenting Together</div> 
+<div class="legend wellbeing">Wellbeing</div>
+<div class="legend dsu">DSU</div> <!-- <div class="legend reserved pending">Pending</div> -->
 <div class="legend pasttime">Past</div>
 <!-- <div class="legend restricted">Restricted</div> -->
 </div>
@@ -315,7 +319,7 @@
 						});
 						cj( "#slotDialog" ).dialog('open'); 
 
-        	}else if(cj(this).hasClass('reserved')){
+        	}else if(!cj(this).hasClass('pasttime')){
         		slotId = cj(this).find('span.slotId').text();
         		cj( "#slotDetailDialog" ).data('obj', slotId)
 	        					   .dialog('open');   

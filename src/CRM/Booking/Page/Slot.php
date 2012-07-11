@@ -46,12 +46,13 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
             $lastKey = end(array_keys($timeRange));
             foreach ($timeRange as $key => $time) { 
                $generated = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['room_no'] . $time;
+               $classNames[$generated]['sessionService'] = $slot['session_service'];
                $classNames[$generated]['status'] = $slot['status'];
                $classNames[$generated]['slotId'] = $slot['id']; 
                if($slot['attended_clinician_name'] == null){
-                $classNames[$generated]['tooltip'] = $slot['display_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'];
+                $classNames[$generated]['tooltip'] = $slot['display_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'] . ', ' . $slot['session_service'];
                }else{
-                $classNames[$generated]['tooltip'] = $slot['display_name'] . ' and ' . $slot['attended_clinician_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'];
+                $classNames[$generated]['tooltip'] = $slot['display_name'] . ' and ' . $slot['attended_clinician_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'] . ', ' . $slot['session_service'];;
                }          
                if ($key == $lastKey) {
                   $classNames[$generated]['lastKey'] = true;
@@ -108,16 +109,33 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                           $class = 'pasttime'; //set the last block of time to be reseveable
                         }else{
                           $class = 'reservable'; //set the last block of time to be reseveable
+                           
                         }
                     }else{
                        $title = $classNames[$id]['tooltip'];
-                       $status = $classNames[$id]['status'];
+                       //$status = $classNames[$id]['status'];
                        $slotId = $classNames[$id]['slotId'];
-                       if($status == 1){
-                        $class = 'reserved editable';
-                       }else if($status == 2 || $status == 3){ //
-                        $class = 'reserved'; //uneditable
-                       }
+                       $type = $classNames[$id]['sessionService'];
+                       switch ($type) {
+                          case 'Counselling':
+                              $class = 'counselling';
+                              break;
+                          case 'Psychotherapy':
+                               $class = 'psychotherapy';
+                               break;
+                          case 'Psychosexual':
+                               $class = 'psychosexual';
+                               break;
+                          case 'Parenting Together':
+                               $class = 'parenting';
+                                break;
+                          case 'Wellbeing':
+                               $class = 'wellbeing';
+                               break;
+                          case 'DSU':
+                               $class = 'dsu';
+                               break;
+                        } 
                     }
 
                     $tdVals[$id] = array('time' => $time,
