@@ -438,7 +438,7 @@
              			});
              			cj('select[name="sessionSelect"] option').each(function () {
 						    		if(cj('#viewSessionService').text() == cj(this).text()){
-										 cj('#sessionSelect option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
+										 cj('#sessionSelect option[value="' + cj(this).val()+ '"]').attr('selected', 'selected');
 										 return;
 										}
              			});
@@ -501,7 +501,7 @@
 							          ajaxURL: crmajaxURL,
 												success:function (data){ 
 							           	if(data.values[0].is_updated == 1){
-					      						cj( "#slotDialog" ).dialog('destroy');
+					     							window.location.reload(true);
 							           }else {
 							            	var errorMessage = data.values[0].error_message;
 							           		 cj('#creatError').html('' + errorMessage.toString());
