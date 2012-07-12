@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="iso-8859-1" ?>
 <menu>
  <item>
-     <path>civicrm/booking/slot/create</path>
+     <path>civicrm/booking/slot/manage</path>
+     <title>Manage slots</title> 
+     <page_callback>CRM_Booking_Page_Slot</page_callback>
+     <page_type>1</page_type>
+     <weight>9000</weight>
+  </item>
+  <item>
+     <path>civicrm/booking/slot/manage/copy</path>
      <title>Manage slots</title> 
      <page_callback>CRM_Booking_Page_Slot</page_callback>
      <page_type>1</page_type>

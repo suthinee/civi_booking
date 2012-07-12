@@ -83,7 +83,7 @@ function civicrm_api3_slot_update($params){
               'slot_date' =>   $d->format('Y-m-d H:i:s'),
               'activity_type' => $activityType,
               'session_service' => $sessionService,
-              'description' => strip_tags($description),
+              'description' => $description,
               'status ' => 1, //set status to free
               'updated_by' => $userId,
               'updated_date' => date('Y-m-d H:i:s')

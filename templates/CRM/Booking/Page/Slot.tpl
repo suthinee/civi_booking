@@ -95,7 +95,7 @@
 {/foreach}
 </div>
 
-<div id="confirm-dialog">This cannot be undone, Are you sure you with to continue?</div>
+<div id="confirm-dialog">Are you sure you wish to continue? This cannot be undone.</div>
 <div id="slotDetailDialog"> 
 	<div id="slotDetailsError" class="creatError"> </div>
 

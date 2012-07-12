@@ -65,6 +65,7 @@ class CRM_Booking_BAO_Slot{
                room_no,
                slot_date,
                session_service,
+               activity_type,
                status
         FROM civi_booking_slot
         LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id

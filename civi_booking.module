@@ -114,6 +114,27 @@ function civi_booking_civicrm_buildForm($formName, &$form) {
   }
 }
 
+
+function civi_booking_civicrm_validate( $formName, &$fields, &$files, &$form ) {
+ // dump($fields);
+  //dump($files);
+  //dump($form);
+  //exit;
+    // sample implementation
+    $errors = array( );
+    if ( $formName == 'CRM_Case_Form_Activity' ) {
+       // ensure that external identifier is present and valid
+       $externalID = CRM_Utils_Array::value( 'external_identifier', $fields );
+       if ( ! $externalID ) {
+          $errors['external_identifier'] = ts( 'External Identifier is a required field' );
+       } else if ( ! myCustomValidatorFunction( $externalID ) ) {
+          $errors['external_identifier'] = ts( 'External Identifier is not valid' );
+       }
+    }
+    return empty( $errors ) ? true : $errors;
+ 
+}
+
 function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
 
   if($objectName == 'Activity'){
