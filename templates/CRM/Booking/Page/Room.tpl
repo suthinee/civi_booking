@@ -21,14 +21,14 @@
             <td>{$room.floor}</td>
             <td>{$room.building}</td>
             <td>{$room.phone_extension_no}</td>
-            <td><a href="{php} print base_path(); {/php}{civicrm/booking/room/edit/?roomId={$room.id}&reset=1">Edit</a></td>
+            <td><a href="{php} print base_path(); {/php}civicrm/booking/room/edit/?roomId={$room.id}&reset=1&action=update">Edit</a></td>
         </tr>
         {/foreach}	
     </tbody>
 </table>
 {literal}
 <script type="text/javascript">
-    var createRoomURL = '{/literal}{php} print base_path(); {/php}{literal}civicrm/booking/room/add/?reset=1';
+    var createRoomURL = '{/literal}{php} print base_path(); {/php}{literal}civicrm/booking/room/add/?reset=1&action=add';
 	var crmajaxURL = '{/literal}{php} print base_path(); {/php}{literal}civicrm/ajax/rest';
 
 	cj(document).ready(function() {

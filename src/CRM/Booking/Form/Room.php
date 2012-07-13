@@ -46,12 +46,10 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
     /**
      * Case Id
      */
-    public $_roomId  = null;
-
+   
     function preProcess(){ 
         echo 'preProcess';
         //TODO: Handle requests
-        $roomId = CRM_Utils_Request::retrieve( 'roomId','Integer', $this ) ;  
         
     }
 
@@ -63,9 +61,12 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
      * @return None
      */
     function setDefaultValues( ){
-       echo 'default';
-        
         $defaults = array( );
+        $action = $this->getAction();
+        if($action == 2){ //edit
+            $defaults['floor'] = 'First';
+        }
+        
         /*
         $defaults['is_reset_timeline'] = 1;
         
@@ -78,6 +79,9 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
 
     function buildQuickForm( ){
         echo 'buildform'; 
+
+        $this->addElement('hidden', 
+                        'room_id');  
 
         $this->addElement('text', 
                         'room_no', 
@@ -93,7 +97,7 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
                         ts('Room Size:'));  
 
         $floorOpts = array('' => '-- Select --',
-                           'Frist' => 'Frist', 
+                           'First' => 'First', 
                            'Second' => 'Second', 
                            'Third' => 'Third',
                            'Forth' => 'Forth');
@@ -120,7 +124,7 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
                         $status);  
 
         $this->addButtons(array( 
-                                    array ( 'type'      => 'next', 
+                                    array ( 'type'      => 'submit', 
                                             'name'      => 'Add', 
                                             'spacing'   => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', 
                                             'isDefault' => true   ), 
@@ -128,16 +132,38 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
                                             'name'      => ts('Cancel'),
                                             )
                                      ));
+        $this->addFormRule( array( 'CRM_Booking_Form_Room', 'formRule' ), $this );
  
     }
 
     function postProcess(){ 
-        echo 'post';
-        exit;
-        //TODO: Handle requests
-        $roomId = CRM_Utils_Request::retrieve( 'roomId','Integer', $this ) ;  
-        
-    }
+            
+
+       $params = $this->controller->exportValues($this->_name);
+       $roomNo = $params['room_no'];
+       $type   = $params['type'];
+       $size = $params['size'];
+       $floor = $params['floor'];
+       $centre = $params['centre'];
+       $extension = $params['extension'];
+       $status = $params['status'];
+
+
+       /*add data into database (Nee)*/
+       $id = db_insert('civi_booking_room')
+              ->fields(array(
+                'room_no' => $roomNo,
+                'type' => $type,
+                'size' => $size,
+                'floor' => $floor,
+                'building' => $centre,
+                'phone_extension_no' => $extension,
+                'is_active' => $status
+                  
+            ))
+            ->execute(); 
+
+        }
     /**
      * global validation rules for the form
      *
@@ -146,9 +172,46 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
      * @return array list of errors to be posted back to the form
      * @access public
      */
-     function formRule( $values, $files, $form )  {
+    /* function formRule( $values, $files, $form )  {
         echo 'rule';
-        return true;
+        return true;*/
+
+        /* Nee@Validation */
+                  
+    function formRule( $values, $files, $form )  {
+
+        $roomNo = CRM_Utils_Array::value( 'room_no', $values );
+        $type = CRM_Utils_Array::value( 'type', $values );
+        $size = CRM_Utils_Array::value( 'size', $values );
+        $floor = CRM_Utils_Array::value( 'floor', $values );
+        $centre = CRM_Utils_Array::value( 'centre', $values );
+        /*$extension = CRM_Utils_Array::value( 'extension', $values );*/
+        $status = CRM_Utils_Array::value( 'status', $values );
+       
+        if ( $roomNo == null || $roomNo == '' ) {
+          $errors['room_no'] = ts( 'Please insert Room Number' );
+        } 
+        if ($type == null || $type == '') {
+            $errors['type'] = ts ('Please insert type');
+        }
+        if ($size == null || $size == ''){
+            $errors['size'] = ts('please insert size');
+        }
+        if ($floor == null || $floor == ''){
+            $errors['floor'] = ts ('Please select the floor');
+        }
+        if ($centre == null|| $centre == ''){
+            $errors ['builing'] = ts('please select the centre');
+        }
+        /*if  ($extension == null || $extension == ''){
+            $errors ['extension']= ts ('Please insert phone extension number');
+        }*/
+        /*if ($status == null || $status == ''){
+            $errors ['status'] = ts('Please select status');
+        }*/
+        return empty( $errors ) ? true : $errors; 
+    
+    /*}*/
     }
 
 
