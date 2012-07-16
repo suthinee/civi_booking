@@ -170,14 +170,20 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         $this->assign('startDate',date('l d/m/Y', $startDate));
         $this->assign('endDate', date('l d/m/Y',  $endDate));
 
-        $lastWeekUrl = CRM_Utils_System::url( 'civicrm/booking/slot/create',
+        $lastWeekUrl = CRM_Utils_System::url( 'civicrm/booking/slot/manage',
                                   "reset=1&sd=" .strtotime("last Monday" , $startDate));
 
-        $nextWeekUrl = CRM_Utils_System::url( 'civicrm/booking/slot/create',
+        $nextWeekUrl = CRM_Utils_System::url( 'civicrm/booking/slot/manage',
                                     "reset=1&sd=" .strtotime("next Monday" , $startDate) );
 
         $this->assign('lastWeekUrl',$lastWeekUrl);
         $this->assign('nextWeekUrl',$nextWeekUrl);
+
+        $copySlotsURL = CRM_Utils_System::url( 'civicrm/booking/slot/manage/copy',
+                                    "action=add&sd=" . $startDate );
+        
+        $this->assign('copySlotsURL',$copySlotsURL);
+
 
 
         require_once 'api/api.php';

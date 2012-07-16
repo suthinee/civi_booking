@@ -8,7 +8,7 @@ class CRM_Booking_BAO_Slot{
 
     }
 
-    static function isSlotCreatable($args){
+    static function isSlotExist($args){
 
       //civicrm_initialize( );
       $params = array(
@@ -60,13 +60,16 @@ class CRM_Booking_BAO_Slot{
                con1.display_name as display_name,
                con2.display_name as attended_clinician_name,
                clinician_contact_id, 
+               attended_clinician_contact_id,
                start_time,  
                end_time, 
                room_no,
+               room_id,
                slot_date,
                session_service,
                activity_type,
-               status
+               status,
+               description
         FROM civi_booking_slot
         LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
         LEFT JOIN civicrm_contact con1 ON con1.id = civi_booking_slot.clinician_contact_id
@@ -215,6 +218,117 @@ WHERE id = %2
           $results[] = $dao->toArray();          
       }
       return $results;
+    }
+
+    static function copySlots($params){
+
+      $results = array();
+
+      $proceed = CRM_Utils_Array::value('proceed',$params);
+      if(isset($proceed)){
+
+        $session =& CRM_Core_Session::singleton( );
+        $userId = $session->get( 'userID' ); // which is contact id of the user
+
+   
+        $sd = CRM_Utils_Array::value('sd',$params);
+        $weeksForward = CRM_Utils_Array::value('weeks',$params);
+
+        require_once 'CRM/Booking/Utils/DateTime.php';
+        $daysOfWeek = CRM_Booking_Utils_DateTime::getWeeklyCalendar($sd);
+        $startDate = array_shift(array_values($daysOfWeek));
+        $endDate = end($daysOfWeek);
+        $args = array();
+        require_once 'CRM/Booking/BAO/Slot.php';
+        $slots = CRM_Booking_BAO_Slot::getSlots(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate), 0, 0);
+        $uncreatableList = array();
+        $values = array();
+
+        for($i = 0; $i < $weeksForward; $i++){
+         foreach ($slots as $key => $slot) {
+            $slotDate = $slot['slot_date'];
+            $nextSevenDay = strtotime("+". $i + 1 . " week",strtotime($slotDate));
+            $nd = date('Y-m-d H:i:s', $nextSevenDay);
+
+            $args['date'] = $nd;
+            $args['startTime'] = $slot['start_time'];
+            $args['endTime'] = $slot['end_time'];
+            $args['contactId'] = $slot['clinician_contact_id'];
+            $args['contactId2'] = $slot['attended_clinician_contact_id'];
+          
+            $results = CRM_Booking_BAO_Slot::isSlotExist($args);
+            $isSlotCreatable = count($results) > 0 ? false : true;
+
+            if(!$isSlotCreatable){
+                $uncreatableList[] = array('slot_date' => date('l d/m/Y', $nextSevenDay),
+                                           'clinician_1' => $slot['display_name'],
+                                           'clinician_2' => $slot['attended_clinician_name'],
+                                           'start_time' => $slot['start_time'],
+                                           'end_time' => $slot['end_time'],
+                                           'room_no' => $slot['room_no'],
+                                           'status' => $slot['status']
+                                           );
+            }else{
+              //if($proceed == 1){
+                $contactId2 = $slot['attended_clinician_contact_id'];
+                if($contactId2 === ''){
+                  $contactId2 = null;
+                }
+               $values[] = array(
+                  'clinician_contact_id' => $slot['clinician_contact_id'],
+                  'attended_clinician_contact_id' => $contactId2,
+                  'room_id' => $slot['room_id'],
+                  'start_time' => $slot['start_time'],
+                  'end_time' => $slot['end_time'],
+                  'slot_date' => $nd,
+                  'activity_type' => $slot['activity_type'],
+                  'session_service' => $slot['session_service'],
+                  'description' => $slot['description'],
+                  'status ' => 1, //set status to free
+                  'created_by' => $userId,
+                  'updated_by' => $userId,
+                  'updated_date' => date('Y-m-d H:i:s')
+                );
+             //}
+            }
+         }
+        }
+        if(sizeof($uncreatableList) == 0 || (sizeof($uncreatableList) > 0 && $proceed ==1)){
+           $query= db_insert('civi_booking_slot')
+              ->fields(array(
+                      'clinician_contact_id',
+                      'attended_clinician_contact_id',
+                      'room_id',
+                      'start_time',
+                      'end_time',
+                      'slot_date',
+                      'activity_type',
+                      'session_service',
+                      'description',
+                      'status ', //set status to free
+                      'created_by',
+                      'updated_by',
+                      'updated_date'
+            ));
+          $txn = db_transaction();
+          try{
+            foreach ($values as $record) {
+              $query->values($record);
+            }
+
+            $query->execute();
+            $results = array('is_created' => 1);
+          }catch(Exception $e){
+            //TODO: Implement proper exception handler
+            dump($e->getMessage());
+          }
+        }else{
+          $results = array('is_created' => 0,
+                          'uncreatableList' => $uncreatableList);
+          return $results;
+        } 
+      }//end isset($proceed);
+      $results;
     }
     
 

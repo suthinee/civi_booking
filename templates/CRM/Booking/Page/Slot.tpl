@@ -23,7 +23,7 @@
 <div class="legend pasttime">Past</div>
 <!-- <div class="legend restricted">Restricted</div> -->
 </div>
-<div style="text-align: right; margin: auto;"><input id="copySlot" type="button" value="Copy slots" /></div>
+<div style="text-align: right; margin: auto;"><a href="{$copySlotsURL}">Copy slots</a></div>
 <div style="height:10px">&nbsp;</div>
 <form id="filterForm"> 
 	<fieldset class="filters">
