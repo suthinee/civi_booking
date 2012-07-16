@@ -72,6 +72,7 @@ function civi_booking_civicrm_tabs( &$tabs, $contactID ) {
  * Add functionality to select slots
  */
 function civi_booking_civicrm_buildForm($formName, &$form) {
+
   if ($formName == 'CRM_Case_Form_Activity') {
     if($form->getAction() == CRM_Core_Action::ADD 
       || $form->getAction() == CRM_Core_Action::UPDATE){
@@ -81,17 +82,6 @@ function civi_booking_civicrm_buildForm($formName, &$form) {
         $activityTypeId == 51 ||
         $activityTypeId == 52 ){ //Hard code for activity type id should change to check name instead of id
 
-
-        //$counsellorOptions = array( NULL => t('Select counsellor'));
-        //$counsellors =  civi_booking_find_contacts();
-        /*foreach($counsellors as $counsellor){
-          $counsellorOptions[$counsellor['contact_id']] = $counsellor['display_name'];
-        } 
-         $form->addElement('select', 
-                        'consellor_id', 
-                        ts('Counsellor'),
-                        $counsellorOptions);   
-      */
         $form->addElement('button', 
                         'select_slot', 
                         ts('Select a slot'));
@@ -116,24 +106,79 @@ function civi_booking_civicrm_buildForm($formName, &$form) {
 
 
 function civi_booking_civicrm_validate( $formName, &$fields, &$files, &$form ) {
- // dump($fields);
-  //dump($files);
-  //dump($form);
-  //exit;
-    // sample implementation
+
     $errors = array( );
     if ( $formName == 'CRM_Case_Form_Activity' ) {
-       // ensure that external identifier is present and valid
-       $externalID = CRM_Utils_Array::value( 'external_identifier', $fields );
-       if ( ! $externalID ) {
-          $errors['external_identifier'] = ts( 'External Identifier is a required field' );
-       } else if ( ! myCustomValidatorFunction( $externalID ) ) {
-          $errors['external_identifier'] = ts( 'External Identifier is not valid' );
+
+        $activityTypeId = CRM_Utils_Array::value( 'activity_type', $fields );
+
+        if($activityTypeId != 52){ //if activity type id != 52
+          return;
+        }
+
+        $slot_id = CRM_Utils_Array::value('slot_id', $fields);
+       
+        if(!$slot_id ){
+         return;
+        }
+
+        $isRepeatedArr = CRM_Utils_Array::value( 'custom_38_-1', $fields);
+        if(isset($isRepeatedArr)){
+          $isRepeated = $isRepeatedArr[1];
+          if($isRepeated != 1){
+            return;
+          }else{
+            $noOfWeeks = CRM_Utils_Array::value( 'custom_39_-1', $fields );
+            if ( ! $noOfWeeks ) {
+               $errors['custom_39_-1'] = ts( 'Repeat every is a required field' );   
+            }else{
+              require_once 'CRM/Booking/BAO/Slot.php';
+              $slot = CRM_Booking_BAO_Slot::getSlotById($slot_id);
+              $slotDate = CRM_Utils_Array::retrieveValueRecursive($slot, 'slot_date');
+              $startTime =  CRM_Utils_Array::retrieveValueRecursive($slot, 'start_time');
+              $endTime =  CRM_Utils_Array::retrieveValueRecursive($slot, 'end_time');
+              $contact1 =  CRM_Utils_Array::retrieveValueRecursive($slot, 'clinician_contact_id');
+              $roomId =  CRM_Utils_Array::retrieveValueRecursive($slot, 'room_id');
+              $results = array ();
+              for($i = 0; $i < $noOfWeeks; $i++){
+                $nextSevenDay = strtotime("+". $i + 1 . " week",strtotime($slotDate));
+                $nd = date('Y-m-d H:i:s', $nextSevenDay);
+                 //civicrm_initialize( );
+                $params = array(
+                  1 => array($nd, 'String'),
+                  2 => array($startTime, 'String'),
+                  3 => array($endTime, 'String'),
+                  4 => array($contact1, 'Integer'),
+                  5 => array($roomId, 'Integer')
+                );
+                $query = "SELECT civi_booking_slot.id
+                      FROM civi_booking_slot 
+                      LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.clinician_contact_id
+                      WHERE civi_booking_slot.slot_date  = %1
+                      AND civi_booking_slot.clinician_contact_id = %4
+                      AND civi_booking_slot.status = 1
+                      AND civi_booking_slot.room_id = %5
+                      AND (civi_booking_slot.start_time BETWEEN %2 AND %3 OR civi_booking_slot.end_time BETWEEN %2 AND %3)";
+
+                require_once('CRM/Core/DAO.php');   
+                $dao = CRM_Core_DAO::executeQuery( $query , $params );
+                while ( $dao->fetch( ) ) {
+                    $results[$i] = $dao->toArray();   
+                }
+              }
+              if($noOfWeeks != sizeof($results)){
+                $errors['custom_39_-1'] = ts( 'Activity cannot be repeated. No slots are avaliable to repeat' );   
+              }
+
+            }
+          }
+
        }
     }
     return empty( $errors ) ? true : $errors;
  
 }
+
 
 function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
 
@@ -143,6 +188,147 @@ function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
     if($activityTypeId == 50 || 
        $activityTypeId == 51 ||
        $activityTypeId == 52 ){
+
+      if($activityTypeId == 52){
+         $caseId = $objectRef->case_id;
+         $activityId = $objectRef->id; //ActivityId
+         $query = "
+           SELECT slot.id, 
+                  slot.slot_date,
+                  slot.start_time,
+                  slot.end_time,
+                  slot.room_id,
+                  slot.clinician_contact_id,
+                  slot.attended_clinician_contact_id,
+                  repeat_session.repeat_38,
+                  repeat_session.repeat_every_39
+          FROM civicrm_activity activity
+          LEFT JOIN civicrm_value_additional_activity_info_8 addition_info ON addition_info.entity_id = activity.id
+          LEFT JOIN civicrm_value_repeat_session_12 repeat_session ON repeat_session.entity_id = activity.id
+          LEFT JOIN civi_booking_slot slot ON slot.id = addition_info.slot_id_34  
+          WHERE activity.id = %1
+         ";
+        $params = array( 1 => array( $activityId, 'Integer' ) );
+
+        require_once('CRM/Core/DAO.php'); 
+        $dao = CRM_Core_DAO::executeQuery( $query,  $params );
+        $results = array ();
+        while ( $dao->fetch( ) ) {
+          $results[] = $dao->toArray();          
+        }
+        $value = $results[0];
+
+        $isRepeat = CRM_Utils_Array::value('repeat_38',$value);
+
+        if($isRepeat){
+          $noOfWeeks = CRM_Utils_Array::value('repeat_every_39',$value);
+          $slotDate = CRM_Utils_Array::value('slot_date',$value);
+          $startTime =  CRM_Utils_Array::value('start_time',$value);
+          $endTime =  CRM_Utils_Array::value('end_time',$value);
+          $contact1 =  CRM_Utils_Array::value('clinician_contact_id',$value );
+          $roomId =  CRM_Utils_Array::value('room_id',$value );
+          $slots = array ();
+          for($i = 0; $i < $noOfWeeks; $i++){
+                $nextSevenDay = strtotime("+". $i + 1 . " week",strtotime($slotDate));
+                $nd = date('Y-m-d H:i:s', $nextSevenDay);
+                 //civicrm_initialize( );
+                $params = array(
+                  1 => array($nd, 'String'),
+                  2 => array($startTime, 'String'),
+                  3 => array($endTime, 'String'),
+                  4 => array($contact1, 'Integer'),
+                  5 => array($roomId, 'Integer')
+                );
+                $query = "SELECT civi_booking_slot.id,
+                                civi_booking_slot.clinician_contact_id, 
+                                civi_booking_slot.attended_clinician_contact_id,
+                                civi_booking_slot.start_time,  
+                                civi_booking_slot.end_time, 
+                                civi_booking_slot.room_id,
+                                civi_booking_slot.slot_date,
+                                civi_booking_slot.session_service,
+                                civi_booking_slot.activity_type,
+                                civi_booking_slot.status,
+                                civi_booking_slot.description,
+                                room.room_no
+                      FROM civi_booking_slot 
+                      LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.clinician_contact_id
+                      LEFT JOIN civi_booking_room room on room.id = civi_booking_slot.room_id
+                      WHERE civi_booking_slot.slot_date  = %1
+                      AND civi_booking_slot.clinician_contact_id = %4
+                      AND civi_booking_slot.status = 1
+                      AND civi_booking_slot.room_id = %5
+                      AND (civi_booking_slot.start_time BETWEEN %2 AND %3 OR civi_booking_slot.end_time BETWEEN %2 AND %3)";
+
+                require_once('CRM/Core/DAO.php');   
+                $dao = CRM_Core_DAO::executeQuery( $query , $params );
+             
+                while ( $dao->fetch( ) ) {
+                    $slots[$i] = $dao->toArray();   
+                }
+            }
+
+            foreach ($slots as $key => $slot) {
+               $slotId = CRM_Utils_Array::value('id',$slot);
+               CRM_Booking_BAO_Slot::setSlotStatus(array('slot_id' => $slotId ,'status' => 2)); //set status to 2 to reserved 
+ 
+               
+               $startTime = (CRM_Utils_Array::value('start_time',$slot)); 
+               $endTime   = (CRM_Utils_Array::value('end_time',$slot)); 
+
+               //Convert date to slot timestamp
+               $slotTimestamp = strtotime(CRM_Utils_Array::value('slot_date',$slot));
+
+               //Convert timestamp to date formate thst CiviCRM uses.
+               $params['activity_date_time'] =  date('m/d/Y', $slotTimestamp);
+               $params['activity_date_time_time'] = date('g:iA', strtotime($startTime));
+
+               //process date for proper formate
+               $params['activity_date_time'] = CRM_Utils_Date::processDate( $params['activity_date_time'], $params['activity_date_time_time'] );
+                 
+               //set assignee contact ids
+               $params['assignee_contact_id'] = array();
+               $params['assignee_contact_id'][0] = CRM_Utils_Array::value('clinician_contact_id',$slot);
+              
+               if(CRM_Utils_Array::value('attended_clinician_contact_id',$slot)){
+                 $params['assignee_contact_id'][1] = CRM_Utils_Array::value('attended_clinician_contact_id',$slot);
+               }
+               
+               //set activity location
+               $params['location'] = CRM_Utils_Array::value('centre',$slot);
+               $params['details'] = 'Room no: ' . CRM_Utils_Array::value('room_no',$slot);
+               $params['duration'] = round(abs(strtotime($endTime) - strtotime($startTime)) / 60,2);               
+
+                  //TODO: add session service
+               //hacked adding session service for custom field'
+               $params['custom_16_-1'] =  CRM_Utils_Array::value('session_service',$slot);
+               $params['custom']['16']['-1']['value'] =  CRM_Utils_Array::value('session_service',$slot);
+
+               $params['custom_22_-1'] = CRM_Utils_Array::value('centre',$slot);
+               $params['custom']['22']['-1']['value'] = CRM_Utils_Array::value('centre',$slot);
+               
+        
+               //slotId
+               $params['custom_34_-1'] = CRM_Utils_Array::value('id',$slot);
+               $params['custom']['34']['-1']['value'] = CRM_Utils_Array::value('id',$slot);
+            
+               $params['subject'] = 'Schedule Regular Session';
+               $params['source_contact_id'] = 102; //TODO: Hook to use contact Id
+               $params['activity_type_id'] = 52;
+               $params['status_id'] = 1;
+               $params['priority_id'] = 2;
+               $params['case_id'] = $caseId;
+
+               $params['version'] = 1;
+
+
+               require_once 'api/api.php';
+               $activity = civicrm_api('Activity','create', $params);
+
+            }
+        }
+      }
+
       $originalId = $objectRef->original_id;    
       if($op == 'create' && isset($originalId)){
         //Query for the prior activity
@@ -180,6 +366,7 @@ ORDER BY ca.id DESC";
 }
 
 function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
+
 
   if($objectName == 'Activity'){
     $activityTypeId = CRM_Utils_Array::value('activity_type_id',$params);
