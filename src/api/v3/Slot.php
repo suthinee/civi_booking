@@ -397,7 +397,9 @@ function civicrm_api3_slot_get( $params ){
               }      
               $slotTypes[$className] = array( 'sessionService' => $slot['session_service'],
                                               'slotId' => $slot['id'],
-                                              'title' => $tooltip);
+                                              'title' => $tooltip,
+                                              'date' => date('d-m-Y', strtotime($slot['slot_date'])),
+                                              'time' => date('G:i', strtotime($slot['start_time'])) . ' - ' . date('G:i', strtotime($slot['end_time'])));
 
           }
       }
@@ -435,8 +437,9 @@ function civicrm_api3_slot_get( $params ){
                                  'timeOptions' => $timeOptions);
 
             foreach($contacts as $contact){
-                $contactId = CRM_Utils_Array::value('contact_id',$contact);
-                $conts[$contactId] = array('display_name' => CRM_Utils_Array::value('display_name',$contact),
+                $contactId = CRM_Utils_Array::value('contact_id',$contact);           
+                $display_name =  CRM_Utils_Array::value('display_name',$contact);    
+                $conts[$contactId] = array('display_name' => $display_name,
                                         'sort_name' => CRM_Utils_Array::value('sort_name',$contact),
                                         'contact_id' => CRM_Utils_Array::value('contact_id',$contact)
                                         );  
@@ -472,7 +475,10 @@ function civicrm_api3_slot_get( $params ){
                                        'tdataId' => $id,
                                        'className' =>  $className,
                                        'slotId' => $slotTypes[$id]['slotId'],
-                                       'title' => $slotTypes[$id]['title']);
+                                       'title' => $slotTypes[$id]['title'],
+                                       'clinician' => $display_name,
+                                       'service' => $slotTypes[$id]['sessionService'],
+                                       'time' => $slotTypes[$id]['time']);
                   }else if  ($day < strtotime("now")){
                     $tdVals[$id] = array('time' => $time,
                                       'timeKey' => $timeKey,

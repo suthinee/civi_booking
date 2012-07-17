@@ -270,8 +270,9 @@ function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
 
             foreach ($slots as $key => $slot) {
                $slotId = CRM_Utils_Array::value('id',$slot);
+
+
                CRM_Booking_BAO_Slot::setSlotStatus(array('slot_id' => $slotId ,'status' => 2)); //set status to 2 to reserved 
- 
                
                $startTime = (CRM_Utils_Array::value('start_time',$slot)); 
                $endTime   = (CRM_Utils_Array::value('end_time',$slot)); 
@@ -312,18 +313,24 @@ function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
                $params['custom_34_-1'] = CRM_Utils_Array::value('id',$slot);
                $params['custom']['34']['-1']['value'] = CRM_Utils_Array::value('id',$slot);
             
-               $params['subject'] = 'Schedule Regular Session';
+               $params['subject'] = 'Scheduled Regular Session';
                $params['source_contact_id'] = 102; //TODO: Hook to use contact Id
                $params['activity_type_id'] = 52;
                $params['status_id'] = 1;
                $params['priority_id'] = 2;
                $params['case_id'] = $caseId;
 
-               $params['version'] = 1;
+               $params['version'] = 3;
+               $params['check_permissions'] = FALSE;
 
 
-               require_once 'api/api.php';
-               $activity = civicrm_api('Activity','create', $params);
+
+              require_once 'api/api.php';
+               $results = civicrm_api("Activity","create", $params);
+
+               if($results['is_error'] == 1){
+                  CRM_Booking_BAO_Slot::setSlotStatus(array('slot_id' => $slotId ,'status' => 1)); //set status to 2 to availables 
+               }
 
             }
         }
