@@ -555,7 +555,7 @@ if(isset($action) && $action == 'get'){
       $id = $daoArr['id'];
       $results['results'][$id]['slot_id'] = $id; 
       $results['results'][$id]['slot_date'] = date('d/m/Y', strtotime($daoArr['slot_date']));
-      $results['results'][$id]['slot_day'] = date(l, strtotime($daoArr['slot_date']));; 
+      $results['results'][$id]['slot_day'] = date('l', strtotime($daoArr['slot_date']));; 
       $results['results'][$id]['start_time'] = date('G:i', strtotime($daoArr['start_time'])); 
       $results['results'][$id]['end_time'] = date('G:i', strtotime($daoArr['end_time'])); 
       $results['results'][$id]['status'] = $daoArr['status'];

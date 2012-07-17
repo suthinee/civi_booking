@@ -242,6 +242,8 @@ cursor: pointer !important;
 	border: 3px solid #AAA;
 	background: #EEE;
 }
-.page-node-submission-edit .slot, #webform-component-cron-check {
+.page-node-submission-edit .slot{
 	display: none;
 }
+
+#webform-component-corn-check {display:none;}
