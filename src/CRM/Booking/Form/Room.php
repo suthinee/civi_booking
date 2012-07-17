@@ -44,12 +44,17 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
 
 
     /**
-     * Case Id
      */
-   
+
+    public $_roomId; 
+
     function preProcess(){ 
-        echo 'preProcess';
-        //TODO: Handle requests
+        $id =CRM_Utils_Request::retrieve( 'roomId', 'Positive', $this );  /* request room_id from page */
+        if($id){
+            $this->_roomId = $id;
+        }else{
+            $this->_roomId = 0;
+        }
         
     }
 
@@ -60,30 +65,30 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
      * @access public
      * @return None
      */
-    function setDefaultValues( ){
+    function setDefaultValues( ){    /* set defaults for edit page */
         $defaults = array( );
         $action = $this->getAction();
-        if($action == 2){ //edit
-            $defaults['floor'] = 'First';
-        }
-        
-        /*
-        $defaults['is_reset_timeline'] = 1;
-        
-        $defaults['reset_date_time'] = array( );
-        list( $defaults['reset_date_time'], $defaults['reset_date_time_time'] ) = CRM_Utils_Date::setDateDefaults( null, 'activityDateTime' );
-        $defaults['case_type_id'] = $form->_caseTypeId; */
 
+         if($action == 2){ //edit
+            $id =CRM_Utils_Request::retrieve( 'roomId', 'Positive', $this );  /* request room_id from page */
+            require_once('CRM/Booking/BAO/Room.php'); 
+            $room = CRM_Booking_BAO_Room::getRoomById($id); 
+            $defaults['floor'] =  $room[0]['floor'];
+            $defaults ['room_no'] = $room[0]['room_no'];
+            $defaults['type'] = $room[0]['type'];
+            $defaults['size'] = $room[0]['size'];
+            $defaults['centre'] = $room[0]['building'];
+            $defaults['extension'] =$room[0]['phone_extension_no'];
+            $defaults ['status'] = $room[0]['is_active'];
+        }
         return $defaults;
+
     }
+       
 
     function buildQuickForm( ){
-        echo 'buildform'; 
 
-        $this->addElement('hidden', 
-                        'room_id');  
-
-        $this->addElement('text', 
+         $this->addElement('text', 
                         'room_no', 
                         ts('Room No:'));  
 
@@ -97,6 +102,7 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
                         ts('Room Size:'));  
 
         $floorOpts = array('' => '-- Select --',
+                           'Basement' => 'Basement',
                            'First' => 'First', 
                            'Second' => 'Second', 
                            'Third' => 'Third',
@@ -137,8 +143,10 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
     }
 
     function postProcess(){ 
-            
-
+    
+ 
+   
+      
        $params = $this->controller->exportValues($this->_name);
        $roomNo = $params['room_no'];
        $type   = $params['type'];
@@ -148,22 +156,48 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
        $extension = $params['extension'];
        $status = $params['status'];
 
+       //dump($params);
+       //exit;
 
-       /*add data into database (Nee)*/
-       $id = db_insert('civi_booking_room')
-              ->fields(array(
-                'room_no' => $roomNo,
-                'type' => $type,
-                'size' => $size,
-                'floor' => $floor,
-                'building' => $centre,
-                'phone_extension_no' => $extension,
-                'is_active' => $status
-                  
-            ))
-            ->execute(); 
+       
+       $action = $this->getAction();
+
+       if($action == 1){
+
+           /*add data into database (Nee)*/
+           $id = db_insert('civi_booking_room')
+                  ->fields(array(
+                    'room_no' => $roomNo,
+                    'type' => $type,
+                    'size' => $size,
+                    'floor' => $floor,
+                    'building' => $centre,
+                    'phone_extension_no' => $extension,
+                    'is_active' => $status
+                      
+                ))
+                ->execute(); 
+        }else if($action == 2){
+
+            if($this->_roomId != 0){
+
+                $id = db_update('civi_booking_room') // Table name no longer needs {}
+                    ->fields(array(
+                    'room_no' => $roomNo,
+                    'type' => $type,
+                    'size' => $size,
+                    'floor' => $floor,
+                    'building' => $centre,
+                    'phone_extension_no' => $extension,
+                    'is_active' => $status
+                ))
+                ->condition('id', $this->_roomId , '=')
+                ->execute(); 
+            }
 
         }
+    }
+
     /**
      * global validation rules for the form
      *

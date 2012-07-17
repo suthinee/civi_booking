@@ -8,6 +8,31 @@ class CRM_Booking_BAO_Room{
 
     }
 
+      /* edit mode Nee*/
+    static function getRoomById($roomId){
+        $params = array( 1 => array( $roomId, 'Integer'));
+
+        $query = "SELECT  id, 
+                  room_no,
+                  type,
+                  size,
+                  floor,
+                  building,
+                  phone_extension_no,
+                  is_active
+            FROM civi_booking_room
+            WHERE id = %1";  
+      
+        require_once('CRM/Core/DAO.php'); 
+        $dao = CRM_Core_DAO::executeQuery( $query, $params);
+        $results = array ();
+        while ( $dao->fetch( ) ) {
+          $results[] = $dao->toArray();          
+        }
+        return $results;
+
+    }
+
     static function getRooms($isActive = 1){
       $params = array( 1 => array( $isActive, 'Integer'));
 
