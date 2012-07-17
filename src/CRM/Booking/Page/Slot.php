@@ -219,6 +219,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
        $parentingTogeter = CRM_Core_OptionGroup::getValue( 'service_20120221114757', 'Parenting Together' );
        $wellbeing = CRM_Core_OptionGroup::getValue( 'service_20120221114757', 'Wellbeing' );
        $dsu = CRM_Core_OptionGroup::getValue( 'service_20120221114757', 'DSU' );
+       $undecided = CRM_Core_OptionGroup::getValue( 'undecided', 'Undecided' );
 
        $sessionServices =  array(
           NULL => t('Select Session service'),
@@ -228,6 +229,8 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
           $parentingTogeter => t('Parenting Together'),
           $wellbeing => t('Wellbeing'),
           $dsu => t('DSU'),
+          $undecided = t('Undecided'),
+
         ); 
 
         $this->assign('sessionServices', $sessionServices);
