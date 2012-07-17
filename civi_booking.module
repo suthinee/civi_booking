@@ -502,9 +502,9 @@ function civi_booking_menu() {
   /**
   * @Params (centre, services, start_date, end_date)
   */
-  $items['slot/get/%'] = array(
+  $items['slots/get'] = array(
      'page callback' => '_get_available_slots',
-     'page arguments' => array(1,2,3,4,5),
+     'page arguments' => array(1,2),
      'access arguments' => array('access content'),
   );
   
@@ -512,7 +512,7 @@ function civi_booking_menu() {
 
 }
 
-function _get_available_slots($action, $service, $centre = null, $startDate = null) {
+function _get_available_slots($action, $startDate = null) {
 if(isset($action) && $action == 'get'){
 
   $query = "SELECT
@@ -523,13 +523,14 @@ if(isset($action) && $action == 'get'){
               civi_booking_slot.status as status
             FROM civi_booking_slot 
             LEFT JOIN civi_booking_room ON civi_booking_room.id = civi_booking_slot.room_id
-            WHERE civi_booking_slot.status IN (1, 2)
+            WHERE civi_booking_slot.status IN (1, 2, 3)
             AND civi_booking_slot.activity_type = 50
-            AND civi_booking_slot.session_service = %1
-            AND civi_booking_slot.slot_date BETWEEN %3 AND %4";
+            AND civi_booking_slot.slot_date BETWEEN %1 AND %2 
+            ORDER BY civi_booking_slot.slot_date";
+  /*
   if(isset($centre) && ($centre == 'WS' || $centre == 'AL')){
     $query .=  "\n AND civi_booking_room.building = %2";
-  }
+  }*/
   civicrm_initialize( );
   require_once 'CRM/Booking/Utils/DateTime.php';
   if(isset($startDate) && $startDate != ''){
@@ -539,13 +540,9 @@ if(isset($action) && $action == 'get'){
   }
   $startDate = array_shift(array_values($daysOfNextweek));
   $endDate =  end($daysOfNextweek); 
-
-  $query .= "\n ORDER BY civi_booking_slot.slot_date";
-
-  $params = array( 1 => array( $service, 'String'),
-                   2 => array( $centre, 'String'),
-                   3 => array(date('Y-m-d H:i:s', $startDate), 'String'),
-                   4 => array( date('Y-m-d H:i:s',$endDate), 'String'));
+ 
+  $params = array( 1 => array(date('Y-m-d H:i:s', $startDate), 'String'),
+                   2 => array( date('Y-m-d H:i:s',$endDate), 'String'));
   require_once('CRM/Core/DAO.php');   
   $dao = CRM_Core_DAO::executeQuery( $query, $params);
   $results = array ();
@@ -561,7 +558,7 @@ if(isset($action) && $action == 'get'){
       $results['results'][$id]['slot_day'] = date(l, strtotime($daoArr['slot_date']));; 
       $results['results'][$id]['start_time'] = date('G:i', strtotime($daoArr['start_time'])); 
       $results['results'][$id]['end_time'] = date('G:i', strtotime($daoArr['end_time'])); 
-      $results['results'][$id]['status'] = $daoArrp['status'];
+      $results['results'][$id]['status'] = $daoArr['status'];
 
   }
 }
