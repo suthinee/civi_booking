@@ -95,6 +95,23 @@ td.slot{
 	color: #E0E0E0;
 }
 
+.initial-assessment{
+	background-color: #408AD2;
+	color: #E0E0E0;
+}
+
+
+.supplementary-assessment{
+	background-color: #CF9D9B;
+	color: white;
+}
+
+
+.regular-session{
+	background-color: #6F9BAE;
+	color: #E0E0E0;
+}
+
 .editable{
 	background-color:#6F9BAE;
 	color: #E0E0E0;
@@ -201,23 +218,40 @@ cursor: pointer !important;
 	padding: 0;
 	margin-bottom: 0;
 }
+.node-type-webform #webform-component-seleted-slot-id ul.left {
+	width: 400px;
+	float: left;
+}
+.node-type-webform #webform-component-seleted-slot-id ul.right {
+	width: 400px;
+	float: right;
+}
+.node-type-webform #edit-actions {
+	width: 100%;
+	float: left;
+}
 .node-type-webform #webform-component-seleted-slot-id ul div.left {
 	float:left;
 }
 .node-type-webform #webform-component-seleted-slot-id ul div.first {
-	width: 150px;
+	width: 175px;
 }
 .node-type-webform #webform-component-seleted-slot-id ul div.middle {
 	width: 150px;
 	text-align: center;
 }
 .node-type-webform #webform-component-seleted-slot-id ul div.last {
-	width: 150px;
+	width: 60px;
 	text-align: center;
 }
 .node-type-webform #webform-component-seleted-slot-id ul li.item {
 	list-style: none;
 	height: 50px;
+	width: 385px;
+	display: inline-block;
+}
+.node-type-webform #webform-component-seleted-slot-id ul li.item.booked {
+	color:#ccc;
 }
 .node-type-webform #webform-component-seleted-slot-id .options {
 	border: 1px solid #ccc;
@@ -242,8 +276,9 @@ cursor: pointer !important;
 	border: 3px solid #AAA;
 	background: #EEE;
 }
-.page-node-submission-edit .slot{
+.page-node-submission-edit .slot, #webform-component-cron-check {
 	display: none;
 }
-
-#webform-component-corn-check {display:none;}
+#webform-component-corn-check {
+	display:none;
+}
