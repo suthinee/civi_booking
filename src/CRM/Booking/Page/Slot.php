@@ -46,7 +46,8 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
             $lastKey = end(array_keys($timeRange));
             foreach ($timeRange as $key => $time) { 
                $generated = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['room_no'] . $time;
-               $classNames[$generated]['sessionService'] = $slot['session_service'];
+               //$classNames[$generated]['sessionService'] = $slot['session_service'];
+               $classNames[$generated]['activityTypes'] = $slot['activity_type'];
                $classNames[$generated]['status'] = $slot['status'];
                $classNames[$generated]['slotId'] = $slot['id']; 
                if($slot['attended_clinician_name'] == null){
@@ -115,7 +116,20 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                        $title = $classNames[$id]['tooltip'];
                        //$status = $classNames[$id]['status'];
                        $slotId = $classNames[$id]['slotId'];
-                       $type = $classNames[$id]['sessionService'];
+                       //$type = $classNames[$id]['sessionService'];
+                       $type = $classNames[$id]['activityTypes'];
+                       switch ($type) {
+                          case 50:
+                            $class = 'initial-assessment';
+                            break;
+                          case 51:
+                            $class = 'supplementary-assessment';
+                            break;
+                          case 52:
+                            $class = 'regular-session';
+                            break;
+                       }
+                       /*
                        switch ($type) {
                           case 'Counselling':
                               $class = 'counselling';
@@ -136,6 +150,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                                $class = 'dsu';
                                break;
                         } 
+                        */
                     }
 
                     $tdVals[$id] = array('time' => $time,
