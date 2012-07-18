@@ -143,10 +143,6 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
     }
 
     function postProcess(){ 
-    
- 
-   
-      
        $params = $this->controller->exportValues($this->_name);
        $roomNo = $params['room_no'];
        $type   = $params['type'];
@@ -158,8 +154,6 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
 
        //dump($params);
        //exit;
-
-       
        $action = $this->getAction();
 
        if($action == 1){
@@ -176,7 +170,8 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
                     'is_active' => $status
                       
                 ))
-                ->execute(); 
+                ->execute();
+                $print_r("Some data from the form was forgotten. Please fill in the entire form.");  
         }else if($action == 2){
 
             if($this->_roomId != 0){
@@ -192,10 +187,21 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
                     'is_active' => $status
                 ))
                 ->condition('id', $this->_roomId , '=')
+
                 ->execute(); 
+               
+                header("Location:http://erawat-virtualbox/tccr/civicrm/booking/room/manage");
+
             }
 
-        }
+        }//else if($action == delete) {
+           // if($this->_roomId != 0){
+
+               // $id = msql_query("Delete from civi_booking_room where roomId=$id")
+               // or die (mysql_error());
+                
+            //    header("Location:http://erawat-virtualbox/tccr/civicrm/booking/room/manage");
+        //}
     }
 
     /**
