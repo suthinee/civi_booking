@@ -8,13 +8,13 @@ table.reservations {
 
 table.reservations td {
 	/* border: solid #36648B 1px; */
-	height: 30px;
+	height: 35px;
 	vertical-align: middle !important;
 
 }
 
 td.resourcename {
-	padding: 1px 3px;
+	padding: 1px 2px;
 	background-color: #EDEDED;
 	color: #999999;
 }
@@ -30,7 +30,7 @@ td.resourcename a:hover {
 
 td.resdate {
 	width: 150px;
-	padding: 0 3px;
+	padding:  3px;
 	background-color: #36648B;
 	color: #F0F0F0;
 }
@@ -42,12 +42,14 @@ tr.today td.resdate {
 }
 
 tr.today td.reslabel {
+	width: 1px;
 	font-weight: bold;
 	background-color: #cfcfcf
 }
 
 td.reslabel {
-	padding-left: 2px;
+	vertical-align: middle;
+	padding-right: 1px;
 	/* background-color: #EDEDED; */
 	color: #333333;
 }
@@ -209,3 +211,20 @@ div.legend {
     *display: inline;
     margin: 0px 2px;
 }
+
+
+.textAlignVer {
+ display:block;  
+    writing-mode: tb-rl;  
+    filter: flipv fliph;  
+    -webkit-transform: rotate(-90deg);   
+    -moz-transform: rotate(-90deg);   
+    transform: rotate(-90deg);   
+    position:relative;  
+   width:0px;  
+    white-space:nowrap;  
+    font-size:12px;  
+    margin-top:10px;  
+
+}
+

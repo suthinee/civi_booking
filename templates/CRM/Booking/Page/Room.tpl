@@ -22,6 +22,7 @@
             <td>{$room.building}</td>
             <td>{$room.phone_extension_no}</td>
             <td><a href="{php} print base_path(); {/php}civicrm/booking/room/edit/?roomId={$room.id}&reset=1&action=update">Edit</a></td>
+            <td><a href="{php} print base_path(); {/php}civicrm/booking/room/delete/?roomId={$room.id}&reset=1&action=delete">Delete</a></td>
         </tr>
         {/foreach}	
     </tbody>
