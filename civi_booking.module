@@ -545,13 +545,18 @@ function civi_booking_form_alter(&$form, &$form_state, $form_id){
  * Implements hook_menu().
 */
 function civi_booking_menu() {
-  /**
-  * @Params (centre, services, start_date, end_date)
-  */
+
   $items['slots/get'] = array(
      'page callback' => '_get_available_slots',
      'page arguments' => array(1,2),
      'access arguments' => array('access content'),
+  );
+
+  $items['corn-test'] = array(
+    'title' => 'Corn Test', 
+    'page callback' => 'automate_generate_regular_session', 
+    'access arguments' => array('access content'),
+   
   );
   
   return $items;
@@ -616,6 +621,8 @@ function dump($val) {
     echo '<pre>'.var_export($val,true).'</pre>';
     return $val;
 }
+
+
 
 
 
