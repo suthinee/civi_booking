@@ -28,7 +28,7 @@
         center: 'title',
         right: 'month,agendaWeek,agendaDay'
       },
-      defaultView: 'agendaWeek',
+      defaultView: 'month',
       firstDay: 1,
       allDaySlot: false,
       firstHour: 8,
@@ -54,7 +54,6 @@
               var events = new Array();
               for(index in data.results){    
                 e = data.results[index];
-                console.log(event);
                 events.push({
                       title: e.title,
                       start: e.start,
