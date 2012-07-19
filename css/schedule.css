@@ -216,15 +216,17 @@ div.legend {
 .textAlignVer {
  display:block;  
     writing-mode: tb-rl;  
-    filter: flipv fliph;  
-    -webkit-transform: rotate(-90deg);   
-    -moz-transform: rotate(-90deg);   
-    transform: rotate(-90deg);   
+    
+    -webkit-transform: rotate(-270deg);   
+    -moz-transform: rotate(-270deg); 
+    -ms-transform:rotate(-270deg);  
+      
     position:relative;  
-   width:0px;  
+   width:15px;  
     white-space:nowrap;  
-    font-size:12px;  
-    margin-top:10px;  
+    font-size:10px;  
+    margin-bottom:20px;  
+
 
 }
 
