@@ -68,7 +68,7 @@
 			<td class="resdate">{$day.date}</td>
 			{foreach from=$day.timeOptions item=time}
 				{if $time.isDisplay eq 1}
-				<td class="reslabel">{$time.time}</td>
+				<td class="reslabel"><span class="textAlignVer">{$time.time}</span></td>
 				{else}
 				<td class="reslabel"></td>
 				{/if}
