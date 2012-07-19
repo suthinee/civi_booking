@@ -15,7 +15,7 @@
 <div class="legend reservable">Reservable</div>
 <div class="legend initial-assessment">Initial Assessment</div>
 <div class="legend supplementary-assessment">Supplementary Aessessment</div>
-<div class="legend regular-session">Regular session</div>
+<!--<div class="legend regular-session">Regular session</div>-->
 <!--<div class="legend unreservable">Unreservable</div>-->
 <div class="legend counselling">Counselling</div>
 <div class="legend psychotherapy">Psychotherapy</div>
