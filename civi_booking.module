@@ -189,7 +189,7 @@ function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
        $activityTypeId == 51 ||
        $activityTypeId == 52 ){
 
-      if($activityTypeId == 52){
+      if($activityTypeId == 52){ //check if repeated or final
          $caseId = $objectRef->case_id;
          $activityId = $objectRef->id; //ActivityId
          $query = "
@@ -200,8 +200,10 @@ function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
                   slot.room_id,
                   slot.clinician_contact_id,
                   slot.attended_clinician_contact_id,
+                  activity.activity_date_time,
                   repeat_session.repeat_38,
-                  repeat_session.repeat_every_39
+                  repeat_session.repeat_every_39,
+                  repeat_session.final_assessment_47
           FROM civicrm_activity activity
           LEFT JOIN civicrm_value_additional_activity_info_8 addition_info ON addition_info.entity_id = activity.id
           LEFT JOIN civicrm_value_repeat_session_12 repeat_session ON repeat_session.entity_id = activity.id
@@ -325,7 +327,7 @@ function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
 
 
 
-              require_once 'api/api.php';
+               require_once 'api/api.php';
                $results = civicrm_api("Activity","create", $params);
 
                if($results['is_error'] == 1){
@@ -333,40 +335,77 @@ function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
                }
 
             }
-        }
-      }
+          }
+          $isFinalSession = CRM_Utils_Array::value('final_assessment_47',$value);
+          if($isFinalSession){ //if the final this activity is final session
+            $activityTime = CRM_Utils_Array::value('activity_date_time',$value);
+             $query = "
+               SELECT activity.id,
+                      info.slot_id_34
+                     
+              FROM civicrm_activity activity
+              LEFT JOIN civicrm_case_activity case_activity ON case_activity.activity_id = activity.id
+              LEFT JOIN civicrm_case c ON c.id = case_activity.case_id  
+              LEFT JOIN civicrm_value_additional_activity_info_8 info ON info.entity_id = activity.id
+              WHERE c.id = %1 
+              AND activity.activity_type_id = 52
+              AND activity.activity_date_time > %2
+              
+             ";
+            $params = array( 1 => array( $caseId, 'Integer' ),
+                             2 => array( $activityTime, 'String') );
+
+            require_once('CRM/Core/DAO.php'); 
+            $dao = CRM_Core_DAO::executeQuery( $query,  $params );
+           // $results = array ();
+            require_once('CRM/Case/BAO/Case.php');
+            while ( $dao->fetch( ) ) {
+              $activityObj = $dao->toArray(); 
+              $slotId = CRM_Utils_Array::value('slot_id_34',$activityObj);
+              $actId = CRM_Utils_Array::value('id',$activityObj);
+              if($slotId){ 
+                CRM_Booking_BAO_Slot::setSlotStatus(array('slot_id' => $slotId ,'status' => 1)); //set status to 2 to availables 
+              }
+              if($actId){
+                CRM_Case_BAO_Case::deleteCaseActivity( $actId );
+              }
+            }
+          }
+       }
+
+      
 
       $originalId = $objectRef->original_id;    
       if($op == 'create' && isset($originalId)){
-        //Query for the prior activity
-        $query = "
-SELECT max(ca.id) as activityID
-FROM civicrm_log cl, civicrm_contact c, civicrm_activity ca
-WHERE (ca.id = %1 OR ca.original_id = %1)
-AND cl.entity_table = 'civicrm_activity'
-AND cl.entity_id    = ca.id
-AND cl.modified_id  = c.id
-AND ca.id < {$objectId}
-ORDER BY ca.id DESC";
-       
-              
-      $params = array( 1 => array( $originalId, 'Integer' ) );
-      $activityID    = CRM_Core_DAO::singleValueQuery( $query, $params );
- 
-      $query = "SELECT cc.slot_id_34
-        FROM civicrm_value_additional_activity_info_8 cc
-        WHERE cc.entity_id = %1";
+          //Query for the prior activity
+          $query = "
+  SELECT max(ca.id) as activityID
+  FROM civicrm_log cl, civicrm_contact c, civicrm_activity ca
+  WHERE (ca.id = %1 OR ca.original_id = %1)
+  AND cl.entity_table = 'civicrm_activity'
+  AND cl.entity_id    = ca.id
+  AND cl.modified_id  = c.id
+  AND ca.id < {$objectId}
+  ORDER BY ca.id DESC";
          
-      $params = array( 1 => array( $activityID, 'Integer' ) );
-      $priorActSlotId = CRM_Core_DAO::singleValueQuery( $query,  $params );
-
-      $params = array( 1 => array( $objectId, 'Integer' ) );
-      $currentActSlotId = CRM_Core_DAO::singleValueQuery( $query,  $params );
-      if($priorActSlotId != $currentActSlotId){ //A slot has been changed
-          //release a slot
-          CRM_Booking_BAO_Slot::setSlotStatus(array('slot_id' => $priorActSlotId ,'status' => 1)); 
-      }
+                
+        $params = array( 1 => array( $originalId, 'Integer' ) );
+        $activityID    = CRM_Core_DAO::singleValueQuery( $query, $params );
    
+        $query = "SELECT cc.slot_id_34
+          FROM civicrm_value_additional_activity_info_8 cc
+          WHERE cc.entity_id = %1";
+           
+        $params = array( 1 => array( $activityID, 'Integer' ) );
+        $priorActSlotId = CRM_Core_DAO::singleValueQuery( $query,  $params );
+
+        $params = array( 1 => array( $objectId, 'Integer' ) );
+        $currentActSlotId = CRM_Core_DAO::singleValueQuery( $query,  $params );
+        if($priorActSlotId != $currentActSlotId){ //A slot has been changed
+            //release a slot
+            CRM_Booking_BAO_Slot::setSlotStatus(array('slot_id' => $priorActSlotId ,'status' => 1)); 
+        }
+     
       }
     }
   }
