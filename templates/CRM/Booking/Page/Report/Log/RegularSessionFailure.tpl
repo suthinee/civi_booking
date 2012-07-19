@@ -3,9 +3,8 @@
 require_once 'CRM/Core/Page.php';
 
 /**
- * Slot page
  */
-class CRM_Booking_Page_Slot extends CRM_Core_Page{
+class CRM_Booking_Page_Report_Log_RegularSessionFailure extends CRM_Core_Page{
 
     /**
      * Run the page.
@@ -46,7 +45,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
             $lastKey = end(array_keys($timeRange));
             foreach ($timeRange as $key => $time) { 
                $generated = date('d-m-Y', strtotime($slot['slot_date'])) . $slot['room_no'] . $time;
-               $classNames[$generated]['sessionService'] = $slot['session_service'];
+               //$classNames[$generated]['sessionService'] = $slot['session_service'];
                $classNames[$generated]['activityTypes'] = $slot['activity_type'];
                $classNames[$generated]['status'] = $slot['status'];
                $classNames[$generated]['slotId'] = $slot['id']; 
@@ -116,7 +115,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                        $title = $classNames[$id]['tooltip'];
                        $status = $classNames[$id]['status'];
                        $slotId = $classNames[$id]['slotId'];
-                       $service = $classNames[$id]['sessionService'];
+                       //$type = $classNames[$id]['sessionService'];
                        $type = $classNames[$id]['activityTypes'];
                        /*
                        if($type == 50){
@@ -127,37 +126,39 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                          $class = $status == 1 ?  'regular-session' :  'regular-session-book'; 
                        }*/
                        
-                         switch ($type) {
+                       switch ($type) {
                           case 50:
-                            $class = $status == 1 ?  'initial-assessment' : 'initial-assessment booked';
+                            $class = $status == 1 ?  'initial-assessment' : 'initial-assessment-booked';
                             break;
                           case 51:
-                            $class = $status == 1 ? 'supplementary-assessment' :  'supplementary-assessment booked';
+                            $class = $status == 1 ? 'supplementary-assessment' :  'supplementary-assessment-booked';
+                            break;
+                          case 52:
+                            $class = $status == 1 ?  'regular-session' :  'regular-session-booked'; 
                             break;
                        }
-                       
-                       if($type == 52){
-                       switch ($service) {
+                       /*
+                       switch ($type) {
                           case 'Counselling':
-                                $class = $status == 1 ?  'counselling' :  'counselling booked'; 
-                               break;
+                              $class = 'counselling';
+                              break;
                           case 'Psychotherapy':
-                               $class = $status == 1 ?  'psychotherapy' :  'psychotherapy booked'; 
+                               $class = 'psychotherapy';
                                break;
                           case 'Psychosexual':
-                               $class = $status == 1 ?  'psychosexual' :  'psychosexual booked'; 
+                               $class = 'psychosexual';
                                break;
                           case 'Parenting Together':
-                                $class = $status == 1 ?  'parenting' :  'parenting booked'; 
+                               $class = 'parenting';
                                 break;
                           case 'Wellbeing':
-                               $class = $status == 1 ?  'wellbeing' :  'wellbeing booked'; 
+                               $class = 'wellbeing';
                                break;
                           case 'DSU':
-                               $class = $status == 1 ?  'dsu' :  'dsu booked'; 
+                               $class = 'dsu';
                                break;
-                        }  
-                      }
+                        } 
+                        */
                     }
 
                     $tdVals[$id] = array('time' => $time,
