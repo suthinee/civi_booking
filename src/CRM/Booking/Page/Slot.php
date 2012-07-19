@@ -114,19 +114,28 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                         }
                     }else{
                        $title = $classNames[$id]['tooltip'];
-                       //$status = $classNames[$id]['status'];
+                       $status = $classNames[$id]['status'];
                        $slotId = $classNames[$id]['slotId'];
                        //$type = $classNames[$id]['sessionService'];
                        $type = $classNames[$id]['activityTypes'];
+                       /*
+                       if($type == 50){
+                         $class = $status == 1 ?  'initial-assessment' : 'initial-assessment-booked';
+                       }else if($type == 51){
+                          $class = $status == 1 ? 'supplementary-assessment' :  'supplementary-assessment-booked';
+                       }else if($type == 51){
+                         $class = $status == 1 ?  'regular-session' :  'regular-session-book'; 
+                       }*/
+                       
                        switch ($type) {
                           case 50:
-                            $class = 'initial-assessment';
+                            $class = $status == 1 ?  'initial-assessment' : 'initial-assessment-booked';
                             break;
                           case 51:
-                            $class = 'supplementary-assessment';
+                            $class = $status == 1 ? 'supplementary-assessment' :  'supplementary-assessment-booked';
                             break;
                           case 52:
-                            $class = 'regular-session';
+                            $class = $status == 1 ?  'regular-session' :  'regular-session-booked'; 
                             break;
                        }
                        /*
