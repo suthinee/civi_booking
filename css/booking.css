@@ -101,7 +101,8 @@ td.slot{
 }
 
 .initial-assessment-booked{
-	background-color: red;
+	background-color: #408AD2;
+	border-top: solid #EE150C 3px;
 }
 
 
@@ -113,6 +114,7 @@ td.slot{
 .supplementary-assessment-booked{
 	background-color: #CF9D9B;
 	color: white;
+	border-top: solid #EE150C 3px;
 }
 
 
@@ -123,8 +125,9 @@ td.slot{
 }
 
 .regular-session-booked{
-	background-color: red;
-
+background-color: #6F9BAE;
+	color: #E0E0E0;
+	border-top: solid #EE150C 3px;
 }
 
 .editable{
