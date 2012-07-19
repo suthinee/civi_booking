@@ -129,37 +129,36 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                        
                        switch ($type) {
                           case 50:
-                            $class = $status == 1 ?  'initial-assessment' : 'initial-assessment-booked';
+                            $class = $status == 1 ?  'initial-assessment' : 'initial-assessment booked';
                             break;
                           case 51:
-                            $class = $status == 1 ? 'supplementary-assessment' :  'supplementary-assessment-booked';
-                            break;
-                          case 52:
-                            $class = $status == 1 ?  'regular-session' :  'regular-session-booked'; 
+                            $class = $status == 1 ? 'supplementary-assessment' :  'supplementary-assessment booked';
                             break;
                        }
-                       /*
+                       if($type == 52){
+                       
                        switch ($type) {
                           case 'Counselling':
-                              $class = 'counselling';
-                              break;
+                                $class = $status == 1 ?  'counselling' :  'counselling booked'; 
+                               break;
                           case 'Psychotherapy':
-                               $class = 'psychotherapy';
+                               $class = $status == 1 ?  'psychotherapy' :  'psychotherapy booked'; 
                                break;
                           case 'Psychosexual':
-                               $class = 'psychosexual';
+                               $class = $status == 1 ?  'psychosexual' :  'psychosexual booked'; 
                                break;
                           case 'Parenting Together':
-                               $class = 'parenting';
+                                $class = $status == 1 ?  'parenting Together' :  'parenting Together booked'; 
                                 break;
                           case 'Wellbeing':
-                               $class = 'wellbeing';
+                               $class = $status == 1 ?  'wellbeing' :  'wellbeing booked'; 
                                break;
                           case 'DSU':
-                               $class = 'dsu';
+                               $class = $status == 1 ?  'dsu' :  'dsu booked'; 
                                break;
                         } 
-                        */
+                        
+                        
                     }
 
                     $tdVals[$id] = array('time' => $time,
