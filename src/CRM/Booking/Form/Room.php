@@ -152,8 +152,12 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
        $extension = $params['extension'];
        $status = $params['status'];
 
-       //dump($params);
-       //exit;
+       dump($params);
+       exit;
+
+
+
+    exit;
        $action = $this->getAction();
 
        if($action == 1){

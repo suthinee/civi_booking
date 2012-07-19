@@ -305,6 +305,7 @@ function civicrm_api3_slot_get_by_contact( $params ){
   require_once 'CRM/Booking/BAO/Slot.php';
   $slots = CRM_Booking_BAO_Slot::getSlotsByContact($cid);
   $events = array();
+  $key = 0;
   foreach($slots as $k => $slot){
 
     $date = strtotime(($slot['slot_date']));
@@ -313,9 +314,8 @@ function civicrm_api3_slot_get_by_contact( $params ){
 
     $st = date('Y-m-d', $date) . ' ' . date('H:i:s', $stime);
     $et = date('Y-m-d', $date) . ' ' . date('H:i:s', $etime);
-    //dump($st);
-    //dump($et);
-
+    
+    
     $events[$k]['title'] = $slot['session_service'];
     $events[$k]['start'] = $st;
     $events[$k]['end'] = $et;
@@ -325,8 +325,36 @@ function civicrm_api3_slot_get_by_contact( $params ){
     }else{
       $events[$k]['color'] = '#408AD2';
     }
+    $key = $k;
+  }
+
+
+  
+
+    ///Unavaiability clinicain
+  $queryParams = array(1 => array($cid, 'Integer'));
+  $query = "SELECT id,entity_id,unavailable_start_date__time_41, unavailable_end_date__time_42,subject_44
+            From  civicrm_value_clinician_unavailability_14 
+            Where entity_id = %1";
+
+  require_once('CRM/Core/DAO.php');   
+  $dao = CRM_Core_DAO::executeQuery( $query , $queryParams );
+  $results = array();
+  while ( $dao->fetch( ) ) {
+        $results[] = $dao->toArray();   
+  }
+  foreach($results as $k => $unavailability){
+      $k += 1;
+      $i = $key + $k;
+      $events[$i]['title'] = $unavailability['subject_44'];
+      $events[$i]['start'] = $unavailability['unavailable_start_date__time_41'];
+      $events[$i]['end'] = $unavailability['unavailable_end_date__time_42'];
+      $events[$i]['allDay'] = false;
+      $events[$i]['color'] = '#BDBDBD';
 
   }
+
+ 
 
   $return = array();
   $return['is_error'] = 0;
