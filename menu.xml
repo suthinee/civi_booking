@@ -48,5 +48,12 @@
      <page_type>1</page_type>
      <weight>9002</weight>
   </item>
+  <item>
+     <path>civicrm/booking/report/automate-regular-session-failure</path>
+     <page_callback>CRM_Booking_Page_Report_Log_RegularSessionFailure</page_callback>
+     <page_type>1</page_type>
+     <weight>9005</weight>
+  </item>
+
 
 </menu>
