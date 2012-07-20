@@ -8,7 +8,7 @@ class CRM_Booking_BAO_Slot{
 
     }
 
-    static function isSlotExist($args){
+    static function isSlotCreatable($args){
 
       //civicrm_initialize( );
       $params = array(
@@ -17,9 +17,10 @@ class CRM_Booking_BAO_Slot{
         3 => array($args['endTime'], 'String'),
         4 => array($args['contactId'], 'Integer')
       );
+      //TODO:: Query for unvalibity
+      //TODO:: if room deativated
       $query = "SELECT civi_booking_slot.id
             FROM civi_booking_slot 
-            LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.clinician_contact_id
             WHERE civi_booking_slot.slot_date  = %1
             AND civi_booking_slot.clinician_contact_id = %4
             AND (civi_booking_slot.start_time BETWEEN %2 AND %3 OR civi_booking_slot.end_time BETWEEN %2 AND %3)";
@@ -40,7 +41,6 @@ class CRM_Booking_BAO_Slot{
           );
           $query = "SELECT civi_booking_slot.id
                 FROM civi_booking_slot 
-                LEFT JOIN civicrm_contact ON civicrm_contact.id = civi_booking_slot.attended_clinician_contact_id
                 WHERE civi_booking_slot.slot_date  = %1
                 AND civi_booking_slot.attended_clinician_contact_id = %4
                 AND (civi_booking_slot.start_time BETWEEN %2 AND %3 OR civi_booking_slot.end_time BETWEEN %2 AND %3)";
@@ -256,7 +256,7 @@ WHERE id = %2
             $args['contactId'] = $slot['clinician_contact_id'];
             $args['contactId2'] = $slot['attended_clinician_contact_id'];
           
-            $results = CRM_Booking_BAO_Slot::isSlotExist($args);
+            $results = CRM_Booking_BAO_Slot::isSlotCreatable($args);
             $isSlotCreatable = count($results) > 0 ? false : true;
 
             if(!$isSlotCreatable){
