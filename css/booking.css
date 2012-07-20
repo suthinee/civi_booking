@@ -61,58 +61,101 @@ td.slot{
 	background-repeat:no-repeat;
 }
 
+/*Regular session*/
+.regularsession-counselling{	
+	background-color: #8D38C9;
+	color: white;
+}
 
-.counselling{
-	
+.regularsession-psychotherapy{
+	background-color:#307D7E;
+	color: #E0E0E0;
+}
+
+.regularsession-psychosexual{
+	background-color: #C36241;
+	color: #E0E0E0;
+}
+
+.regularsession-parenting{
+	background-color:#41627E;
+	color: white;
+}
+
+.regularsession-wellbeing{
+	background-color: #C68E17;
+	color: white;
+}
+
+.regularsession-dsu{
+	background-color:#7F525D;
+	color: #E0E0E0;
+}
+
+/*initial-assessment*/
+.initial-assessment-counselling{
+	background-color: #9E7BFF;
+	color: #E0E0E0;
+}
+.initial-assessment-psychotherapy{
+	background-color: #46C7C7;
+	color: #E0E0E0;
+}
+.initial-assessment-psychosexual{
+	background-color: #F9966B;
+	color: #E0E0E0;
+}
+.initial-assessment-parenting{
+	background-color: #82CAFA;
+	color: #E0E0E0;
+}
+.initial-assessment-wellbeing{
+	background-color: #FDD017;
+	color: #E0E0E0;
+}
+.initial-assessment-dsu{
+	background-color:#FBBBB9;
+	color: #E0E0E0;
+}
+.initial-assessment-unknown{
+	background-color:#4CC552;
+	color: #E0E0E0;
+}
+
+/*supplementary-assessment*/
+.supplementary-assessment-counselling{
+	background-color: #7A5DC7;
+	color: #E0E0E0;
+}
+.supplementary-assessment-psychotherapy{
+	background-color: #3EA99F;
+	color: #E0E0E0;
+}
+.supplementary-assessment-psychosexual{
 	background-color: #E55B3C;
-	color: white;
+	color: #E0E0E0;
 }
-
-
-.psychotherapy{
-	background-color: #806517;
+.supplementary-assessment-parenting{
+	background-color: #87AFC7;
+	color: #E0E0E0;
+}
+.supplementary-assessment-wellbeing{
+	background-color: #FBB917;
+	color: #E0E0E0;
+}
+.supplementary-assessment-dsu{
+	background-color:#C48793;
+	color: #E0E0E0;
+}
+.supplementary-assessment-unknown{
+	background-color:#4AA02C;
 	color: #E0E0E0;
 }
 
-
-.psychosexual{
+/*.regular-session{
 	background-color: #6F9BAE;
 	color: #E0E0E0;
-}
-
-
-.parenting{
-	background-color: #FFB540;
-	color: white;
-}
-
-.wellbeing{
-	background-color: #7ABA7A;
-	color: black;
-}
-
-.dsu{
-	background-color:#ae56ab;
-	color: #E0E0E0;
-}
-
-.initial-assessment{
-	background-color: #408AD2;
-	color: #E0E0E0;
-}
-
-
-.supplementary-assessment{
-	background-color: #CF9D9B;
-	color: white;
-}
-
-
-
-.regular-session{
-	background-color: #6F9BAE;
-	color: #E0E0E0;
-}
+}*/
 
 
 

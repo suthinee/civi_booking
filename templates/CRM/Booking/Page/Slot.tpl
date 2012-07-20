@@ -11,21 +11,45 @@
 	</div>
 </div>
 
-<div style="text-align: center; margin: auto;">
+<div style="text-align: right; margin: auto;">  
 <div class="legend reservable">Reservable</div>
-<div class="legend initial-assessment">Initial Assessment</div>
-<div class="legend supplementary-assessment">Supplementary Aessessment</div><br><br>
-<!--<div class="legend regular-session">Regular session</div>-->
-<!--<div class="legend unreservable">Unreservable</div>-->
-<div class="legend counselling">Counselling</div>
-<div class="legend psychotherapy">Psychotherapy</div>
-<div class="legend psychosexual">Psychosexual</div>
-<div class="legend parenting">Parenting Together</div> 
-<div class="legend wellbeing">Wellbeing</div>
-<div class="legend dsu">DSU</div>  <!-- <div class="legend reserved pending">Pending</div> -->
-<div class="legend pasttime">Past</div>
-<!-- <div class="legend restricted">Restricted</div> -->
+<div class="legend pasttime">Past</div><br>
 </div>
+
+<div style="text-align: left; margin: auto;">  
+<div class="legend initial-assessment">Initial Assessment</div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<div class="legend initial-assessment-counselling">Counselling</div>
+<div class="legend initial-assessment-psychotherapy">Psychotherapy</div>
+<div class="legend initial-assessment-psychosexual">Psychosexual</div>
+<div class="legend initial-assessment-parenting">Parenting Together</div> 
+<div class="legend initial-assessment-wellbeing">Wellbeing</div>
+<div class="legend initial-assessment-dsu">DSU</div> 
+<div class="legend initial-assessment-unknown">Unknown</div><br><br>
+</div>
+
+<div style="text-align: left; margin: auto;"> 
+<div class="legend supplementary-assessment">Supplementary Aessessment</div>&nbsp;
+<div class="legend supplementary-assessment-counselling">Counselling</div>
+<div class="legend supplementary-assessment-psychotherapy">Psychotherapy</div>
+<div class="legend supplementary-assessment-psychosexual">Psychosexual</div>
+<div class="legend supplementary-assessment-parenting">Parenting Together</div> 
+<div class="legend supplementary-assessment-wellbeing">Wellbeing</div>
+<div class="legend supplementary-assessment-dsu">DSU</div>
+<div class="legend supplementary-assessment-unknown">Unknown</div><br><br> 
+</div>
+
+<div style="text-align: left; margin: auto;"> 
+<div class="legend regular-session">Regular session </div> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<!--<div class="legend unreservable">Unreservable</div>-->
+<div class="legend regularsession-counselling">Counselling</div>
+<div class="legend regularsession-psychotherapy">Psychotherapy</div>
+<div class="legend regularsession-psychosexual">Psychosexual</div>
+<div class="legend regularsession-parenting">Parenting Together</div> 
+<div class="legend regularsession-wellbeing">Wellbeing</div>
+<div class="legend regularsession-dsu">DSU</div>  <!-- <div class="legend reserved pending">Pending</div> -->
+</div>
+<!-- <div class="legend restricted">Restricted</div> -->
+
 <div style="text-align: right; margin: auto;"><a href="{$copySlotsURL}">Copy slots</a></div>
 <div style="height:10px">&nbsp;</div>
 <form id="filterForm"> 
