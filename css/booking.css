@@ -240,6 +240,10 @@ div.creatError{float: none; color: red; padding-left: .5em; vertical-align: top;
 	top:1px;
 }
 
+.page-civicrm-booking-report-automate-regular-session-failure  div#printer-friendly{
+	display:none;
+}
+
 /*Jitesh add down arrow */
 
  .filters legend{

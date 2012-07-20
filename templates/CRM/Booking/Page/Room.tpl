@@ -43,7 +43,6 @@
     	});
 
         cj('#addRoom').click(function(){
-            alert(createRoomURL);
             window.location.href = createRoomURL;
         });
 	

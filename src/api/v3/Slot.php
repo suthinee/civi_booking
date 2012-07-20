@@ -67,7 +67,7 @@ function civicrm_api3_slot_update($params){
                 "contactId2" => $contactId2);
  
   require_once 'CRM/Booking/BAO/Slot.php';
-  $result = CRM_Booking_BAO_Slot::isSlotExist($args);
+  $result = CRM_Booking_BAO_Slot::isSlotCreatable($args);
   $isSlotCreatable = count($result) > 0 ? false : true;
  
   if($isSlotCreatable){
@@ -135,7 +135,7 @@ function civicrm_api3_slot_create( $params ){
                 "contactId2" => $contactId2);
  
   require_once 'CRM/Booking/BAO/Slot.php';
-  $result = CRM_Booking_BAO_Slot::isSlotExist($args);
+  $result = CRM_Booking_BAO_Slot::isSlotCreatable($args);
   $isSlotCreatable = count($result) > 0 ? false : true;
  
   if($isSlotCreatable){
@@ -203,66 +203,7 @@ function civicrm_api3_slot_copy($params){
     return civicrm_api3_create_success(array(), $params, 'slot', 'is_copyable');
   }
 
-
-  /*
-
-  $sd = CRM_Utils_Array::value('sd',$params);
-  $weeksForward = CRM_Utils_Array::value('weeks',$params);
-
-
-
-
-
-  require_once 'CRM/Booking/Utils/DateTime.php';
-  $daysOfWeek = CRM_Booking_Utils_DateTime::getWeeklyCalendar($sd);
-  $startDate = array_shift(array_values($daysOfWeek));
-  $endDate = end($daysOfWeek);
-  $args = array();
-  require_once 'CRM/Booking/BAO/Slot.php';
-  $slots = CRM_Booking_BAO_Slot::getSlots(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate), 0, 0);
-  $uncreatableList = array();
-  for($i = 0; $i < $weeksForward; $i++){
-    foreach ($slots as $key => $slot) {
-      $slotDate = $slot['slot_date'];
-      $nextSevenDay = strtotime("+". $i + 1 . " week",strtotime($slotDate));
-      $nd = date('Y-m-d H:i:s', $nextSevenDay);
-
-      $args['date'] = $nd;
-      $args['startTime'] = $slot['start_time'];
-      $args['endTime'] = $slot['end_time'];
-      $args['contactId'] = $slot['clinician_contact_id'];
-      $args['contactId2'] = $slot['attended_clinician_contact_id'];
-            
-      $results = CRM_Booking_BAO_Slot::isSlotExist($args);
-      $isSlotCreatable = count($results) > 0 ? false : true;
-
-      if(!$isSlotCreatable){
-        $uncreatableList[] = array('slot_date' => date('l d/m/Y', $nextSevenDay),
-                                   'clinician_1' => $slot['display_name'],
-                                   'clinician_2' => $slot['attended_clinician_name'],
-                                   'start_time' => $slot['start_time'],
-                                   'end_time' => $slot['end_time'],
-                                   'room_no' => $slot['room_no'],
-                                   'status' => $slot['status']
-                                  );
-              }
-      }
-    }
-  if(sizeof($uncreatableList) > 0){
-
-         
-  }else{
-    for($i = 0; $i < $weeksForward; $i++){
-      foreach ($slots as $key => $slot) {
       
-      }
-    }
-  }
-  */
-
- // return civicrm_api3_create_success($uncreatableList, $params, 'slot', 'is_copyable');
-
-        
 
 }
 
