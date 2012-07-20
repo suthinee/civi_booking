@@ -10,6 +10,8 @@ class CRM_Booking_BAO_Slot{
 
     static function isSlotCreatable($args){
 
+      $roomId = $args['roomId'];
+
       //civicrm_initialize( );
       $params = array(
         1 => array( $args['date'], 'String'),
@@ -17,8 +19,6 @@ class CRM_Booking_BAO_Slot{
         3 => array($args['endTime'], 'String'),
         4 => array($args['contactId'], 'Integer')
       );
-      //TODO:: Query for unvalibity
-      //TODO:: if room deativated
       $query = "SELECT civi_booking_slot.id
             FROM civi_booking_slot 
             WHERE civi_booking_slot.slot_date  = %1
@@ -31,7 +31,7 @@ class CRM_Booking_BAO_Slot{
       while ( $dao->fetch( ) ) {
           $results[] = $dao->toArray();   
        } 
-       if(!is_null($args['contactId2'])){
+      if(!is_null($args['contactId2'])){
          if(empty($results) && !$args['contactId2'] == ''){
            $params = array(
             1 => array( $args['date'], 'String'),
@@ -39,19 +39,63 @@ class CRM_Booking_BAO_Slot{
             3 => array($args['endTime'], 'String'),
             4 => array($args['contactId2'], 'Integer')
           );
-          $query = "SELECT civi_booking_slot.id
+          /*$query = "SELECT civi_booking_slot.id
                 FROM civi_booking_slot 
                 WHERE civi_booking_slot.slot_date  = %1
                 AND civi_booking_slot.attended_clinician_contact_id = %4
-                AND (civi_booking_slot.start_time BETWEEN %2 AND %3 OR civi_booking_slot.end_time BETWEEN %2 AND %3)";
+                AND (civi_booking_slot.start_time BETWEEN %2 AND %3 OR civi_booking_slot.end_time BETWEEN %2 AND %3)"; */
 
-          require_once('CRM/Core/DAO.php');   
+          //require_once('CRM/Core/DAO.php');   
           $dao = CRM_Core_DAO::executeQuery( $query , $params );
            while ( $dao->fetch( ) ) {
               $results[] = $dao->toArray();   
            } 
          }
        }
+      ///Checked unavaiability clinicain
+      $date = strtotime(($args['slotDate']));
+      $stime = strtotime(($args['startTime'])) ;
+      $etime = strtotime(($args['endTime'])) ;
+
+      $st = date('Y-m-d', $date) . ' ' . date('H:i:s', $stime);
+      $et = date('Y-m-d', $date) . ' ' . date('H:i:s', $etime);
+      $params = array(1 => array($args['contactId'], 'Integer'),
+                      2 => array($stime, 'String'),
+                      3 => array($etime, 'String'));
+     $query = "SELECT cu.id,
+                       cu.entity_id,
+                       cu.unavailable_start_date__time_41,
+                       cu.unavailable_end_date__time_42
+                FROM  civicrm_value_clinician_unavailability_14 cu
+                WHERE cu.entity_id = %1
+                AND (cu.unavailable_start_date__time_41 BETWEEN %2 AND %3 OR cu.unavailable_end_date__time_42 BETWEEN %2 AND %3)";
+      //require_once('CRM/Core/DAO.php');   
+      $dao = CRM_Core_DAO::executeQuery( $query , $params );
+      $results = array();
+      while ( $dao->fetch( ) ) {
+            $results[] = $dao->toArray();   
+      }
+      if(!is_null($args['contactId2'])){
+         if(empty($results) && !$args['contactId2'] == ''){
+             ///Checked unavaiability clinicain
+            $params = array(1 => array($args['contactId2'], 'Integer'),
+                            2 => array($stime, 'String'),
+                            3 => array($etime, 'String'));
+                        
+
+            //require_once('CRM/Core/DAO.php');   
+            $dao = CRM_Core_DAO::executeQuery( $query , $params );
+            $results = array();
+            while ( $dao->fetch( ) ) {
+                  $results[] = $dao->toArray();   
+            }
+         }
+       }
+       if(empty($results)){
+          $results = CRM_Booking_BAO_Room::getRoomById($roomId, $status = 0); //check if the room is unactive
+       }
+       //TODO
+       //1: Check if the room is active
       return $results;
     }
 
@@ -255,6 +299,7 @@ WHERE id = %2
             $args['endTime'] = $slot['end_time'];
             $args['contactId'] = $slot['clinician_contact_id'];
             $args['contactId2'] = $slot['attended_clinician_contact_id'];
+            $args['roomId'] = $slot['room_id'];
           
             $results = CRM_Booking_BAO_Slot::isSlotCreatable($args);
             $isSlotCreatable = count($results) > 0 ? false : true;

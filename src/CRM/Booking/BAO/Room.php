@@ -9,8 +9,9 @@ class CRM_Booking_BAO_Room{
     }
 
       /* edit mode Nee*/
-    static function getRoomById($roomId){
-        $params = array( 1 => array( $roomId, 'Integer'));
+    static function getRoomById($roomId, $status = 1){
+        $params = array( 1 => array( $roomId, 'Integer'),
+                         2 => array( $status, 'Integer'));
 
         $query = "SELECT  id, 
                   room_no,
@@ -21,7 +22,8 @@ class CRM_Booking_BAO_Room{
                   phone_extension_no,
                   is_active
             FROM civi_booking_room
-            WHERE id = %1";  
+            WHERE id = %1
+            AND status = %2";  
       
         require_once('CRM/Core/DAO.php'); 
         $dao = CRM_Core_DAO::executeQuery( $query, $params);
