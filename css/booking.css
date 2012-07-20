@@ -63,13 +63,13 @@ td.slot{
 
 
 .counselling{
-	background-color: #CF9D9B;
+	background-color: #E55B3C;
 	color: white;
 }
 
 
 .psychotherapy{
-	background-color: #408AD2;
+	background-color: #806517;
 	color: #E0E0E0;
 }
 
@@ -100,21 +100,10 @@ td.slot{
 	color: #E0E0E0;
 }
 
-.initial-assessment-booked{
-	background-color: #408AD2;
-	border-top: solid #EE150C 3px;
-}
-
 
 .supplementary-assessment{
 	background-color: #CF9D9B;
 	color: white;
-}
-
-.supplementary-assessment-booked{
-	background-color: #CF9D9B;
-	color: white;
-	border-top: solid #EE150C 3px;
 }
 
 
@@ -124,11 +113,7 @@ td.slot{
 	color: #E0E0E0;
 }
 
-.regular-session-booked{
-background-color: #6F9BAE;
-	color: #E0E0E0;
-	border-top: solid #EE150C 3px;
-}
+
 
 .editable{
 	background-color:#6F9BAE;
@@ -137,6 +122,12 @@ background-color: #6F9BAE;
 
 .unavailable{
 	background-color:white;
+
+}
+
+.booked{
+	border-top: solid #EE150C 3px;
+
 
 }
 
