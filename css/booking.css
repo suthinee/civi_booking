@@ -196,6 +196,10 @@ td.slot{
 	border-top: solid #EE150C 3px;
 }
 
+td.other{
+	background-color: #262626;   
+}
+
 .user-minus{
 	display:block;
 	float:left;

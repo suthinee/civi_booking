@@ -103,6 +103,7 @@
 					<td class="resourcename {$room.room_id}">{$room.room_no}, {$room.room_centre} </td>
 					{foreach from=$room.tdVals key=key item=value}
 		        	<td id="{$value.tdataId}" colspan="1" class="slot {$value.className}" title="{$value.title}">
+		        		
 			        	<div style="display:none">
 			        	<span class='time'>{$value.timeKey}</span>
 			        	<span class='defaultEndtime'>{$value.defaultEndTime}</span>
@@ -387,6 +388,8 @@
 					height:680,
 					modal: true,
 					open : function(){
+					cj('#generalGroup').hide();
+					cj('#counsellingGroup').show();	
 					//Removed disable attribute
              		cj('#startSelect').removeAttr('disabled');
              		cj('#endSelect').removeAttr('disabled');
@@ -467,6 +470,7 @@
 					    Cancel: function() {
 					    		validator.resetForm();
 		    					cj("#dialogForm")[0].reset();
+		    					cj('#ulParticipants').html('');
 					      	    cj(this).dialog('destroy');
 					    	}			        
 						}

@@ -60,8 +60,7 @@
     </td>
     </tr>
 </table>
-{include file="CRM/common/formButtons.tpl" }
-
+{include file="CRM/common/formButtons.tpl" }x
 </div>
 {literal}
 <script type="text/javascript"> 

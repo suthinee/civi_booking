@@ -136,6 +136,10 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                             break;
                        }*/
 
+                       if($type == 0){ //meeting or other
+                        $class = 'other';
+                       }
+
                        if($type == 50){
                         switch ($service) {
                           case 'Counselling':
