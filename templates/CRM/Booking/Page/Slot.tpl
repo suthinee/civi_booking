@@ -464,14 +464,14 @@
 						    		}
 								}
 		        		},
-					    	Cancel: function() {
+					    Cancel: function() {
 					    		validator.resetForm();
 		    					cj("#dialogForm")[0].reset();
-					      	cj(this).dialog('destroy');
+					      	    cj(this).dialog('destroy');
 					    	}			        
-							}
+						}
 						});
-						cj( "#slotDialog" ).dialog('open'); 
+				cj( "#slotDialog" ).dialog('open'); 
 
         	}else if(!cj(this).hasClass('pasttime')){
         		slotId = cj(this).find('span.slotId').text();
@@ -573,38 +573,38 @@
 						    	cj('select[name="startSelect"] option').each(function () {
 						    		if(cj('#viewStartTime').text() == cj(this).text()){
 										 cj('#startSelect option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
-										 	return;
-										}
+										 return;
+									}
 		             			});
 		             			cj('select[name="endSelect"] option').each(function () {
-								    		if(cj('#viewEndTime').text() == cj(this).text()){
-												 cj('#endSelect option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
-												 return;
-												}
+								    if(cj('#viewEndTime').text() == cj(this).text()){
+										cj('#endSelect option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
+										return;
+									}
 		             			});
 		             			cj('select[name="activitySelect"] option').each(function () {
-								    		if(cj('#viewActivityType').text() == cj(this).text()){
-												 cj('#activitySelect option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
-												 return;
-												}
+								    if(cj('#viewActivityType').text() == cj(this).text()){
+										cj('#activitySelect option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
+										return;
+									}
 		             			});
 		             			cj('select[name="sessionSelect"] option').each(function () {
-								    		if(cj('#viewSessionService').text() == cj(this).text()){
-												 cj('#sessionSelect option[value="' + cj(this).val()+ '"]').attr('selected', 'selected');
-												 return;
-												}
+								    if(cj('#viewSessionService').text() == cj(this).text()){
+										cj('#sessionSelect option[value="' + cj(this).val()+ '"]').attr('selected', 'selected');
+										return;
+									}
 		             			});
 		             			cj('select[name="counsellor"] option').each(function () {
-								    		if(cj('#viewCounsellor1').text() == cj(this).text()){
-												 cj('#counsellor option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
-												 return;
-												}
+								    if(cj('#viewCounsellor1').text() == cj(this).text()){
+										cj('#counsellor option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
+										return;
+									}
 		             			});
 		             			cj('select[name="counsellor2"] option').each(function () {
-								    		if(cj('#viewCounsellor2').text() == cj(this).text()){
-												 cj('#counsellor2 option[value="' + cj(this).val()+ '"]').attr('selected', 'selected');
-												 return;
-												}
+								    if(cj('#viewCounsellor2').text() == cj(this).text()){
+										cj('#counsellor2 option[value="' + cj(this).val()+ '"]').attr('selected', 'selected');
+										return;
+									}
 		             			});
 
              			if(jQuery.trim(cj('#dummyStatus').val()) == 2){
