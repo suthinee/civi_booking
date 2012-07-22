@@ -195,7 +195,7 @@ td.slot{
 
 }
 
-.booked{
+.slot-booked{
 	border-top: solid #EE150C 3px;
 
 
@@ -365,3 +365,10 @@ cursor: pointer !important;
 #webform-component-corn-check {
 	display:none;
 }
+#webform-component-civicrm-1-contact-1-fieldset-fieldset--civicrm-1-case-1-case-subject{
+	display:none;
+}
+
+
+
+

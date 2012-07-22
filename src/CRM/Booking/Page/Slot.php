@@ -139,48 +139,48 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                        if($type == 50){
                         switch ($service) {
                           case 'Counselling':
-                                $class = $status == 1 ?  'initial-assessment-counselling' :  'initial-assessment-counselling booked'; 
+                                $class = $status == 1 ?  'initial-assessment-counselling' :  'initial-assessment-counselling slot-booked'; 
                                break;
                           case 'Psychotherapy':
-                               $class = $status == 1 ?  'initial-assessment-psychotherapy' :  'initial-assessment-psychotherapy booked'; 
+                               $class = $status == 1 ?  'initial-assessment-psychotherapy' :  'initial-assessment-psychotherapy slot-booked'; 
                                break;
                           case 'Psychosexual':
-                               $class = $status == 1 ?  'initial-assessment-psychosexual' :  'initial-assessment-psychosexual booked'; 
+                               $class = $status == 1 ?  'initial-assessment-psychosexual' :  'initial-assessment-psychosexual slot-booked'; 
                                break;
                           case 'Parenting Together':
-                                $class = $status == 1 ?  'initial-assessment-parenting' :  'initial-assessment-parenting booked'; 
+                                $class = $status == 1 ?  'initial-assessment-parenting' :  'initial-assessment-parenting slot-booked'; 
                                 break;
                           case 'Wellbeing':
-                               $class = $status == 1 ?  'initial-assessment-wellbeing' :  'initial-assessment-wellbeing booked'; 
+                               $class = $status == 1 ?  'initial-assessment-wellbeing' :  'initial-assessment-wellbeing slot-booked'; 
                                break;
                           case 'DSU':
-                               $class = $status == 1 ?  'initial-assessment-dsu' :  'initial-assessment-dsu booked'; 
+                               $class = $status == 1 ?  'initial-assessment-dsu' :  'initial-assessment-dsu slot-booked'; 
                                break;
-                          default: $class = $status == 1 ?  'initial-assessment-unknown' :  'initial-assessment-unknown'; 
+                          default: $class = $status == 1 ?  'initial-assessment-unknown' :  'initial-assessment-unknown slot-booked'; 
                         }  
                        }
 
                        if($type == 51){
                         switch ($service) {
                           case 'Counselling':
-                                $class = $status == 1 ?  'supplementary-assessment-counselling' :  'supplementary-assessment-counselling booked'; 
+                                $class = $status == 1 ?  'supplementary-assessment-counselling' :  'supplementary-assessment-counselling slot-booked'; 
                                break;
                           case 'Psychotherapy':
-                               $class = $status == 1 ?  'supplementary-assessment-psychotherapy' :  'supplementary-assessment-psychotherapy booked'; 
+                               $class = $status == 1 ?  'supplementary-assessment-psychotherapy' :  'supplementary-assessment-psychotherapy slot-booked'; 
                                break;
                           case 'Psychosexual':
-                               $class = $status == 1 ?  'supplementary-assessment-psychosexual' :  'supplementary-assessment-psychosexual booked'; 
+                               $class = $status == 1 ?  'supplementary-assessment-psychosexual' :  'supplementary-assessment-psychosexual slot-booked'; 
                                break;
                           case 'Parenting Together':
-                                $class = $status == 1 ?  'supplementary-assessment-parenting' :  'supplementary-assessment-parenting booked'; 
+                                $class = $status == 1 ?  'supplementary-assessment-parenting' :  'supplementary-assessment-parenting slot-booked'; 
                                 break;
                           case 'Wellbeing':
-                               $class = $status == 1 ?  'supplementary-assessment-wellbeing' :  'supplementary-assessment-wellbeing booked'; 
+                               $class = $status == 1 ?  'supplementary-assessment-wellbeing' :  'supplementary-assessment-wellbeing slot-booked'; 
                                break;
                           case 'DSU':
-                               $class = $status == 1 ?  'supplementary-assessment-dsu' :  'supplementary-assessment-dsu booked'; 
+                               $class = $status == 1 ?  'supplementary-assessment-dsu' :  'supplementary-assessment-dsu slot-booked'; 
                                break;
-                          default: $class = $status == 1 ?  'supplementary-assessment-unknown' :  'supplementary-assessment-unknown'; 
+                          default: $class = $status == 1 ?  'supplementary-assessment-unknown' :  'supplementary-assessment-unknown slot-booked'; 
 
                         }  
                        }
@@ -188,22 +188,22 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                        if($type == 52){
                        switch ($service) {
                           case 'Counselling':
-                                $class = $status == 1 ?  'regularsession-counselling' :  'regularsession-counselling booked'; 
+                                $class = $status == 1 ?  'regularsession-counselling' :  'regularsession-counselling slot-booked'; 
                                break;
                           case 'Psychotherapy':
-                               $class = $status == 1 ?  'regularsession-psychotherapy' :  'regularsession-psychotherapy booked'; 
+                               $class = $status == 1 ?  'regularsession-psychotherapy' :  'regularsession-psychotherapy slot-booked'; 
                                break;
                           case 'Psychosexual':
-                               $class = $status == 1 ?  'regularsession-psychosexual' :  'regularsession-psychosexual booked'; 
+                               $class = $status == 1 ?  'regularsession-psychosexual' :  'regularsession-psychosexual slot-booked'; 
                                break;
                           case 'Parenting Together':
-                                $class = $status == 1 ?  'regularsession-parenting' :  'regularsession-parenting booked'; 
+                                $class = $status == 1 ?  'regularsession-parenting' :  'regularsession-parenting slot-booked'; 
                                 break;
                           case 'Wellbeing':
-                               $class = $status == 1 ?  'regularsession-wellbeing' :  'regularsession-wellbeing booked'; 
+                               $class = $status == 1 ?  'regularsession-wellbeing' :  'regularsession-wellbeing slot-booked'; 
                                break;
                           case 'DSU':
-                               $class = $status == 1 ?  'regularsession-dsu' :  'regularsession-dsu booked'; 
+                               $class = $status == 1 ?  'regularsession-dsu' :  'regularsession-dsu slot-booked'; 
                                break;
                         }  
                       }
