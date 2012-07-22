@@ -133,11 +133,9 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
 
         $this->addButtons(array( 
                                     array ( 'type'      => 'submit', 
-                                            'name'      => 'Add', 
+                                            'name'      => 'Save', 
                                             'spacing'   => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', 
-                                            'isDefault' => true   ), 
-                                    array ( 'type'      => 'cancel', 
-                                            'name'      => ts('Cancel'),
+                                            'isDefault' => true   )
                                             )
                                      ));
         $this->addFormRule( array( 'CRM_Booking_Form_Room', 'formRule' ), $this );
@@ -154,12 +152,6 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
        $extension = $params['extension'];
        $status = $params['status'];
 
-       dump($params);
-       exit;
-
-
-
-    exit;
        $action = $this->getAction();
 
        if($action == 1){
@@ -177,7 +169,6 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
                       
                 ))
                 ->execute();
-                $print_r("Some data from the form was forgotten. Please fill in the entire form.");  
         }else if($action == 2){
 
             if($this->_roomId != 0){
@@ -196,11 +187,14 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
 
                 ->execute(); 
                
-                header("Location:http://erawat-virtualbox/tccr/civicrm/booking/room/manage");
 
             }
 
-        }//else if($action == delete) {
+        }
+
+        //header("Location:http://erawat-virtualbox/tccr/civicrm/booking/room/manage");
+
+        //else if($action == delete) {
            // if($this->_roomId != 0){
 
                // $id = msql_query("Delete from civi_booking_room where roomId=$id")

@@ -23,7 +23,7 @@ class CRM_Booking_BAO_Room{
                   is_active
             FROM civi_booking_room
             WHERE id = %1
-            AND status = %2";  
+            AND is_active = %2";  
       
         require_once('CRM/Core/DAO.php'); 
         $dao = CRM_Core_DAO::executeQuery( $query, $params);
