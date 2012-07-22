@@ -64,7 +64,8 @@ function civicrm_api3_slot_update($params){
                 "startTime" => $startTime,
                 "endTime" => $endTime,
                 "contactId" => $contactId,
-                "contactId2" => $contactId2);
+                "contactId2" => $contactId2,
+                "roomId" => $roomId);
  
   require_once 'CRM/Booking/BAO/Slot.php';
   $result = CRM_Booking_BAO_Slot::isSlotCreatable($args);
@@ -132,7 +133,8 @@ function civicrm_api3_slot_create( $params ){
                 "startTime" => date('G:i',$startTime),
                 "endTime" => date('G:i',$endTime),
                 "contactId" => $contactId,
-                "contactId2" => $contactId2);
+                "contactId2" => $contactId2,
+                "roomId" => $roomId);
  
   require_once 'CRM/Booking/BAO/Slot.php';
   $result = CRM_Booking_BAO_Slot::isSlotCreatable($args);
@@ -268,9 +270,6 @@ function civicrm_api3_slot_get_by_contact( $params ){
     }
     $key = $k;
   }
-
-
-  
 
     ///Unavaiability clinicain
   $queryParams = array(1 => array($cid, 'Integer'));

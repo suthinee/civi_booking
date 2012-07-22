@@ -49,6 +49,8 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
     public $_roomId; 
 
     function preProcess(){ 
+
+ 
         $id =CRM_Utils_Request::retrieve( 'roomId', 'Positive', $this );  /* request room_id from page */
         if($id){
             $this->_roomId = $id;

@@ -53,7 +53,7 @@ class CRM_Booking_BAO_Slot{
          }
        }
       ///Checked unavaiability clinicain
-      $date = strtotime(($args['slotDate']));
+      $date = strtotime(($args['date']));
       $stime = strtotime(($args['startTime'])) ;
       $etime = strtotime(($args['endTime'])) ;
 

@@ -157,6 +157,32 @@ td.slot{
 	color: #E0E0E0;
 }*/
 
+/*supplementary-assessment*/
+.counselling{
+	background-color: #7A5DC7;
+	color: #E0E0E0;
+}
+.psychotherapy{
+	background-color: #3EA99F;
+	color: #E0E0E0;
+}
+.psychosexual{
+	background-color: #E55B3C;
+	color: #E0E0E0;
+}
+.parenting{
+	background-color: #87AFC7;
+	color: #E0E0E0;
+}
+.wellbeing{
+	background-color: #FBB917;
+	color: #E0E0E0;
+}
+.dsu{
+	background-color:#C48793;
+	color: #E0E0E0;
+}
+
 
 
 .editable{
