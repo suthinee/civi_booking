@@ -183,8 +183,6 @@ td.slot{
 	color: #E0E0E0;
 }
 
-
-
 .editable{
 	background-color:#6F9BAE;
 	color: #E0E0E0;
@@ -192,14 +190,30 @@ td.slot{
 
 .unavailable{
 	background-color:white;
-
 }
 
 .slot-booked{
 	border-top: solid #EE150C 3px;
+}
 
+.user-minus{
+	display:block;
+	float:left;
+	width:16px;
+	height:16px;
+	margin-right:10px;
+	background-image: url("../img/user-minus.png");
+	background-repeat:no-repeat;
 
 }
+
+#participantList {
+	margin-top: 5px;
+	height: 100px;
+	width: 100%;
+	overflow-y: auto;
+	border: solid 1px #EDEDED;
+	}
 
 .contact-reserved{
 	background-color: #408AD2;
@@ -368,6 +382,8 @@ cursor: pointer !important;
 #webform-component-civicrm-1-contact-1-fieldset-fieldset--civicrm-1-case-1-case-subject{
 	display:none;
 }
+
+
 
 
 

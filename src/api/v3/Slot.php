@@ -117,28 +117,44 @@ function civicrm_api3_slot_update($params){
 
 function civicrm_api3_slot_create( $params ){
 
-  $contactId = $params['contact_id']; 
-  $contactId2 = $params['contact_id_2']; 
-
+  $type = $params['type'];
   $roomId = $params['room_id']; 
   $date = $params['date'];  
   $startTime = $params['start_time']; 
   $endTime = $params['end_time']; 
-  $sessionService = $params['session_service']; 
-  $activityType = $params['activity_type'];
   $description = $params['description'];
 
+  $contactId = null;
+  $contactId2 = null;
+  $sessionService = null;
+  $activityType = 0; //set default to 0 for meeting/other
 
-  $args = array("date" =>  date('Y-m-d H:i:s', $date),
+  if($type == 1){ //counselling
+
+    $contactId = $params['contact_id']; 
+    $contactId2 = $params['contact_id_2']; 
+    $sessionService = $params['session_service']; 
+    $activityType = $params['activity_type'];
+
+     $args = array("date" =>  date('Y-m-d H:i:s', $date),
                 "startTime" => date('G:i',$startTime),
                 "endTime" => date('G:i',$endTime),
                 "contactId" => $contactId,
                 "contactId2" => $contactId2,
                 "roomId" => $roomId);
- 
+
+  }else if($type =2){ //other
+    $contacts = $params['contacts'];
+  }
+  
+
   require_once 'CRM/Booking/BAO/Slot.php';
-  $result = CRM_Booking_BAO_Slot::isSlotCreatable($args);
-  $isSlotCreatable = count($result) > 0 ? false : true;
+  if($type == 1){
+    $result = CRM_Booking_BAO_Slot::isSlotCreatable($args);
+    $isSlotCreatable = count($result) > 0 ? false : true;
+  }else{
+    $isSlotCreatable = true;
+  }
  
   if($isSlotCreatable){
 
@@ -151,30 +167,49 @@ function civicrm_api3_slot_create( $params ){
      $session =& CRM_Core_Session::singleton( );
      $userId = $session->get( 'userID' ); // which is contact id of the user
 
-  	 $id = db_insert('civi_booking_slot')
-          ->fields(array(
-            'clinician_contact_id' => $contactId,
-            'attended_clinician_contact_id' => $contactId2,
-      	    'room_id' => $roomId,
-      	    'start_time' => date('G:i',$startTime),
-      	    'end_time' => date('G:i',$endTime),
-      	    'slot_date' => date('Y-m-d H:i:s',$date),
-      	    'activity_type' => $activityType,
-        	  'session_service' => $sessionService,
-            'description' => $description,
-      	    'status ' => 1, //set status to free
-      	    'created_by' => $userId,
-            'updated_by' => $userId,
-            'updated_date' => date('Y-m-d H:i:s')
-        ))->execute();
+     $id = db_insert('civi_booking_slot')
+            ->fields(array(
+              'clinician_contact_id' => $contactId,
+              'attended_clinician_contact_id' => $contactId2,
+              'room_id' => $roomId,
+              'start_time' => date('G:i',$startTime),
+              'end_time' => date('G:i',$endTime),
+              'slot_date' => date('Y-m-d H:i:s',$date),
+              'activity_type' => $activityType,
+              'session_service' => $sessionService,
+              'description' => $description,
+              'status ' => 1, //set status to free
+              'created_by' => $userId,
+              'updated_by' => $userId,
+              'updated_date' => date('Y-m-d H:i:s')
+      ))->execute();
 
-        $slot = array(
-         'slot_id' => $id,
-         'is_created' => 1
+    if($type == 2){
+      if($id && $contacts){
+        $query= db_insert('civi_booking_slot_attendee')
+                  ->fields(array(
+                          'slot_id',
+                          'contact_id',
+                          'slot_type'
+                ));
+        foreach ($contacts as $key => $contactId) {
+          $record = array(
+                  'slot_id' => $id,
+                  'contact_id' => $contactId,
+                  'slot_type' => 0
+                  );   
+          $query->values($record);    
+        }
+        $query->execute();
+      }
+    }
+    $slot = array(
+           'slot_id' => $id,
+           'is_created' => 1
         );
-        $value = array($slot);
-        return civicrm_api3_create_success($value,$params,'slot', 'create');
-    }catch (Exception $e){
+    $value = array($slot);
+    return civicrm_api3_create_success($value,$params,'slot', 'create');
+   }catch (Exception $e){
         $txn->rollback();
 
         $error = array("is_created" => 0,
@@ -488,23 +523,27 @@ function civicrm_api3_slot_get( $params ){
 function _civicrm_api3_slot_update_spec(&$params){
   $params['slot_id']['api.required'] =1;
   $params['room_id']['api.required'] =1;
-  $params['contact_id']['api.required'] =1;
   $params['date']['api.required'] =1;
   $params['start_time']['api.required'] =1;
   $params['end_time']['api.required'] =1;
+  $params['type']['api.required']=1;
+  /*
+  $params['contact_id']['api.required'] =1;
   $params['activity_type']['api.required'] =1;
-  $params['session_service']['api.required'] =1;
+  $params['session_service']['api.required'] =1;*/
 
 }
 
 
 function _civicrm_api3_slot_create_spec(&$params){
   $params['room_id']['api.required'] =1;
-  $params['contact_id']['api.required'] =1;
   $params['date']['api.required'] =1;
   $params['start_time']['api.required'] =1;
   $params['end_time']['api.required'] =1;
+  $params['type']['api.required']=1;
+  /*
+  $params['contact_id']['api.required'] =1;
   $params['activity_type']['api.required'] =1;
-  $params['session_service']['api.required'] =1;
+  $params['session_service']['api.required'] =1;*/
 
 }

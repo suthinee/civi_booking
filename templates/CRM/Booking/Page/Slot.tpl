@@ -163,39 +163,59 @@
 					</select>
 				</li>
 				<li>
-					<label for="activitySelect">Activity type: </label>			
-					<select id="activitySelect" name="activitySelect">
-						{foreach from=$activityTypes key=k item=activityType}
-							<option value="{$k}">{$activityType}</option>
-						{/foreach}		
-					</select>
+					<label for="slotType">Slot type: </label>
+					<input id="cCheck"  type="radio" name="slotType" value="1" checked> Counselling slot<br>
+					<input id="gCheck" type="radio" name="slotType" value="2" > Meeting/Other<br>
 				</li>
-				<li>
-					<label for="sessionSelect">Session service: </label>
-					<select id="sessionSelect" name="sessionSelect">
-						{foreach from=$sessionServices key=k item=sessionService}
-							<option value="{$k}">{$sessionService}</option>
-						{/foreach}		
-					</select>	
-				</li>
-				<li>				
-					<label for="counsellor">Counsellor 1: </label>
-					<select id="counsellor" name="counsellor">
-						<option value="">Select Counsellor</option>
-						{foreach from=$contacts key=k item=contact}
-							<option value="{$k}">{$contact}</option>
-						{/foreach}		
-					</select>
-				</li>
-				<li>					
-					<label for="counsellor2">Counsellor 2: </label>
-					<select id="counsellor2" name="counsellor2">
-						<option value="">Select Counsellor</option>
-						{foreach from=$contacts key=k item=contact}
-							<option value="{$k}">{$contact}</option>
-						{/foreach}		
-					</select>
-				</li>
+				<div id="counsellingGroup">
+					<li>
+						<label for="activitySelect">Activity type: </label>			
+						<select id="activitySelect" name="activitySelect">
+							{foreach from=$activityTypes key=k item=activityType}
+								<option value="{$k}">{$activityType}</option>
+							{/foreach}		
+						</select>
+					</li>
+					<li>
+						<label for="sessionSelect">Session service: </label>
+						<select id="sessionSelect" name="sessionSelect">
+							{foreach from=$sessionServices key=k item=sessionService}
+								<option value="{$k}">{$sessionService}</option>
+							{/foreach}		
+						</select>	
+					</li>
+					<li>				
+						<label for="counsellor">Counsellor 1: </label>
+						<select id="counsellor" name="counsellor">
+							<option value="">Select Counsellor</option>
+							{foreach from=$contacts key=k item=contact}
+								<option value="{$k}">{$contact}</option>
+							{/foreach}		
+						</select>
+					</li>
+					<li>					
+						<label for="counsellor2">Counsellor 2: </label>
+						<select id="counsellor2" name="counsellor2">
+							<option value="">Select Counsellor</option>
+							{foreach from=$contacts key=k item=contact}
+								<option value="{$k}">{$contact}</option>
+							{/foreach}		
+						</select>
+					</li>
+				</div>
+				<div id="generalGroup">
+					<li>				
+						<label for="contacts">Participants: </label>
+						<input type="text" name="contacts" />
+					</li>
+					<li>					
+						<div id="participantList">
+				   		<ul id="ulParticipants">
+			
+						</ul>
+						</div>
+					</li>
+				</div>
 				<li>
 					<label for="decription">Description</label>
 					<textarea rows="4" cols="50" id="description" name="description" style="resize: none;" class="required" ></textarea>
@@ -206,12 +226,15 @@
 
 {literal}
 <script type="text/javascript">
-	var crmajaxURL = '{/literal}{php} print base_path(); {/php}{literal}civicrm/ajax/rest';
+  var crmajaxURL = '{/literal}{php} print base_path(); {/php}{literal}civicrm/ajax/rest';
   //var startTime = null;
   var unixDate = null;
+  //var participantList = new Array();
   //var roomId = null;
 
 	cj(window).load(function(){
+
+		cj('#generalGroup').hide();
 
 		cj("#roomFilter").change(function(event) {
 			var room = cj('select[name="roomFilter"]').val(); 
@@ -243,36 +266,105 @@
   			});
 		});
 
-		cj.validator.addMethod("greaterThan", function(value, element) {
-          var sTime = parseInt(cj('select[name="startSelect"]').val());
-  		   	var eTime =	parseInt(cj('select[name="endSelect"]').val());
-  		   	var val = sTime < eTime || value == "";
-  		    return val; 
+
+
+	cj.validator.addMethod("greaterThan", function(value, element) {
+        var sTime = parseInt(cj('select[name="startSelect"]').val());
+  		var eTime =	parseInt(cj('select[name="endSelect"]').val());
+  		var val = sTime < eTime || value == "";
+  		return val; 
      }, "End time must be after start time");
 
     cj.validator.addMethod("notEqaulTo", function(value, element) {
-      var contactId = cj('select[name="counsellor"]').val();    // get the value from a dropdown select
- 			var contactId2 = cj('select[name="counsellor2"]').val(); 
+      	var contactId = cj('select[name="counsellor"]').val();    // get the value from a dropdown select
+ 		var contactId2 = cj('select[name="counsellor2"]').val(); 
   		var val = contactId != contactId2 || value == "";
   		 return val; 
     }, "Counsellor 2 must not be same as Counsellor 1");
 
+    cj.validator.addMethod("hasPaticipant", function(value, element) {
+    	var has = false;
+    	cj('#ulParticipants').find('li').each(function(){
+    		has = true;
+    		return;
+    	});
+    	return has;
+  		//return cj('#ulParticipants').has('li')?true:false; 
+    }, "At leat one participant required");
+
     var validator = cj("#dialogForm").validate({
        	  rules: {
-		    		startSelect: "required",
-		   		  endSelect:  {
-		    			"greaterThan" : true,
-		    			"required" : true
-		    		},
-				    activitySelect: "required",
-				    counsellor: "required",
-				    sessionSelect: "required",
-				    counsellor2: "notEqaulTo"		  
-		 			}
+		    	startSelect: "required",
+		   		endSelect:  {
+		    		"greaterThan" : true,
+		    		"required" : true
+		    	},
+				activitySelect: {"required": "#cCheck:checked"},
+				counsellor: {"required": "#cCheck:checked"},
+				sessionSelect: {"required": "#cCheck:checked"},
+				counsellor2: "notEqaulTo",
+				contacts: {"hasPaticipant": "#gCheck:checked"}		  
+		 	},
+		 	onfocusout: false 
 		});
 
+    cj('input[name="slotType"]').change(function() {
+		if (cj(this).val() === '1') {
+			cj('#generalGroup').hide();
+			cj('#counsellingGroup').show();
+			/*
+			cj('#activitySelect').rules("add", "required");
+			cj('#counsellor').rules("add",  "required");
+			cj('#sessionSelect').rules("add", "required");
+			cj('#counsellor2').rules("add", "notEqaulTo");*/
 
-		cj("td.slot").live('click', function(){
+
+		 } else if (cj(this).val() === '2') {
+		    cj('#generalGroup').show();
+			cj('#counsellingGroup').hide();
+			/*
+			cj('#activitySelect').rules("remove");
+			cj('#counsellor').rules("remove");
+			cj('#sessionSelect').rules("remove");
+			cj('#counsellor2').rules("remove");*/
+		} 
+	});
+
+	var contactUrl = crmajaxURL + "?fnName=civicrm/contact/search&json=1&contact_type=Individual&return[sort_name]=1";
+
+	cj('input[name="contacts"]').autocomplete( contactUrl, {
+		dataType:"json",
+		extraParams:{sort_name:function (){ //extra % to force looking to the data typed anywhere in the name
+			return "%"+cj('input[name="contacts"]').val();
+			}
+		},
+		formatItem: function(data,i,max,value,term){
+			return value;
+		}, 
+		parse: function(data){ //reformat to something the plugin expects
+			var acd = new Array();
+			for(cid in data){
+				acd[acd.length] = { data:data[cid], value:data[cid].sort_name, result:data[cid].sort_name };
+			}
+			return acd;
+		},
+		width: 500,
+		selectFirst: true,
+		mustMatch: true
+
+		
+	}).result( function( event, data, formatted ) {
+		cj('#ulParticipants').append('<li id="'+ data.contact_id+'"><a href="#" class="delParticipant"><span class="user-minus">&nbsp;</span></a>' + data.sort_name + '</li>');
+		cj('input[name="contacts"]').val('').focus();
+    });
+
+
+	cj(".delParticipant").live('click', function(){
+		cj(this).parent().remove();
+	});
+	
+
+	cj("td.slot").live('click', function(){
 			if(cj(this).hasClass('reservable')){
 	        	startTime = cj(this).find('span.time').text();
 	        	date = cj(this).find('span.date').text();
@@ -284,18 +376,18 @@
 	        	cj('#dateHolder').text(date);
 	        	cj('#roomNo').text(roomNo);
 	        	cj('#hiddenRoomId').text(roomId);
-					  cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
-						cj('#endSelect option[value=' +defaultEndtime+ ']').attr('selected', 'selected');
+				cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
+				cj('#endSelect option[value=' +defaultEndtime+ ']').attr('selected', 'selected');
 
-						cj( "#slotDialog" ).dialog({				
-					    autoOpen: false,
-					    resizable: false,
-					    draggable: false,
-		   			  width:450,
-					    height:600,
-					    modal: true,
-					    open : function(){
-					    	//Removed disable attribute
+				cj( "#slotDialog" ).dialog({				
+					autoOpen: false,
+					resizable: false,
+					draggable: false,
+		   			width:480,
+					height:680,
+					modal: true,
+					open : function(){
+					//Removed disable attribute
              		cj('#startSelect').removeAttr('disabled');
              		cj('#endSelect').removeAttr('disabled');
              		cj('#activitySelect').removeAttr('disabled');
@@ -307,37 +399,70 @@
 					    	'Create a slot': function() {
 					    	    		
 					    		if(cj("#dialogForm").valid()){	
-					    			var contactId = cj('select[name="counsellor"]').val();    // get the value from a dropdown select
-			 					    var contactId2 = cj('select[name="counsellor2"]').val(); 
-						    		var startTime = cj('select[name="startSelect"]').val(); 
-						    		var endTime = cj('select[name="endSelect"]').val(); 
-						    		var sessionService = cj('select[name="sessionSelect"]').val(); 
-						    		var activityType = cj('select[name="activitySelect"]').val(); 
-						    		var description = cj('#description').val();		
-						    		var roomId = jQuery.trim(cj('#hiddenRoomId').text());  
-						    	    
-						    	   cj().crmAPI ('slot','create',{'version' :'3', 
-						    	    							  'sequential' :'1',
-						    	    							  'contact_id' : contactId, 
-			  			    	    							'contact_id_2' : contactId2, 
-						    	    							  'date' : unixDate, 
-						    	    							  'start_time' : startTime, 
-						    	    							  'end_time' : endTime, 
-						    	    							  'session_service' :sessionService, 
-						    	    							  'room_id' : roomId, 
-						    	    							  'activity_type' : activityType,
-						    	    							  'description' : description},{
-							           ajaxURL: crmajaxURL,
-							           success:function (data){ 
-							           	if(data.values[0].is_created == 1){
-							           		window.location.reload(true);
-							           }else {
-							            	var errorMessage = data.values[0].error_message;
-							           		 cj('#creatError').html('' + errorMessage.toString());
-							            } 
-							          }
-							        });
-									}
+					    			var startTime = cj('select[name="startSelect"]').val(); 
+							        var endTime = cj('select[name="endSelect"]').val(); 
+							        var description = cj('#description').val();		
+							    	var roomId = jQuery.trim(cj('#hiddenRoomId').text());  
+							      
+					    			var type = cj('input[name="slotType"]:checked').val();
+					    			if(type == 1){
+						    			var contactId = cj('select[name="counsellor"]').val();    // get the value from a dropdown select
+				 					    var contactId2 = cj('select[name="counsellor2"]').val(); 
+							    		
+							    		var sessionService = cj('select[name="sessionSelect"]').val(); 
+							    		var activityType = cj('select[name="activitySelect"]').val(); 
+							    		
+							    	    cj().crmAPI ('slot','create',{'version' :'3', 
+							    	    							  'sequential' :'1',
+							    	    							  'contact_id' : contactId, 
+				  			    	    							  'contact_id_2' : contactId2, 
+							    	    							  'date' : unixDate, 
+							    	    							  'start_time' : startTime, 
+							    	    							  'end_time' : endTime, 
+							    	    							  'session_service' :sessionService, 
+							    	    							  'room_id' : roomId, 
+							    	    							  'activity_type' : activityType,
+							    	    							  'description' : description,
+							    	    							  'type' : type},{
+								           ajaxURL: crmajaxURL,
+								           success:function (data){ 
+								           	if(data.values[0].is_created == 1){
+								           		window.location.reload(true);
+								           }else {
+								            	var errorMessage = data.values[0].error_message;
+								           		 cj('#creatError').html('' + errorMessage.toString());
+								            } 
+								          }
+								        });
+						    		}else if(type == 2){
+						    			var contacts = new Array();
+						    			cj('#ulParticipants').find('li').each(function(){
+								    		contacts.push(cj(this).attr('id'));
+								    	});
+
+								    	console.log(contacts);
+						    			cj().crmAPI ('slot','create',{'version' :'3', 
+							    	    							  'sequential' :'1',
+							    	    							  'date' : unixDate, 
+							    	    							  'start_time' : startTime, 
+							    	    							  'end_time' : endTime, 
+							    	    							  'room_id' : roomId, 
+							    	    							  'description' : description,
+							    	    							  'contacts' : contacts,
+							    	    							  'type': type},{
+								           ajaxURL: crmajaxURL,
+								           success:function (data){ 
+								           	if(data.values[0].is_created == 1){
+								           		window.location.reload(true);
+								           }else {
+								            	var errorMessage = data.values[0].error_message;
+								           		 cj('#creatError').html('' + errorMessage.toString());
+								            } 
+								          }
+								        });
+
+						    		}
+								}
 		        		},
 					    	Cancel: function() {
 					    		validator.resetForm();
@@ -450,37 +575,37 @@
 										 cj('#startSelect option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
 										 	return;
 										}
-             			});
-             			cj('select[name="endSelect"] option').each(function () {
-						    		if(cj('#viewEndTime').text() == cj(this).text()){
-										 cj('#endSelect option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
-										 return;
-										}
-             			});
-             			cj('select[name="activitySelect"] option').each(function () {
-						    		if(cj('#viewActivityType').text() == cj(this).text()){
-										 cj('#activitySelect option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
-										 return;
-										}
-             			});
-             			cj('select[name="sessionSelect"] option').each(function () {
-						    		if(cj('#viewSessionService').text() == cj(this).text()){
-										 cj('#sessionSelect option[value="' + cj(this).val()+ '"]').attr('selected', 'selected');
-										 return;
-										}
-             			});
-             			cj('select[name="counsellor"] option').each(function () {
-						    		if(cj('#viewCounsellor1').text() == cj(this).text()){
-										 cj('#counsellor option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
-										 return;
-										}
-             			});
-             			cj('select[name="counsellor2"] option').each(function () {
-						    		if(cj('#viewCounsellor2').text() == cj(this).text()){
-										 cj('#counsellor2 option[value="' + cj(this).val()+ '"]').attr('selected', 'selected');
-										 return;
-										}
-             			});
+		             			});
+		             			cj('select[name="endSelect"] option').each(function () {
+								    		if(cj('#viewEndTime').text() == cj(this).text()){
+												 cj('#endSelect option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
+												 return;
+												}
+		             			});
+		             			cj('select[name="activitySelect"] option').each(function () {
+								    		if(cj('#viewActivityType').text() == cj(this).text()){
+												 cj('#activitySelect option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
+												 return;
+												}
+		             			});
+		             			cj('select[name="sessionSelect"] option').each(function () {
+								    		if(cj('#viewSessionService').text() == cj(this).text()){
+												 cj('#sessionSelect option[value="' + cj(this).val()+ '"]').attr('selected', 'selected');
+												 return;
+												}
+		             			});
+		             			cj('select[name="counsellor"] option').each(function () {
+								    		if(cj('#viewCounsellor1').text() == cj(this).text()){
+												 cj('#counsellor option[value=' + cj(this).val()+ ']').attr('selected', 'selected');
+												 return;
+												}
+		             			});
+		             			cj('select[name="counsellor2"] option').each(function () {
+								    		if(cj('#viewCounsellor2').text() == cj(this).text()){
+												 cj('#counsellor2 option[value="' + cj(this).val()+ '"]').attr('selected', 'selected');
+												 return;
+												}
+		             			});
 
              			if(jQuery.trim(cj('#dummyStatus').val()) == 2){
              				 cj('#startSelect').attr('disabled', 'disabled');
@@ -493,9 +618,9 @@
              			}
 
 						    	//var slot = cj('#viewSlotId').text();
-						    	cj('#description').val(cj('#viewDesc').text());
-						    	cj('#dateHolder').text(cj('#viewSlotDate').text());
-	        				cj('#roomNo').text(cj('#dummyRoomNo').val());
+						      cj('#description').val(cj('#viewDesc').text());
+						      cj('#dateHolder').text(cj('#viewSlotDate').text());
+	        				  cj('#roomNo').text(cj('#dummyRoomNo').val());
 	        				//cj('#hiddenRoomId').text(cj('#dummyRoomId').val())
 								},
 						    buttons: {
@@ -563,6 +688,9 @@
 	function toggleFieldset(obj){
 		cj('#filterTable').toggle();
 	}
+
+
+
 
 </script>
 {/literal}
