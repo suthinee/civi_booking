@@ -406,13 +406,24 @@ function civi_booking_civicrm_post( $op, $objectName, $objectId, &$objectRef ){
             CRM_Booking_BAO_Slot::setSlotStatus(array('slot_id' => $priorActSlotId ,'status' => 1)); 
         }
      
+      }else if($op == 'delete'){
+        $params = array( 1 => array( $objectId, 'Integer' ) );
+   
+        $query = "SELECT cc.slot_id_34
+          FROM civicrm_value_additional_activity_info_8 cc
+          WHERE cc.entity_id = %1";
+           
+        $slotId = CRM_Core_DAO::singleValueQuery( $query,  $params );
+        if($slotId){
+          CRM_Booking_BAO_Slot::setSlotStatus(array('slot_id' => $slotId ,'status' => 1)); 
+        }
       }
+
     }
   }
 }
 
 function civi_booking_civicrm_pre( $op, $objectName, $id, &$params ){
-
 
   if($objectName == 'Activity'){
     $activityTypeId = CRM_Utils_Array::value('activity_type_id',$params);
