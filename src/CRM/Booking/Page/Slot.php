@@ -50,6 +50,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                $classNames[$generated]['activityTypes'] = $slot['activity_type'];
                $classNames[$generated]['status'] = $slot['status'];
                $classNames[$generated]['slotId'] = $slot['id']; 
+
                if($slot['attended_clinician_name'] == null){
                 $classNames[$generated]['tooltip'] = $slot['display_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'] . ', ' . $slot['session_service'];
                }else{
@@ -57,9 +58,14 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                }          
                if ($key == $lastKey) {
                   $classNames[$generated]['lastKey'] = true;
-                } else {
+               } else {
                   $classNames[$generated]['lastKey'] = false;
-                }               
+               } 
+               if($key == 1){
+                $classNames[$generated]['textStart'] = true;
+               }else{
+                $classNames[$generated]['textStart'] = false;
+               }              
             }      
          }
 
@@ -101,6 +107,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                   $id = date('d-m-Y', $day) . CRM_Utils_Array::value('room_no',$room) .  $timeKey;  
                   $title = '';
                   $slotId = 0;
+                  $text = '';
                   //check if generated Id is in the className array
                   //if (in_array($id, $classNames)) {   
                   if (isset($classNames[$id])){
@@ -118,15 +125,24 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                        $slotId = $classNames[$id]['slotId'];
                        $service = $classNames[$id]['sessionService'];
                        $type = $classNames[$id]['activityTypes'];
-                       /*
+                       $textStart = $classNames[$id]['textStart'];
+
+
+                       /* distinguish by service************************/
+
+
+                       if($type == 0){ //meeting or other
+                        $class = 'other';
+                       }
+                       
                        if($type == 50){
                          $class = $status == 1 ?  'initial-assessment' : 'initial-assessment-booked';
                        }else if($type == 51){
                           $class = $status == 1 ? 'supplementary-assessment' :  'supplementary-assessment-booked';
-                       }else if($type == 51){
+                       }else if($type == 52){
                          $class = $status == 1 ?  'regular-session' :  'regular-session-book'; 
-                       }*/
-                       /*
+                       }
+                      
                          switch ($type) {
                           case 50:
                             $class = $status == 1 ?  'initial-assessment' : 'initial-assessment booked';
@@ -134,19 +150,21 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                           case 51:
                             $class = $status == 1 ? 'supplementary-assessment' :  'supplementary-assessment booked';
                             break;
-                       }*/
-
-                       if($type == 0){ //meeting or other
-                        $class = 'other';
+                          case 52:
+                            $class =$status ==1 ?'regular-session': 'regular-session booked';
                        }
 
-                       if($type == 50){
+                      
+
+                       /*if($type == 50){
                         switch ($service) {
                           case 'Counselling':
                                 $class = $status == 1 ?  'initial-assessment-counselling' :  'initial-assessment-counselling slot-booked'; 
+                              
                                break;
                           case 'Psychotherapy':
                                $class = $status == 1 ?  'initial-assessment-psychotherapy' :  'initial-assessment-psychotherapy slot-booked'; 
+                               
                                break;
                           case 'Psychosexual':
                                $class = $status == 1 ?  'initial-assessment-psychosexual' :  'initial-assessment-psychosexual slot-booked'; 
@@ -161,7 +179,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                                $class = $status == 1 ?  'initial-assessment-dsu' :  'initial-assessment-dsu slot-booked'; 
                                break;
                           default: $class = $status == 1 ?  'initial-assessment-unknown' :  'initial-assessment-unknown slot-booked'; 
-                        }  
+                        }
                        }
 
                        if($type == 51){
@@ -193,6 +211,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                        switch ($service) {
                           case 'Counselling':
                                 $class = $status == 1 ?  'regularsession-counselling' :  'regularsession-counselling slot-booked'; 
+                              
                                break;
                           case 'Psychotherapy':
                                $class = $status == 1 ?  'regularsession-psychotherapy' :  'regularsession-psychotherapy slot-booked'; 
@@ -210,8 +229,33 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                                $class = $status == 1 ?  'regularsession-dsu' :  'regularsession-dsu slot-booked'; 
                                break;
                         }  
+                      }*/
+                    }
+
+                    if($textStart){
+                      switch ($service) {
+                        case 'Counselling':
+                               $text='Counselling';
+                               break;
+                        case 'Psychotherapy':
+                              $text='Psychotherapy';
+                               break;
+                          case 'Psychosexual':
+                               $text='Counselling';
+                               break;
+                          case 'Parenting Together':
+                                $text='Psychosexual';
+                                break;
+                          case 'Wellbeing':
+                               $text='Wellbeing'; 
+                               break;
+                          case 'DSU':
+                               $text='DSU';
+                               break;
                       }
                     }
+
+
 
                     $tdVals[$id] = array('time' => $time,
                                        'defaultEndTime' => strtotime('+60 mins', $timeKey),
@@ -219,19 +263,22 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                                        'tdataId' => $id,
                                        'className' =>  $class,
                                        'title' => $title,
-                                       'slotId' => $slotId );
+                                       'slotId' => $slotId,
+                                       'text' => $text );
                   }else if  ($day < strtotime("now")){
                     $tdVals[$id] = array('time' => $time,
                                       'defaultEndTime' => strtotime('+60 mins', $timeKey),
                                       'timeKey' => $timeKey,
                                       'tdataId' => $id,
-                                      'className' => 'pasttime');
+                                      'className' => 'pasttime',
+                                      'text' => $text);
                   }else{
                     $tdVals[$id] = array('time' => $time,
                                       'defaultEndTime' => strtotime('+60 mins', $timeKey),
                                       'timeKey' => $timeKey,
                                       'tdataId' => $id,
-                                      'className' => 'reservable');
+                                      'className' => 'reservable',
+                                      'text' => $text);
                   }
               }
               $rooms[$roomId]['tdVals'] = $tdVals;
