@@ -37,7 +37,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         $startDate = array_shift(array_values($daysOfNextweek));
         $endDate = end($daysOfNextweek);
 
-        $slots = CRM_Booking_BAO_Slot::getSlots(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate), 0);
+        $slots = CRM_Booking_BAO_Slot::getSlots(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate), 0, 0);
         $classNames = array();
         //convert slot to use strtotime 
         foreach($slots as $k => $slot){
@@ -126,23 +126,15 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                        $service = $classNames[$id]['sessionService'];
                        $type = $classNames[$id]['activityTypes'];
                        $textStart = $classNames[$id]['textStart'];
-
-
-                       /* distinguish by service************************/
-
-
-                       if($type == 0){ //meeting or other
-                        $class = 'other';
-                       }
-                       
+                       /*
                        if($type == 50){
                          $class = $status == 1 ?  'initial-assessment' : 'initial-assessment-booked';
                        }else if($type == 51){
                           $class = $status == 1 ? 'supplementary-assessment' :  'supplementary-assessment-booked';
-                       }else if($type == 52){
+                       }else if($type == 51){
                          $class = $status == 1 ?  'regular-session' :  'regular-session-book'; 
-                       }
-                      
+                       }*/
+                       /*
                          switch ($type) {
                           case 50:
                             $class = $status == 1 ?  'initial-assessment' : 'initial-assessment booked';
@@ -150,13 +142,14 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                           case 51:
                             $class = $status == 1 ? 'supplementary-assessment' :  'supplementary-assessment booked';
                             break;
-                          case 52:
-                            $class =$status ==1 ?'regular-session': 'regular-session booked';
+                       }*/
+
+
+                       if($type == 0){ //meeting or other
+                        $class = 'other';
                        }
 
-                      
-
-                       /*if($type == 50){
+                       if($type == 50){
                         switch ($service) {
                           case 'Counselling':
                                 $class = $status == 1 ?  'initial-assessment-counselling' :  'initial-assessment-counselling slot-booked'; 
@@ -229,29 +222,20 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                                $class = $status == 1 ?  'regularsession-dsu' :  'regularsession-dsu slot-booked'; 
                                break;
                         }  
-                      }*/
+                      }
                     }
 
                     if($textStart){
-                      switch ($service) {
-                        case 'Counselling':
-                               $text='Counselling';
-                               break;
-                        case 'Psychotherapy':
-                              $text='Psychotherapy';
-                               break;
-                          case 'Psychosexual':
-                               $text='Counselling';
-                               break;
-                          case 'Parenting Together':
-                                $text='Psychosexual';
-                                break;
-                          case 'Wellbeing':
-                               $text='Wellbeing'; 
-                               break;
-                          case 'DSU':
-                               $text='DSU';
-                               break;
+                      switch ($type) {
+                        case 50:
+                          $text = 'Init Acessment';
+                          break;
+                        case 51:
+                          $text = 'Sup Acessment';
+                          break;
+                        case 52:
+                          $text = 'Reg Session';
+                          break;
                       }
                     }
 
