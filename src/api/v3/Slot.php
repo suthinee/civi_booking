@@ -250,25 +250,52 @@ function civicrm_api3_slot_get_by_id($params){
   try{
     if(!isset($sid)) throw new Exception('Slot id not found.');
     require_once 'CRM/Booking/BAO/Slot.php';
-    $results = CRM_Booking_BAO_Slot::getSlotById($sid);
-    $value = array();
-    foreach ($results as $key => $slot) {
-      $value[$key]['id'] = $slot['id'];
-      $value[$key]['start_time'] = date('G:i', strtotime($slot['start_time']));
-      $value[$key]['end_time'] = date('G:i', strtotime($slot['end_time']));
-      $value[$key]['slot_date'] = $slot['slot_date'];
-      $value[$key]['room_no'] = $slot['room_no'];
-      $value[$key]['room_id'] = $slot['room_id'];
-      $value[$key]['centre'] = $slot['centre'];
-      $value[$key]['session_service'] = $slot['session_service'];
-      $value[$key]['activity_type'] = $slot['activity_type'];
-      $value[$key]['clinician_contact_display_name'] = $slot['clinician_contact_display_name'];
-      $value[$key]['attended_clinician_contact_display_name'] = $slot['attended_clinician_contact_display_name'];
-      $value[$key]['status'] = $slot['status'];
-      $value[$key]['description'] = $slot['description'];
-
-      break;
+    $activityType = CRM_Booking_BAO_Slot::getActivityType($sid);
+    if($activityType == 0){ //other
+      $type = 2;
+    }else{
+      $type =1;
     }
+    $results = CRM_Booking_BAO_Slot::getSlotById($sid,$type);
+    $value = array();
+    if($type == 1){//counselling slots
+      foreach ($results as $key => $slot) {
+        $value[$key]['id'] = $slot['id'];
+        $value[$key]['start_time'] = date('G:i', strtotime($slot['start_time']));
+        $value[$key]['end_time'] = date('G:i', strtotime($slot['end_time']));
+        $value[$key]['slot_date'] = date('l d/m/Y', strtotime($slot['slot_date']));
+        $value[$key]['room_no'] = $slot['room_no'];
+        $value[$key]['room_id'] = $slot['room_id'];
+        $value[$key]['centre'] = $slot['centre'];
+        $value[$key]['session_service'] = $slot['session_service'];
+        $value[$key]['activity_type'] = $slot['activity_type'];
+        $value[$key]['clinician_contact_display_name'] = $slot['clinician_contact_display_name'];
+        $value[$key]['attended_clinician_contact_display_name'] = $slot['attended_clinician_contact_display_name'];
+        $value[$key]['status'] = $slot['status'];
+        $value[$key]['description'] = $slot['description'];
+
+       break;
+      }
+    }else if($type == 2){//other
+      foreach ($results as $key => $slot) {
+        $value[$key]['id'] = $slot['id'];
+        $value[$key]['start_time'] = date('G:i', strtotime($slot['start_time']));
+        $value[$key]['end_time'] = date('G:i', strtotime($slot['end_time']));
+        $value[$key]['slot_date'] = date('l d/m/Y', strtotime($slot['slot_date']));
+        $value[$key]['room_no'] = $slot['room_no'];
+        $value[$key]['room_id'] = $slot['room_id'];
+        $value[$key]['centre'] = $slot['building'];
+        $value[$key]['activity_type'] = $slot['activity_type'];
+        $value[$key]['status'] = $slot['status'];
+        $value[$key]['description'] = $slot['description'];
+        $attendee = CRM_Booking_BAO_Slot::getSlotAttendee($sid);
+        $value[$key]['attendee'] = $attendee;
+       break;
+    }
+
+
+    }
+    
     return civicrm_api3_create_success($value, $params, 'slot', 'get_by_id');
 
   }catch(Exception $e){

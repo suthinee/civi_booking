@@ -103,8 +103,18 @@
 					<td class="resourcename {$room.room_id}">{$room.room_no}, {$room.room_centre} </td>
 					{foreach from=$room.tdVals key=key item=value}
 		        	<td id="{$value.tdataId}" colspan="1" class="slot {$value.className}" title="{$value.title}">
+<<<<<<< HEAD
 						{$value.text}	        
 						<div style="display:none">
+=======
+						{if $key eq '30-07-20121011343029200'}
+							Parenting Together        
+						{/if}
+						{if $key eq '30-07-20121011343046300'}
+							RS
+						{/if}
+			        	<div style="display:none">
+>>>>>>> 3d08fea4545278e646f148be1cadf4954652b50e
 			        	<span class='time'>{$value.timeKey}</span>
 			        	<span class='defaultEndtime'>{$value.defaultEndTime}</span>
 								<span class='roomNo'>{$room.room_no}</span>
@@ -282,7 +292,7 @@
   		var val = contactId != contactId2 || value == "";
   		 return val; 
     }, "Counsellor 2 must not be same as Counsellor 1");
-    /*
+    
     cj.validator.addMethod("hasPaticipant", function(value, element) {
     	var type = cj('input[name="slotType"]:checked').val();
     	console.log(type);
@@ -297,7 +307,7 @@
 	    	return has;
     	}
   		//return cj('#ulParticipants').has('li')?true:false; 
-    }, "At leat one participant required"); */
+    }, "At leat one participant required"); 
 
     var validator = cj("#dialogForm").validate({
        	  rules: {
@@ -309,8 +319,8 @@
 				activitySelect: {"required": "#cCheck:checked"},
 				counsellor: {"required": "#cCheck:checked"},
 				sessionSelect: {"required": "#cCheck:checked"},
-				counsellor2: "notEqaulTo"/*,
-				contacts: "hasPaticipant"	*/	  
+				counsellor2: "notEqaulTo",
+				contacts: "hasPaticipant"	  
 		 	},
 		 	onfocusout: false 
 		});
@@ -394,6 +404,9 @@
 					height:680,
 					modal: true,
 					open : function(){
+
+				    cj('#cCheck').attr('checked', 'checked');
+
 					cj('#generalGroup').hide();
 					cj('#counsellingGroup').show();	
 					//Removed disable attribute
@@ -541,18 +554,34 @@
 					           ajaxURL: crmajaxURL,
 					           success:function (data){ 
 					           	var slot = data.values[0];
-					           	var date = new Date(slot.slot_date);
-					           	var counsellor2 = (slot.attended_clinician_contact_display_name == null || slot.attended_clinician_contact_display_name == '' ) ? '-' : slot.attended_clinician_contact_display_name
+
+					           	console.log(slot);
+					           //	var date = new Date(slot.slot_date);
+					           //	console.log(slot.slot_date);
+					           
 					           	var status = (slot.status == 1) ? 'Avalibale' :'Appointment';
 					           	var slotHtml = '<table class="crm-info-panel" id="crm-activity-view-table"> <!-- reused activity css -->';
 					           	slotHtml += '<tr><td class="label">Slot reference Id</td><td id="viewSlotId">' + slot.id + '</td></tr>';
-					           	slotHtml += '<tr><td class="label">Slot date</td><td id="viewSlotDate">' + cj.datepicker.formatDate('DD d/MM/yy', date); + '</td></tr>';
+					           	//slotHtml += '<tr><td class="label">Slot date</td><td id="viewSlotDate">' + cj.datepicker.formatDate('DD d/MM/yy', date); + '</td></tr>';
+					           	slotHtml += '<tr><td class="label">Slot date</td><td id="viewSlotDate">' + slot.slot_date + '</td></tr>';
 					           	slotHtml += '<tr><td class="label">Start time</td><td id="viewStartTime">' + slot.start_time + '</td></tr>';
 					           	slotHtml += '<tr><td class="label">End time</td><td id="viewEndTime">' + slot.end_time + '</td></tr>';
-					           	slotHtml += '<tr><td class="label">Counsellor 1</td><td id="viewCounsellor1">' + slot.clinician_contact_display_name + '</td></tr>';
-					           	slotHtml += '<tr><td class="label">Counsellor 2</td><td id="viewCounsellor2">' + counsellor2 + '</td></tr>';
-					           	slotHtml += '<tr><td class="label">Activity type</td><td id="viewActivityType">' + slot.activity_type + '</td></tr>';
-					           	slotHtml += '<tr><td class="label">Session service</td><td id="viewSessionService">' + slot.session_service + '</td></tr>';
+					           	if(slot.activity_type != 0){
+					           		var counsellor2 = (slot.attended_clinician_contact_display_name == null || slot.attended_clinician_contact_display_name == '' ) ? '-' : slot.attended_clinician_contact_display_name
+						           	slotHtml += '<tr><td class="label">Counsellor 1</td><td id="viewCounsellor1">' + slot.clinician_contact_display_name + '</td></tr>';
+						           	slotHtml += '<tr><td class="label">Counsellor 2</td><td id="viewCounsellor2">' + counsellor2 + '</td></tr>';
+						           	slotHtml += '<tr><td class="label">Activity type</td><td id="viewActivityType">' + slot.activity_type + '</td></tr>'; 	
+						           	slotHtml += '<tr><td class="label">Session service</td><td id="viewSessionService">' + slot.session_service + '</td></tr>';
+					            }else{
+						           	//slotHtml += '<tr><td class="label">Attendee</td><td id="viewAttendee">Attendee</td></tr>';
+						           	for (i in slot.attendee) {  
+						           		if(i == 0){
+						           			slotHtml += '<tr><td class="label">Attendee</td><td id="viewAttendee">'+ slot.attendee[i].sort_name; +'</td></tr>';
+						           		}else{
+						           			slotHtml += '<tr><td class="label"></td><td>'+ slot.attendee[i].sort_name; +'</td></tr>';
+						           		}
+						           	}
+					            }
 					           	slotHtml += '<tr><td class="label">Location</td><td id="viewLocation">' + slot.centre + '</td></tr>';
 					           	slotHtml += '<tr><td class="label">Status</td><td id="viewStatus">' + status + '</td></tr>';
 					           	slotHtml += '<tr><td class="label">Description</td><td id="viewDesc">' + slot.description + '</td></tr>';
@@ -563,6 +592,10 @@
 					           	if(slot.status == 1){
 					           		slotHtml += '<div><button id="delButton" type="button" class="deleteButton"><span class="">Delete slot</span></button></div>';
 					            }
+					            if(slot.activity_type == 0){
+					            	cj(".ui-dialog-buttonpane button:contains('Edit a slot')").button("disable");
+					        	}
+
 					           	cj('#activity-content').html(slotHtml);
 					         	
 					          }
