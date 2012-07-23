@@ -104,7 +104,7 @@
 					{foreach from=$room.tdVals key=key item=value}
 		        	<td id="{$value.tdataId}" colspan="1" class="slot {$value.className}" title="{$value.title}">
 						{if $key eq '30-07-20121011343029200'}
-							Parenting Together	3241234123412342	        
+							Parenting123131 Together123131231        
 						{/if}
 						{if $key eq '30-07-20121011343046300'}
 							RS
@@ -287,16 +287,22 @@
   		var val = contactId != contactId2 || value == "";
   		 return val; 
     }, "Counsellor 2 must not be same as Counsellor 1");
-
+    /*
     cj.validator.addMethod("hasPaticipant", function(value, element) {
-    	var has = false;
-    	cj('#ulParticipants').find('li').each(function(){
-    		has = true;
-    		return;
-    	});
-    	return has;
+    	var type = cj('input[name="slotType"]:checked').val();
+    	console.log(type);
+    	if(type == 1){
+    		return false;
+    	}else{
+    		var has = false;
+	    	cj('#ulParticipants').find('li').each(function(){
+	    		has = true;
+	    		return;
+	    	});
+	    	return has;
+    	}
   		//return cj('#ulParticipants').has('li')?true:false; 
-    }, "At leat one participant required");
+    }, "At leat one participant required"); */
 
     var validator = cj("#dialogForm").validate({
        	  rules: {
@@ -308,8 +314,8 @@
 				activitySelect: {"required": "#cCheck:checked"},
 				counsellor: {"required": "#cCheck:checked"},
 				sessionSelect: {"required": "#cCheck:checked"},
-				counsellor2: "notEqaulTo",
-				contacts: {"hasPaticipant": "#gCheck:checked"}		  
+				counsellor2: "notEqaulTo"/*,
+				contacts: "hasPaticipant"	*/	  
 		 	},
 		 	onfocusout: false 
 		});
@@ -530,7 +536,7 @@
 			    autoOpen: false,
 			    resizable: false,
 			    draggable: false,
-   			  width:450,
+   			  	width:450,
 			    height:400,
 			    modal: true,
 			    title: "View slot" ,

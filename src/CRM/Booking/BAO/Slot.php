@@ -92,6 +92,7 @@ class CRM_Booking_BAO_Slot{
          }
        }
        if(empty($results)){
+          require_once('CRM/Booking/BAO/Room.php');   
           $results = CRM_Booking_BAO_Room::getRoomById($roomId, $status = 0); //check if the room is unactive
        }
        //TODO
@@ -129,7 +130,7 @@ class CRM_Booking_BAO_Slot{
       }  
       if(isset($activityType) && $activityType != 0){
         $query .= "\n AND civi_booking_slot.activity_type = %3";
-      }else $activityType == 0){
+      }else if($activityType == 0){
         $query .= "\n AND civi_booking_slot.activity_type <> 0";
       }
       $params = array(
