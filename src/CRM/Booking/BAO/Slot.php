@@ -260,8 +260,16 @@ WHERE id = %2
           WHERE s.id = %1";
          
       }else{
-         $query = "SELECT s.*,
-                        r.*
+         $query = "SELECT s.id as id, 
+                        s.start_time as start_time,
+                        s.end_time as end_time,
+                        s.slot_date as slot_date,
+                        s.status as status, 
+                        s.description,
+                        s.activity_type,
+                        s.room_id as room_id,
+                        r.room_no as room_no,
+                        r.building 
           FROM civi_booking_slot s
           LEFT JOIN civi_booking_room r ON s.room_id = r.id
           WHERE s.id = %1";     
