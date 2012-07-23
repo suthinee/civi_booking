@@ -100,7 +100,7 @@ class CRM_Booking_BAO_Slot{
       return $results;
     }
 
-    static function getSlots($startDate = null, $endDate = null, $status = 1, $activityType = null){  
+    static function getSlots($startDate = null, $endDate = null,  $activityType = 0, $status = 0 ){  
       $query = "SELECT civi_booking_slot.id as id,
                con1.display_name as display_name,
                con2.display_name as attended_clinician_name,
@@ -130,9 +130,10 @@ class CRM_Booking_BAO_Slot{
       }  
       if(isset($activityType) && $activityType != 0){
         $query .= "\n AND civi_booking_slot.activity_type = %3";
-      }else if($activityType == 0){
-        $query .= "\n AND civi_booking_slot.activity_type <> 0";
       }
+     // }else if($activityType == 0){
+     //   $query .= "\n AND civi_booking_slot.activity_type <> 0";
+    //  }
       $params = array(
         1 => array( $startDate, 'String'),
         2 => array( $endDate, 'String'),
@@ -200,35 +201,71 @@ WHERE id = %2
       require_once('CRM/Core/DAO.php'); 
       return CRM_Core_DAO::singleValueQuery( $query,  $params );
     }
+
+    static function getActivityType($id){
+      $params = array(1 => array( $id, 'Integer'));
+      $query = "SELECT s.activity_type as type           
+        FROM civi_booking_slot s
+        WHERE s.id = %1";
+         
+      
+      require_once('CRM/Core/DAO.php'); 
+      return CRM_Core_DAO::singleValueQuery( $query,  $params );
+
+    }
+
+    static function getSlotAttendee($id){
+      $params = array(1 => array( $id, 'Integer'));
+      $query = "SELECT c.*
+          FROM civi_booking_slot s
+          LEFT JOIN civi_booking_slot_attendee sa ON sa.slot_id = s.id
+          LEFT JOIN civicrm_contact c ON c.id = sa.contact_id
+          WHERE s.id = %1";     
+      
+      require_once('CRM/Core/DAO.php'); 
+      $dao = CRM_Core_DAO::executeQuery( $query,  $params );
+      $results = array ();
+      while ( $dao->fetch( ) ) {
+          $results[] = $dao->toArray();          
+      }
+      return $results;
+    }
     
-    static function getSlotById($id){
+    static function getSlotById($id, $type = 1){
       if(!isset($id)){
         return;
       }
       $params = array(1 => array( $id, 'Integer'));
-      $query = "SELECT s.id as id, 
-                      s.start_time as start_time,
-                      s.end_time as end_time,
-                      s.slot_date as slot_date, 
-                      s.room_id as room_id,
-                      r.room_no as room_no,
-                      s.session_service as session_service,
-                      s.clinician_contact_id as clinician_contact_id,
-                      s.attended_clinician_contact_id as attended_clinician_contact_id,
-                      ov.label as activity_type,
-                      s.status as status,
-                      s.description as description,
-                      r.building as centre,
-                      con1.display_name as clinician_contact_display_name,
-                      con2.display_name as attended_clinician_contact_display_name
-        FROM civi_booking_slot s
-        LEFT JOIN civi_booking_room r ON s.room_id = r.id
-        LEFT JOIN civicrm_contact con1 ON con1.id = s.clinician_contact_id
-        LEFT JOIN civicrm_contact con2 ON con2.id = s.attended_clinician_contact_id
-        JOIN civicrm_option_value ov ON ov.value = s.activity_type AND ov.option_group_id = 2
-        WHERE s.id = %1";
+      if($type == 1){
+        $query = "SELECT s.id as id, 
+                        s.start_time as start_time,
+                        s.end_time as end_time,
+                        s.slot_date as slot_date, 
+                        s.room_id as room_id,
+                        r.room_no as room_no,
+                        s.session_service as session_service,
+                        s.clinician_contact_id as clinician_contact_id,
+                        s.attended_clinician_contact_id as attended_clinician_contact_id,
+                        ov.label as activity_type,
+                        s.status as status,
+                        s.description as description,
+                        r.building as centre,
+                        con1.display_name as clinician_contact_display_name,
+                        con2.display_name as attended_clinician_contact_display_name
+          FROM civi_booking_slot s
+          LEFT JOIN civi_booking_room r ON s.room_id = r.id
+          LEFT JOIN civicrm_contact con1 ON con1.id = s.clinician_contact_id
+          LEFT JOIN civicrm_contact con2 ON con2.id = s.attended_clinician_contact_id
+          JOIN civicrm_option_value ov ON ov.value = s.activity_type AND ov.option_group_id = 2
+          WHERE s.id = %1";
          
-      
+      }else{
+         $query = "SELECT s.*,
+                        r.*
+          FROM civi_booking_slot s
+          LEFT JOIN civi_booking_room r ON s.room_id = r.id
+          WHERE s.id = %1";     
+      }
       require_once('CRM/Core/DAO.php'); 
       $dao = CRM_Core_DAO::executeQuery( $query,  $params );
       $results = array ();
