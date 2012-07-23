@@ -103,7 +103,12 @@
 					<td class="resourcename {$room.room_id}">{$room.room_no}, {$room.room_centre} </td>
 					{foreach from=$room.tdVals key=key item=value}
 		        	<td id="{$value.tdataId}" colspan="1" class="slot {$value.className}" title="{$value.title}">
-		        		
+						{if $key eq '30-07-20121011343029200'}
+							Parenting Together	3241234123412342	        
+						{/if}
+						{if $key eq '30-07-20121011343046300'}
+							RS
+						{/if}
 			        	<div style="display:none">
 			        	<span class='time'>{$value.timeKey}</span>
 			        	<span class='defaultEndtime'>{$value.defaultEndTime}</span>

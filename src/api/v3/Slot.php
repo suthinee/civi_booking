@@ -196,7 +196,7 @@ function civicrm_api3_slot_create( $params ){
           $record = array(
                   'slot_id' => $id,
                   'contact_id' => $contactId,
-                  'slot_type' => 0
+                  'slot_type' => 'Other'
                   );   
           $query->values($record);    
         }

@@ -99,7 +99,7 @@ class CRM_Booking_BAO_Slot{
       return $results;
     }
 
-    static function getSlots($startDate = null, $endDate = null, $activityType = 0, $status = 1){  
+    static function getSlots($startDate = null, $endDate = null, $status = 1, $activityType = null){  
       $query = "SELECT civi_booking_slot.id as id,
                con1.display_name as display_name,
                con2.display_name as attended_clinician_name,
@@ -129,6 +129,8 @@ class CRM_Booking_BAO_Slot{
       }  
       if(isset($activityType) && $activityType != 0){
         $query .= "\n AND civi_booking_slot.activity_type = %3";
+      }else $activityType == 0){
+        $query .= "\n AND civi_booking_slot.activity_type <> 0";
       }
       $params = array(
         1 => array( $startDate, 'String'),
@@ -284,7 +286,7 @@ WHERE id = %2
         $endDate = end($daysOfWeek);
         $args = array();
         require_once 'CRM/Booking/BAO/Slot.php';
-        $slots = CRM_Booking_BAO_Slot::getSlots(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate), 0, 0);
+        $slots = CRM_Booking_BAO_Slot::getSlots(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate),0);
         $uncreatableList = array();
         $values = array();
 
