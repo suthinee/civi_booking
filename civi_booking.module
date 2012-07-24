@@ -560,13 +560,13 @@ function civi_booking_menu() {
   $items['slots/get'] = array(
      'page callback' => '_get_available_slots',
      'page arguments' => array(1,2),
-     'access arguments' => array('access content'),
+     'access arguments' => array('import contacts'),
   );
 
   $items['corn-test'] = array(
     'title' => 'Corn Test', 
     'page callback' => 'automate_generate_regular_session', 
-    'access arguments' => array('access content'),
+    'access arguments' => array('import contacts'),
    
   );
   
