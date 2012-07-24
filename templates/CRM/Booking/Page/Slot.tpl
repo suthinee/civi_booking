@@ -284,6 +284,7 @@
   		 return val; 
     }, "Counsellor 2 must not be same as Counsellor 1");
     
+    /*
     cj.validator.addMethod("hasPaticipant", function(value, element) {
     	var type = cj('input[name="slotType"]:checked').val();
     	console.log(type);
@@ -298,7 +299,7 @@
 	    	return has;
     	}
   		//return cj('#ulParticipants').has('li')?true:false; 
-    }, "At leat one participant required"); 
+    }, "At leat one participant required"); */
 
     var validator = cj("#dialogForm").validate({
        	  rules: {
@@ -310,8 +311,8 @@
 				activitySelect: {"required": "#cCheck:checked"},
 				counsellor: {"required": "#cCheck:checked"},
 				sessionSelect: {"required": "#cCheck:checked"},
-				counsellor2: "notEqaulTo",
-				contacts: "hasPaticipant"	  
+				counsellor2: "notEqaulTo"/*,
+				contacts: "hasPaticipant"*/	  
 		 	},
 		 	onfocusout: false 
 		});

@@ -136,7 +136,7 @@ class CRM_Booking_Form_Room extends CRM_Core_Form {
                                             'name'      => 'Save', 
                                             'spacing'   => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;', 
                                             'isDefault' => true   )
-                                            )
+                                            
                                      ));
         $this->addFormRule( array( 'CRM_Booking_Form_Room', 'formRule' ), $this );
  
