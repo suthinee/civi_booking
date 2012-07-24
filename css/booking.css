@@ -455,7 +455,8 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#c4d561', end
 }
 
 .other{
-	background-color: #262626;   
+	/*background-color: #262626; */
+	background: url("../img/stripe.bg.red.png");  
 }
 
 .user-minus{
