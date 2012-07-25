@@ -615,6 +615,7 @@ if(isset($action) && $action == 'get'){
   while ( $dao->fetch( ) ) {
       $daoArr = $dao->toArray();
       $id = $daoArr['id'];
+      //$results['mark'][] = $id;
       $results['results'][$id]['slot_id'] = $id; 
       $results['results'][$id]['slot_date'] = date('d/m/Y', strtotime($daoArr['slot_date']));
       $results['results'][$id]['slot_day'] = date('l', strtotime($daoArr['slot_date']));; 
@@ -624,6 +625,11 @@ if(isset($action) && $action == 'get'){
 
   }
 }
+
+//$arWrapper = array();        
+//$arWrapper['k'] = array_keys($results); 
+//$arWrapper['v'] = array_values($results); 
+//$json = json_encode($arWrapper); 
 echo json_encode ($results);
 
 }
