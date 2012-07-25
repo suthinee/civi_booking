@@ -66,7 +66,7 @@
 					{/foreach}	
 				</select>
 			</td>
-			<!--
+			<!-- for room filter nee modifie -->
 			<td>
 				<label for="roomFilter">Room: </label>
 				<select id="roomFilter" name="roomFilter">
@@ -76,7 +76,28 @@
 					{/foreach}	
 				</select>
 			</td>
-			-->
+			<!-- for floor filter -->
+			<td>
+				<label for="floorFilter">Floor: </label>
+				<select id="floorFilter" name="floorFilter">
+				    <option value="all">-- All Floor --</option>
+				 	{foreach from=$floors key=k item=floors}
+						<option value="{$floors.floor}">{$floors.floor}</option>
+					{/foreach}	
+				</select>
+			</td>
+			<!-- for centre filter -->
+			<td>
+				<label for="centreFilter">Centre: </label>
+				<select id="centreFilter" name="centreFilter">
+				    <option value="all">-- All centre --</option>
+				    <option value="AL"> Artillery Lane </option>
+				    <option value="WS"> Warren Street </option>
+				 	<!-- {foreach from=$rooms key=k item=c}
+						<option value="{$c.room_centre}">{$c.room_centre}</option>
+					{/foreach}	-->
+				</select>
+			</td>
 		</tr>
 
 	</table>
@@ -98,11 +119,15 @@
 				{/if}
 			{/foreach}				
 		</tr>
+
 			{foreach from=$day.rooms key=roomKey item=room}
 				<tr class="slots">
-					<td class="resourcename {$room.room_id}">{$room.room_no}, {$room.room_centre} </td>
+					<td class="resourcename {$room.room_id}">
+						<span class="roomText">{$room.room_no}</span>,
+						<span class="floorText">{$room.room_floor}</span>,
+						<span class="centreText"> {$room.room_centre}</span> </td>
 					{foreach from=$room.tdVals key=key item=value}
-		        	<td id="{$value.tdataId}" colspan="1" class="slot {$value.className}" title="{$value.title}">
+		        	<td id="{$value.tdataId}" colspan="1" class="slot {$value.className}" slotId="{$value.slotId}">
 						{$value.text}	        
 						<div style="display:none">
 			        	<div style="display:none">
@@ -236,17 +261,18 @@
 
 	cj(window).load(function(){
 
-		cj('#generalGroup').hide();
+	cj('#generalGroup').hide();
 
 		cj("#roomFilter").change(function(event) {
-			var room = cj('select[name="roomFilter"]').val(); 
+			var room_no = cj('select[name="roomFilter"]').val(); 
     	  cj('tbody tr td.resourcename').each(function() { 
-    	    	if(room != cj(this).text()){
-    	    		cj(this).parent().hide();    	    	
-    	    	}else{
-    	    		cj(this).parent().show();
+    	  		var r = cj(this).find('span.roomText').text();
+    	  		if (room_no != r) {
+					cj(this).parent().hide(); 
+				}else{
+    	    		cj(this).parent().show();    	    	
     	    	}
-    	    	if(room.localeCompare('all') == 0){
+    	    	if(room_no.localeCompare('all') == 0){
     	    		cj(this).parent().show();
     	    	}
 
@@ -265,6 +291,36 @@
     	    		cj(this).show();
     	    	}    	    	
 
+  			});
+		});
+
+		cj("#floorFilter").change(function(event) {
+			var floor = cj('select[name="floorFilter"]').val(); 
+			cj('tbody tr td.resourcename').each(function() { 
+    	    	var f = cj(this).find('span.floorText').text();
+    	    	if(floor != f){
+    	    		cj(this).parent().hide();    	    	
+    	    	}else{
+    	    		cj(this).parent().show();    	    	
+    	    	}
+    	    	if(floor.localeCompare('all') == 0){
+    	    		cj(this).parent().show();
+    	    	}   
+  			});
+		});
+
+		cj("#centreFilter").change(function(event) {
+			var centre = cj.trim(cj('select[name="centreFilter"]').val()); 
+			cj('tbody tr td.resourcename').each(function() { 
+    	    	var c = cj.trim(cj(this).find('span.centreText').text());
+    	    	if(centre != c){
+    	    		cj(this).parent().hide();    	    	
+    	    	}else{
+    	    		cj(this).parent().show();    	    	
+    	    	}
+    	    	if(centre.localeCompare('all') == 0){
+    	    		cj(this).parent().show();
+    	    	}   
   			});
 		});
 
@@ -372,7 +428,7 @@
 		cj(this).parent().remove();
 	});
 	
-
+    // added slot id *****
 	cj("td.slot").live('click', function(){
 			if(cj(this).hasClass('reservable')){
 	        	startTime = cj(this).find('span.time').text();
@@ -381,9 +437,11 @@
 	        	roomNo = cj(this).find('span.roomNo').text();
 	        	defaultEndtime = cj(this).find('span.defaultEndtime').text();
 	        	roomId = cj(this).find('span.roomId').text();
+	        	slotId = cj(this).find('span.slotId').text(); //slot id show type name ********
 
 	        	cj('#dateHolder').text(date);
 	        	cj('#roomNo').text(roomNo);
+	        	cj('#slotId').text(slotId); // just added 24/07/2012 ********
 	        	cj('#hiddenRoomId').text(roomId);
 				cj('#startSelect option[value=' +startTime+ ']').attr('selected', 'selected');
 				cj('#endSelect option[value=' +defaultEndtime+ ']').attr('selected', 'selected');
@@ -402,7 +460,7 @@
 					cj('#generalGroup').hide();
 					cj('#counsellingGroup').show();	
 					//Removed disable attribute
-             		cj('#startSelect').removeAttr('disabled');
+             		cj('#startSelect').removeAttr('disabled');''
              		cj('#endSelect').removeAttr('disabled');
              		cj('#activitySelect').removeAttr('disabled');
              		cj('#sessionSelect').removeAttr('disabled');
@@ -416,7 +474,8 @@
 					    			var startTime = cj('select[name="startSelect"]').val(); 
 							        var endTime = cj('select[name="endSelect"]').val(); 
 							        var description = cj('#description').val();		
-							    	var roomId = jQuery.trim(cj('#hiddenRoomId').text());  
+							    	var roomId = jQuery.trim(cj('#hiddenRoomId').text());
+							    	var slotId = jQuery.trim(cj('#slotId').text()); // slotId just added 24/07  
 							      
 					    			var type = cj('input[name="slotType"]:checked').val();
 					    			if(type == 1){
@@ -670,13 +729,13 @@
 							    		var description = cj('#description').val();	
 							    		var roomId = cj('#dummyRoomId').val();
 							    		var date =  cj('#viewSlotDate').text(); 			
-							    		var slotId = jQuery.trim(cj('#viewSlotId').text());	
+							    		var slotId = jQuery.trim(cj('#viewSlotId').text());	//**********************24/07
 
 						    	    cj().crmAPI ('slot','update',{'version' :'3', 
 						    	    							  'sequential' :'1',
 						    	    							  'slot_id' : slotId,
 						    	    							  'contact_id' : contactId, 
-			  			    	    							'contact_id_2' : contactId2, 
+			  			    	    							  'contact_id_2' : contactId2, 
 						    	    							  'date' : date, 
 						    	    							  'start_time' : startTime, 
 						    	    							  'end_time' : endTime, 

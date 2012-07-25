@@ -4,9 +4,9 @@ class CRM_Booking_BAO_Room{
      /**
      * class constructor
      */
-    function __construct( ) {
+    function __construct( ) {}
 
-    }
+    
 
       /* edit mode Nee*/
     static function getRoomById($roomId, $status = 1){
@@ -59,11 +59,28 @@ class CRM_Booking_BAO_Room{
 
     }
 
+    
+    static function getFloors() {
+     
 
-    static function getRoomByNo($roomNo){
+      $query = "SELECT  DISTINCT floor     
+      FROM civi_booking_room";
+      
+      require_once('CRM/Core/DAO.php'); 
+        $dao = CRM_Core_DAO::executeQuery( $query, $params);
+        $results = array ();
+        while ( $dao->fetch( ) ) {
+          $results[] = $dao->toArray();          
+        }
+        return $results;
+    }
+
+
+    static function getRoomByNo ($isActive = 1){
         $params = array( 1 => array( $roomNo, 'String'));
 
-        $query = "SELECT id, room_no, floor
+        $query = "SELECT id, 
+        room_no, floor
             FROM civi_booking_room
             WHERE room_no = %1
             AND is_active = 1";  
@@ -80,5 +97,3 @@ class CRM_Booking_BAO_Room{
 
 
 }
-     
-        

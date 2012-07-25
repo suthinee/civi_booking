@@ -25,7 +25,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         require_once 'CRM/Booking/Utils/DateTime.php';
 
         $sd = CRM_Utils_Request::retrieve( 'sd', 'Positive', $this );
-        if (date('Y-m-d H:i:s', strtotime($sd)) == $sd) {
+        if (date('Y-m-d H:i:s', strtotime($sd)) == $sd) { /*if (date('Y-m-d H:i:s', strtotime($sd)) == $sd) */
           $sd = null;
         }
         $daysOfNextweek = CRM_Booking_Utils_DateTime::getWeeklyCalendar();
@@ -37,7 +37,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         $startDate = array_shift(array_values($daysOfNextweek));
         $endDate = end($daysOfNextweek);
 
-        $slots = CRM_Booking_BAO_Slot::getSlots(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate), 0, 0);
+        $slots = CRM_Booking_BAO_Slot::getSlots(date('Y-m-d H:i:s', $startDate) ,date('Y-m-d H:i:s', $endDate), 0, 0); 
         $classNames = array();
         //convert slot to use strtotime 
         foreach($slots as $k => $slot){
@@ -52,9 +52,9 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                $classNames[$generated]['slotId'] = $slot['id']; 
 
                if($slot['attended_clinician_name'] == null){
-                $classNames[$generated]['tooltip'] = $slot['display_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'] . ', ' . $slot['session_service'];
+                $classNames[$generated]['tooltip'] = $slot['display_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'] . ', ' . $slot['session_service'].', ' . $slot['id']; // added $slot[id] 24/07
                }else{
-                $classNames[$generated]['tooltip'] = $slot['display_name'] . ' and ' . $slot['attended_clinician_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'] . ', ' . $slot['session_service'];;
+                $classNames[$generated]['tooltip'] = $slot['display_name'] . ' and ' . $slot['attended_clinician_name'] . ', ' . $slot['start_time'] . ' - ' . $slot['end_time'] . ', ' . $slot['session_service'].', ' . $slot['id'];// added $slot[id] 24/07
                }          
                if ($key == $lastKey) {
                   $classNames[$generated]['lastKey'] = true;
@@ -138,7 +138,9 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                          switch ($type) {
                           case 50:
                             $class = $status == 1 ?  'initial-assessment' : 'initial-assessment booked';
-                            break;
+                            break;          $roomResults = CRM_Booking_BAO_Room::getRooms();
+      $roomResults = CRM_Booking_BAO_Room::getRooms();
+
                           case 51:
                             $class = $status == 1 ? 'supplementary-assessment' :  'supplementary-assessment booked';
                             break;
@@ -149,7 +151,8 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                         $class = 'other';
                        }
 
-                       if($type == 50){
+                       if($type == 50)   {
+
                         switch ($service) {
                           case 'Counselling':
                                 $class = $status == 1 ?  'initial-assessment-counselling' :  'initial-assessment-counselling slot-booked'; 
@@ -195,13 +198,13 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
                           case 'DSU':
                                $class = $status == 1 ?  'supplementary-assessment-dsu' :  'supplementary-assessment-dsu slot-booked'; 
                                break;
-                          default: $class = $status == 1 ?  'supplementary-assessment-unknown' :  'supplementary-assessment-unknown slot-booked'; 
+                          default: $class = $status == 1 ?  'supplementary-assessment-unknown' :  'supplementary-assessment-unknown slot-booked';
 
                         }  
                        }
                        
                        if($type == 52){
-                       switch ($service) {
+                       switch ($service)  {
                           case 'Counselling':
                                 $class = $status == 1 ?  'regularsession-counselling' :  'regularsession-counselling slot-booked'; 
                               
@@ -340,6 +343,11 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         ); 
 
         $this->assign('sessionServices', $sessionServices);
+
+        // Floor filter
+        $floors = CRM_Booking_BAO_Room::getFloors();
+
+        $this->assign('floors', $floors);
 
       
         return parent::run();
