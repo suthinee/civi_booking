@@ -6,7 +6,7 @@
 	</div>
 	<div class="schedule_dates">
 		<a href="{$lastWeekUrl}" ><span class="arrow-left">&nbsp;&nbsp;&nbsp;</span></a>
-		 {$startDate} - {$endDate}<a href="{$nextWeekUrl}"><span class="arrow-right">&nbsp;&nbsp;&nbsp;</span></a>
+		 {$startDate} - {$endDate}<a href="{$nextWeekUrl}"><span class="arrow-right">&nbsp;&nbsp;&nbsp;&nbsp</span></a>
 		 <div style="text-align:right"></div>
 	</div>
 </div>

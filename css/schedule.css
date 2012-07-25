@@ -9,7 +9,7 @@ table.reservations {
 table.reservations td {
 	/* border: solid #36648B 1px; */
 	height: 35px;
-	vertical-align: middle !important;
+	/*vertical-align: middle !important;*/
 
 }
 
@@ -201,7 +201,7 @@ td.resourcename.hilite {
 }
 
 div.legend {
-    line-height: 25px;
+    line-height: 23px;
     /* width: 100px; */
     padding-left: 10px; 
 	padding-right:10px;
@@ -209,7 +209,7 @@ div.legend {
     text-align: center;
     display: inline-block;
     *display: inline;
-    margin: 0px 2px;
+    margin: 0px 1px;
 }
 
 
