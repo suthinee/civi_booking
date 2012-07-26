@@ -568,7 +568,6 @@ function civicrm_api3_slot_get( $params ){
                   }
               }
               $conts[$contactId]['tdVals'] = $tdVals;
-              dump($conts[$contactId]);
             }
             $days[$k]['contacts'] = $conts;
         } 
