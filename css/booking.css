@@ -556,11 +556,14 @@ background: url(../img/down_arrow.gif) no-repeat 0% 40% !important;
 cursor: pointer !important;
  
  }
-    .centrefilter {
-        width: 40px;
-        display: inline;
-        padding-left: 10px;
-        padding-right: 10px;
+ .centrefilter {
+     width: 40px;
+     display: inline;
+     padding-left: 10px;
+    padding-right: 10px;
+}
+ 
+
  
 /*////////////////////////////////// */
 /* Modify webform by koobitor */
@@ -590,6 +593,7 @@ cursor: pointer !important;
 .node-type-webform #webform-component-seleted-slot-id ul.right {
 	width: 400px;
 	float: right;
+	padding-top: 42px;
 }
 .node-type-webform #edit-actions {
 	width: 100%;
@@ -645,13 +649,38 @@ cursor: pointer !important;
 	display: none;
 }
 #webform-component-corn-check {
-	display:none;
+	display: none;
 }
 #webform-component-civicrm-1-contact-1-fieldset-fieldset--civicrm-1-case-1-case-subject{
-	display:none;
+	display: none;
 }
-
-
-
-
-
+#webform-component-ms {
+	display: none;
+}
+.node-type-webform #webform-component-seleted-slot-id .change-week {
+	height: 35px;
+}
+.node-type-webform #webform-component-seleted-slot-id .change-week span.pre {
+	float: left;
+}
+.node-type-webform #webform-component-seleted-slot-id .change-week span.show {
+	width: 90%;
+	float: left;
+	padding-top: 8px;
+	text-align: center;
+}
+.node-type-webform #webform-component-seleted-slot-id .change-week span.next {
+	float: left;
+}
+.node-type-webform #webform-component-seleted-slot-id ul li.item.unable {
+	background: #CC66FF;
+	padding: 5px;
+	width: 306px;
+	height: 20px;
+	text-align: center;
+	/*color: white;*/
+	margin-bottom: 10px;
+}
+.node-type-webform #webform-component-seleted-slot-id ul li.head {
+	font-weight: bold;
+}

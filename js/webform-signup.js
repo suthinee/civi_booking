@@ -1,16 +1,21 @@
+var unable = false;
 function createForm(ms){
 	clearSlot();
 	jQuery(".loading").show();
 	var basePath = Drupal.settings.basePath;
 	var url = basePath + "slots/get";
 	var now = new Date();
-	if(ms != undefined) url += "/" + ms;
+	if(ms != undefined){ 
+		url += "/" + ms;
+		jQuery("#webform-component-ms input").val(ms);
+	}
 	var component = jQuery('#webform-component-seleted-slot-id');
 	component.append("<div class='slot'></div>");
 	component = jQuery('#webform-component-seleted-slot-id .slot');
 	jQuery.getJSON(url, function(data){
 		if(data.is_error == 0){
 			var slots = data.results;
+			var mark_data = data.mark; 
 			var start = new Date((data.lastWeek+604800)*1000);//1209600
 			var end = new Date((data.nextWeek-86400)*1000);
 			var show = "Monday " + (start.getUTCDate() +1) + " " + start.getMonthName() + " - " + " Saturday " + end.getUTCDate() + " " + end.getMonthName() + " " + end.getUTCFullYear();
@@ -23,7 +28,9 @@ function createForm(ms){
 			var mark = false;
 			var markLeft = false;
 			var markRight = false;
+			var i = 0;
 			for(var slotId in slots){
+				slotId = data.mark[i];
 				mark = true;
 				if(slots[slotId].slot_day == "Monday" || slots[slotId].slot_day == "Wednesday" || slots[slotId].slot_day == "Friday"){
 					markLeft = true;
@@ -83,6 +90,7 @@ function createForm(ms){
 					tempRight += "</li>";
 					jQuery("ul.right",component).append(tempRight);
 				}
+				i++;
 			}
 			if(jQuery("#edit-submitted-seleted-slot-id").val() != ''){
 				jQuery(".item input[name=group]").each(function(key,item){
@@ -109,29 +117,41 @@ function createForm(ms){
 			}
 			if(ms != undefined){
 				if((ms*1000) >= now.getTime()){
-					jQuery("ul.group.left",component).append('<li class="item">Unable to find a slot? Join waiting list <input id="unable-callback" type="checkbox" onclick="setUnableSlot1(0);" /></li>');
+					jQuery("ul.group.left",component).append('<li class="item unable">Unable to find a slot? Join waiting list <input class="unable-callback" type="checkbox" name="unable" onclick="setUnableSlot1(0);" /></li>');
+					jQuery("ul.group.left",component).prepend('<li class="item unable">Unable to find a slot? Join waiting list <input class="unable-callback" type="checkbox" name="unable" onclick="setUnableSlot1(0);" /></li>');
 				}else{
-					jQuery("ul.group.left",component).append('<li class="item">Unable to find a slot? Join waiting list <input id="unable-callback" type="checkbox" onclick="setUnableSlot(0);" /></li>');
+					jQuery("ul.group.left",component).append('<li class="item unable">Unable to find a slot? Join waiting list <input class="unable-callback" type="checkbox" name="unable" onclick="setUnableSlot(0);" /></li>');
+					jQuery("ul.group.left",component).prepend('<li class="item unable">Unable to find a slot? Join waiting list <input class="unable-callback" type="checkbox" name="unable" onclick="setUnableSlot1(0);" /></li>');
 				}
 			} else{
-				jQuery("ul.group.left",component).append('<li class="item">Unable to find a slot? Join waiting list <input id="unable-callback" type="checkbox" onclick="setUnableSlot1(0);" /></li>');
+				jQuery("ul.group.left",component).append('<li class="item unable">Unable to find a slot? Join waiting list <input class="unable-callback" type="checkbox" name="unable" onclick="setUnableSlot1(0);" /></li>');
+				jQuery("ul.group.left",component).prepend('<li class="item unable">Unable to find a slot? Join waiting list <input class="unable-callback" type="checkbox" name="unable" onclick="setUnableSlot1(0);" /></li>');
 			}
 		}
 	});
 }
 
 function setUnableSlot(value){
-	if(!jQuery("#unable-callback").is(':checked')){
+	if(unable == true){
+		unable = false;
+		jQuery(".unable-callback").attr("checked","");
 		jQuery("#edit-submitted-seleted-slot-id").val('');
 	}else{
+		unable = true;
+		jQuery(".unable-callback").attr("checked","checked");
 		jQuery("#edit-submitted-seleted-slot-id").val(value);
 	}
 }
 function setUnableSlot1(value){
-	if(!jQuery("#unable-callback").is(':checked')){
+	if(unable == true){
+		unable = false;
+		jQuery(".unable-callback").attr("checked","");
 		jQuery("#edit-submitted-seleted-slot-id").val('');
 		jQuery(".item div.nobook input[type=radio]").attr("disabled","");
+		jQuery(".item div.nobook input[type=radio]").attr("checked","");
 	}else{
+		unable = true;
+		jQuery(".unable-callback").attr("checked","checked");
 		jQuery("#edit-submitted-seleted-slot-id").val(value);
 		jQuery(".item div.nobook input[type=radio]").attr("disabled","disabled");
 	}
@@ -162,7 +182,11 @@ function bindRadio(){
 
 (function ($) {
 	$(document).ready(function () { 
-		createForm();
+		var ms;
+		if($("#webform-component-ms input").val()){
+			ms = $("#webform-component-ms input").val();
+		}
+		createForm(ms);
 		$("#webform-component-civicrm-1-case-1-cg6-custom-9").append("<div class='loading'></div>");
 	});
 })(jQuery);
