@@ -59,7 +59,7 @@
 		<tr>
 			<td>
 				<label for="dateFilter">Date: </label>
-				<select id="dateFilter" name="dateFilter">
+				<select class="dateFilter" name="dateFilter">
 				    <option value="all">-- All dates --</option>
 					{foreach from=$slots key=k item=day}
 						<option value="{$k}">{$day.date}</option>
@@ -88,7 +88,8 @@
 			</td>
 			<!-- for centre filter -->
 			<td>
-				<label for="centreFilter">Centre: </label>
+				<!--<label for="centreFilter">Centre: </label>-->
+				<span class="centreFilter">Centre:</span>
 				<select id="centreFilter" name="centreFilter">
 				    <option value="all">-- All centre --</option>
 				    <option value="AL"> Artillery Lane </option>

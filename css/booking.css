@@ -17,6 +17,30 @@
 	font-size: 1em;
 }
 
+
+td.resourcename {
+   /* background-color: #EDEDED;*/
+    color: #3E3535;
+    padding: 1px 2px;
+background: #ffffff; /* Old browsers */
+background: -moz-linear-gradient(top,  #ffffff 0%, #f3f3f3 32%, #e5e5e5 53%, #f7f7f7 100%); /* FF3.6+ */
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ffffff), color-stop(32%,#f3f3f3), color-stop(53%,#e5e5e5), color-stop(100%,#f7f7f7)); /* Chrome,Safari4+ */
+background: -webkit-linear-gradient(top,  #ffffff 0%,#f3f3f3 32%,#e5e5e5 53%,#f7f7f7 100%); /* Chrome10+,Safari5.1+ */
+background: -o-linear-gradient(top,  #ffffff 0%,#f3f3f3 32%,#e5e5e5 53%,#f7f7f7 100%); /* Opera 11.10+ */
+background: -ms-linear-gradient(top,  #ffffff 0%,#f3f3f3 32%,#e5e5e5 53%,#f7f7f7 100%); /* IE10+ */
+background: linear-gradient(to bottom,  #ffffff 0%,#f3f3f3 32%,#e5e5e5 53%,#f7f7f7 100%); /* W3C */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#f7f7f7',GradientType=0 ); /* IE6-9 */
+font-weight:bold;
+
+
+}
+
+.groupText{
+	padding-left:3px;
+	padding-right:3px;
+    font-size: 9px !important;
+}
+
 .reslabel{
   /*
   -moz-transform: rotate(270deg);
@@ -32,7 +56,9 @@
 .page-civicrm-booking-create-slots table {
 	border: solid #36648B 1px !important;
 }
-
+.groupText {
+	colour :red;
+}
 td.resourcename,
 td.resdate {
 	border: solid #36648B 1px;
@@ -530,6 +556,11 @@ background: url(../img/down_arrow.gif) no-repeat 0% 40% !important;
 cursor: pointer !important;
  
  }
+    .centrefilter {
+        width: 40px;
+        display: inline;
+        padding-left: 10px;
+        padding-right: 10px;
  
 /*////////////////////////////////// */
 /* Modify webform by koobitor */
@@ -619,7 +650,6 @@ cursor: pointer !important;
 #webform-component-civicrm-1-contact-1-fieldset-fieldset--civicrm-1-case-1-case-subject{
 	display:none;
 }
-
 
 
 

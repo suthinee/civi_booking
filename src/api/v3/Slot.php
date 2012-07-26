@@ -450,14 +450,18 @@ function civicrm_api3_slot_get( $params ){
                           'sequential' =>'1', 
                           'contact_type' =>'Individual',
                           'contact_sub_type' => 'Clinician', 
-                          'rowCount' =>'0'));
+                          'rowCount' =>'0',
+                          'return:group_id'));
 
+  
       $contacts = array();
       foreach($results['values'] as $contact){
         $id = CRM_Utils_Array::value('contact_id',$contact);   
-        $contacts[$id]['contact_id'] = CRM_Utils_Array::value('id',$contact); 
+        $contactId = CRM_Utils_Array::value('id',$contact); 
+        $contacts[$id]['contact_id'] = $contactId;
         $contacts[$id]['display_name'] = CRM_Utils_Array::value('display_name',$contact);    
-        $contacts[$id]['sort_name'] = CRM_Utils_Array::value('sort_name',$contact);    
+        $contacts[$id]['sort_name'] = CRM_Utils_Array::value('sort_name',$contact); 
+   
       } 
         $days = array();
         $conts = array();
@@ -468,10 +472,14 @@ function civicrm_api3_slot_get( $params ){
 
             foreach($contacts as $contact){
                 $contactId = CRM_Utils_Array::value('contact_id',$contact);           
-                $display_name =  CRM_Utils_Array::value('display_name',$contact);    
+                $display_name =  CRM_Utils_Array::value('display_name',$contact);
+                $groupContact =civicrm_api("GroupContact","get", array ('version'=>'3','sequential' =>'1', 'contact_id' => $contactId));
+
+     
                 $conts[$contactId] = array('display_name' => $display_name,
                                         'sort_name' => CRM_Utils_Array::value('sort_name',$contact),
-                                        'contact_id' => CRM_Utils_Array::value('contact_id',$contact)
+                                        'contact_id' => CRM_Utils_Array::value('contact_id',$contact),
+                                        'groups' => CRM_Utils_Array::value('values',$groupContact), 
                                         );  
                 $tdVals = array();
                 foreach($timeOptions as $timeKey => $time){
