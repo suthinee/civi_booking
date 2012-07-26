@@ -599,7 +599,7 @@ function _civicrm_api3_slot_update_spec(&$params){
   $params['date']['api.required'] =1;
   $params['start_time']['api.required'] =1;
   $params['end_time']['api.required'] =1;
-  $params['type']['api.required']=1;
+  /*$params['type']['api.required']=1;*/
   /*
   $params['contact_id']['api.required'] =1;
   $params['activity_type']['api.required'] =1;
