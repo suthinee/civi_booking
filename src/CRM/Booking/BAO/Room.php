@@ -67,7 +67,7 @@ class CRM_Booking_BAO_Room{
       FROM civi_booking_room";
       
       require_once('CRM/Core/DAO.php'); 
-        $dao = CRM_Core_DAO::executeQuery( $query, $params);
+        $dao = CRM_Core_DAO::executeQuery( $query);
         $results = array ();
         while ( $dao->fetch( ) ) {
           $results[] = $dao->toArray();          

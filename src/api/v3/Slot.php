@@ -415,8 +415,7 @@ function civicrm_api3_slot_get( $params ){
       $slotContacts = array();
         //convert slot to use strtotime 
       foreach($slots as $k => $slot){
-          $slotContacts[$k]['date'] =  strtotime($slot['slot_date']);
-          $slotContacts[$k]['id'] = $slot['clinician_contact_id'];
+          $slotContacts[] = strtotime($slot['slot_date']) . $slot['clinician_contact_id'];
           $timeRange = CRM_Booking_Utils_DateTime::createTimeRange($slot['start_time'], $slot['end_time'], '5 mins');
           //$timeOptions = array();
           foreach ($timeRange as $key => $time) { 
@@ -437,6 +436,7 @@ function civicrm_api3_slot_get( $params ){
           }
       }
 
+
       $timeRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '5 mins');
       $timeDisplayRange = CRM_Booking_Utils_DateTime::createTimeRange('8:30', '20:30', '30 mins'); //for screen to display
       $timeOptions = array();
@@ -455,8 +455,9 @@ function civicrm_api3_slot_get( $params ){
                           'contact_sub_type' => 'Clinician', 
                           'rowCount' =>'0',
                           'return:group_id')); */
-    $params = array( 1 => array( $activityType, 'Integer'));
-
+    $params = array( 1 => array( $activityType, 'Integer'),
+                     2 => array( date('Y-m-d H:i:s', $startDate), 'String'),
+                     3 => array( date('Y-m-d H:i:s', $endDate), 'String'));
 
       $query = "
           SELECT c.* 
@@ -466,6 +467,7 @@ function civicrm_api3_slot_get( $params ){
           WHERE ci.status_13 = 'active' 
           AND c.contact_sub_type = 'Clinician'
           AND s.activity_type = %1
+          AND s.slot_date BETWEEN %2AND %3
           GROUP BY c.id";
 
         require_once('CRM/Core/DAO.php');   
@@ -491,13 +493,25 @@ function civicrm_api3_slot_get( $params ){
                                  'date' => date('l d/m/Y', $day),
                                  'timeOptions' => $timeOptions);
 
+            //dump($day);
             foreach($contacts as $contact){
-                $contactId = CRM_Utils_Array::value('contact_id',$contact);     
-                //in_array(,$slotContacts     
+                $contactId = CRM_Utils_Array::value('contact_id',$contact);  
+                //dump(in_array($day . $contactId, $slotContacts));  
+                //$proceed = in_array($day . $contactId, $slotContacts);
+                //if(!$proceed){
+                //  continue;
+                //}
+
+                /*
+                if(in_array($day . $contactId, $slotContacts)){
+                  continue;
+                }*/
+                //dump($contact);
+
                 $display_name =  CRM_Utils_Array::value('display_name',$contact);
                 $groupContact =civicrm_api("GroupContact","get", array ('version'=>'3','sequential' =>'1', 'contact_id' => $contactId));
 
-     
+
                 $conts[$contactId] = array('display_name' => $display_name,
                                         'sort_name' => CRM_Utils_Array::value('sort_name',$contact),
                                         'contact_id' => CRM_Utils_Array::value('contact_id',$contact),
@@ -554,9 +568,11 @@ function civicrm_api3_slot_get( $params ){
                   }
               }
               $conts[$contactId]['tdVals'] = $tdVals;
+              dump($conts[$contactId]);
             }
             $days[$k]['contacts'] = $conts;
         } 
+
 
       $return['sd'] = $sd;
       $return['is_error'] = 0;

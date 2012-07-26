@@ -295,8 +295,8 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
 
 
 
-        //require_once 'api/api.php';
-        //$results = civicrm_api("Contact", "get", array ('version' => '3','sequential' =>'1', 'contact_type' =>'Individual', 'contact_sub_type' => 'Clinician' , 'rowCount' =>'0', 'group_id' => '27'));
+       // require_once 'api/api.php';
+       // $results = civicrm_api("Contact", "get", array ('version' => '3','sequential' =>'1', 'contact_type' =>'Individual', 'contact_sub_type' => 'Clinician' , 'rowCount' =>'0', 'group_id' => '27'));
        // dump($results);
         $query = "
           SELECT c.* 
@@ -312,7 +312,7 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
         while ( $dao->fetch( ) ) {
             $results[] = $dao->toArray();   
          } 
-                      
+                     
         $contacts = array();
         foreach($results as $contact){
             //$id = CRM_Utils_Array::value('contact_id',$contact);  
