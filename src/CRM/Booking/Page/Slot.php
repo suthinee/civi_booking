@@ -295,15 +295,33 @@ class CRM_Booking_Page_Slot extends CRM_Core_Page{
 
 
 
-        require_once 'api/api.php';
-        $results = civicrm_api("Contact", "get", array ('version' => '3','sequential' =>'1', 'contact_type' =>'Individual', 'contact_sub_type' => 'Clinician' , 'rowCount' =>'0'));
+        //require_once 'api/api.php';
+        //$results = civicrm_api("Contact", "get", array ('version' => '3','sequential' =>'1', 'contact_type' =>'Individual', 'contact_sub_type' => 'Clinician' , 'rowCount' =>'0', 'group_id' => '27'));
+       // dump($results);
+        $query = "
+          SELECT c.* 
+          FROM civicrm_contact c
+          LEFT JOIN civicrm_value_clinician_infomation_5 ci ON ci.entity_id = c.id 
+          WHERE ci.status_13 = 'active' 
+          AND c.contact_sub_type = 'Clinician'
+          GROUP BY c.id";
+
+        require_once('CRM/Core/DAO.php');   
+        $dao = CRM_Core_DAO::executeQuery( $query);
+        $results = array ();
+        while ( $dao->fetch( ) ) {
+            $results[] = $dao->toArray();   
+         } 
                       
         $contacts = array();
-        foreach($results['values'] as $contact){
-            $id = CRM_Utils_Array::value('contact_id',$contact);  
-            //$contacts[$id]['contact_id'] = CRM_Utils_Array::value('id',$contact);   
+        foreach($results as $contact){
+            //$id = CRM_Utils_Array::value('contact_id',$contact);  
+            $id = CRM_Utils_Array::value('id',$contact);  
+
+            //$contacts[$id]['id']] = CRM_Utils_Array::value('id',$contact);   
             $contacts[$id] = CRM_Utils_Array::value('display_name',$contact);   
         } 
+    
 
         $this->assign('contacts', $contacts);
 
