@@ -48,7 +48,7 @@ function civicrm_api3_slot_update($params){
 
   $roomNo = $params['room_id']; 
   $date = $params['date'] . ' 00:00:00';  
-  $d = date_create_from_format('l d/F/Y H:i:s',$date);
+  $d = date_create_from_format('l d/m/Y H:i:s',$date);
 
   $startTime = $params['start_time']; 
   $endTime = $params['end_time']; 
