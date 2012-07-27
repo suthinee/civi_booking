@@ -540,7 +540,7 @@ function _default_slot_options(){
   return $options;
 }
 */
-function civi_booking_form_alter(&$form, &$form_state, $form_id){
+function civi_booking_form_alter(&$form, $form_state, $form_id){
     
     if(strstr($form_id, 'webform_client_form_1')){
       $form['#attached']['js'] = array(
